@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Yeny Gorden - High Contrast Print</title>
     
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Yeny Gorden">
     <link rel="apple-touch-icon" href="https://via.placeholder.com/192/3b82f6/ffffff?text=YG">
+    
+    <link rel="manifest" href='data:application/json,{"name":"Kalkulator Yeny Gorden","short_name":"YenyGorden","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#3b82f6","icons":[{"src":"https://via.placeholder.com/192/3b82f6/ffffff?text=YG","sizes":"192x192","type":"image/png"},{"src":"https://via.placeholder.com/512/3b82f6/ffffff?text=Yeny+Gorden","sizes":"512x512","type":"image/png"}]}'>
 
     <style>
         :root {
@@ -173,6 +175,7 @@
     </template>
 
     <script>
+        // DAFTAR HARGA & RUMUS TETAP SAMA
         const PR = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
         let allW = [];
 
@@ -192,6 +195,21 @@
             const saved = localStorage.getItem('y_logo_permanent');
             if(saved) document.getElementById('app-logo-print').src = saved;
             addWindow(); 
+
+            // REGISTER SERVICE WORKER UNTUK INSTALASI HOMESCREEN
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'yeny-v1';
+                    self.addEventListener('install', e => {
+                        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./'])));
+                    });
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+                    });
+                `;
+                const blob = new Blob([swCode], {type: 'text/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(blob));
+            }
         };
 
         function addWindow() { document.getElementById('window-container').appendChild(document.getElementById('win-tmp').content.cloneNode(true)); calculateAll(); }
@@ -298,7 +316,7 @@
                 const winEl = document.querySelectorAll('.window-item')[index];
                 let html = `<div class="item-box"><b>ITEM ${w.id}</b><br>`;
                 if(w.type === 'gorden') {
-                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${ Pan = w.spec.p} PANEL)`;
+                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${w.spec.p} PANEL)`;
                     if(winEl.querySelector('.sel-v-toggle').value === 'ya' && winEl.querySelector('.sel-vm').value === 'spiral') {
                         html += `<br>-- DETAIL VITRASE SPIRAL --<br>UKURAN VIT : ${winEl.querySelector('.in-vl').value} X ${winEl.querySelector('.in-vt').value} (QTY: ${winEl.querySelector('.in-vq').value})`;
                     }
@@ -316,15 +334,6 @@
             document.getElementById('modal-detail').style.display = "block";
         }
         function closeModal() { document.getElementById('modal-detail').style.display = "none"; }
-
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker terdaftar!', reg))
-                    .catch(err => console.log('Gagal daftar SW:', err));
-            });
-        }
     </script>
 </body>
 </html>
