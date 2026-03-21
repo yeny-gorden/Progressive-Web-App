@@ -4,12 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Yeny Gorden - High Contrast Print</title>
-    
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
-    <link rel="manifest" href='data:application/json,{"name":"Kalkulator Yeny Gorden","short_name":"YenyGorden","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#3b82f6","icons":[{"src":"https://via.placeholder.com/192/3b82f6/ffffff?text=YG","sizes":"192x192","type":"image/png"}]}'>
-
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
@@ -41,7 +36,15 @@
         .header-info p { margin: 2px 0; font-weight: 700; font-size: 16px; color: #000; }
         #modal-title { text-align: center; text-decoration: underline; font-size: 22px; font-weight: 900; margin-bottom: 20px; color: #000; }
         
-        .item-box { border: 3px solid #000; padding: 15px; margin-bottom: 12px; font-family: 'Arial Black', Gadget, sans-serif; font-size: 16px; line-height: 1.4; color: #000; }
+        .item-box { 
+            border: 3px solid #000; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            font-family: 'Arial Black', Gadget, sans-serif; 
+            font-size: 16px; 
+            line-height: 1.4; 
+            color: #000; 
+        }
         .item-box b { font-size: 18px; text-decoration: underline; }
         #p-total { font-size: 28px; font-weight: 900; color: #000; }
 
@@ -105,11 +108,14 @@
                     <p id="p-valid" style="color: #000; font-style: italic;"></p>
                 </div>
             </div>
+            
             <h3 id="modal-title"></h3>
             <div id="modal-list"></div>
+
             <div id="p-total-container" style="margin-top:20px; text-align:right; border-top:5px solid #000; padding-top:10px;">
                 <h3 id="p-total"></h3>
             </div>
+
             <div class="no-print" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:25px;">
                 <button onclick="window.print()" style="background:#000; color:#fff; padding:18px; border:none; font-weight:900; border-radius:8px;">CETAK / PDF</button>
                 <button onclick="closeModal()" style="background:var(--danger); color:white; padding:18px; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
@@ -180,14 +186,10 @@
             const saved = localStorage.getItem('y_logo_permanent');
             if(saved) document.getElementById('app-logo-print').src = saved;
             addWindow(); 
-
-            // DAFTARKAN SERVICE WORKER
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
-            }
         };
 
         function addWindow() { document.getElementById('window-container').appendChild(document.getElementById('win-tmp').content.cloneNode(true)); calculateAll(); }
+        
         function handleM(el) {
             const win = el.closest('.window-item');
             const isB = el.value === 'blinds';
@@ -196,6 +198,7 @@
             if(el.value === 'spiral' || isB) win.querySelector('.sel-v-toggle').value = 'tidak';
             togVit(win.querySelector('.sel-v-toggle')); calculateAll();
         }
+
         function togVit(el) { el.closest('.window-item').querySelector('.vit-sec').classList.toggle('hidden', el.value === 'tidak'); calculateAll(); }
         function handleVM(el) { el.closest('.vit-sec').querySelector('.v-spiral-input').classList.toggle('hidden', el.value !== 'spiral'); calculateAll(); }
 
@@ -226,6 +229,7 @@
                     const tK = (J === 'im') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
                     let cost = tK * hK;
                     details.push(`KAIN ${nK.toUpperCase()} (${tK.toFixed(2)}m): Rp ${Math.round(tK*hK).toLocaleString('id-ID')}`);
+
                     if (isV) {
                         const vModel = win.querySelector('.sel-vm').value;
                         const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
@@ -242,6 +246,7 @@
                             details.push(`RELL VITRASE (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rell).toLocaleString('id-ID')}`);
                         }
                     }
+                    
                     if (M === 'smokring') {
                         let smok = Math.ceil(L * 24); if(smok % 2 !== 0) smok++; 
                         cost += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
@@ -255,6 +260,7 @@
                         cost += Math.max(L,1) * PR.rell;
                         details.push(`RELL GORDEN (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rell).toLocaleString('id-ID')}`);
                     }
+                    
                     if(M !== 'spiral') {
                         const vm = win.querySelector('.sel-vm').value;
                         const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
@@ -281,11 +287,12 @@
             document.getElementById('p-valid').innerText = mode === 'estimasi' ? "Berlaku s/d: " + new Date(now.getTime() + 7*24*60*60*1000).toLocaleDateString('id-ID') : "";
             document.getElementById('modal-title').innerText = mode==='estimasi'?"ESTIMASI PENAWARAN":mode==='spk'?"SURAT PERINTAH KERJA (SPK)":"RINCIAN PEMAKAIAN ITEM";
             document.getElementById('p-total-container').style.display = (mode==='estimasi'||mode==='rincian')?'block':'none';
+
             allW.forEach((w, index) => {
                 const winEl = document.querySelectorAll('.window-item')[index];
                 let html = `<div class="item-box"><b>ITEM ${w.id}</b><br>`;
                 if(w.type === 'gorden') {
-                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${w.spec.p} PANEL)`;
+                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${ Pan = w.spec.p} PANEL)`;
                     if(winEl.querySelector('.sel-v-toggle').value === 'ya' && winEl.querySelector('.sel-vm').value === 'spiral') {
                         html += `<br>-- DETAIL VITRASE SPIRAL --<br>UKURAN VIT : ${winEl.querySelector('.in-vl').value} X ${winEl.querySelector('.in-vt').value} (QTY: ${winEl.querySelector('.in-vq').value})`;
                     }
@@ -303,6 +310,16 @@
             document.getElementById('modal-detail').style.display = "block";
         }
         function closeModal() { document.getElementById('modal-detail').style.display = "none"; }
+    </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker terdaftar!', reg))
+            .catch(err => console.error('Gagal daftar Service Worker:', err));
+        });
+      }
     </script>
 </body>
 </html>
