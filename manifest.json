@@ -1,0 +1,18 @@
+{
+  "short_name": "YenyGorden",
+  "name": "Kalkulator Yeny Gorden",
+  "description": "Kalkulator Gorden dan Blinds",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1000/1000939.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a"
+}
