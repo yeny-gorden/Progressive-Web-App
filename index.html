@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Yeny Gorden - High Contrast Print</title>
+    <title>Kalkulator Yeny Gorden Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -204,7 +204,8 @@
 
         function calculateAll() {
             let totalOverall = 0; allW = [];
-            const hK = parseFloat(document.getElementById('global-harga-kain').value) || 0, hV = parseFloat(document.getElementById('global-harga-vitrase').value) || 0;
+            const hK = parseFloat(document.getElementById('global-harga-kain').value) || 0;
+            const hV = parseFloat(document.getElementById('global-harga-vitrase').value) || 0;
             const nK = document.getElementById('global-nama-kain').value || "-";
             const nV = document.getElementById('global-nama-vitrase').value || "-";
 
@@ -227,51 +228,57 @@
                 } else {
                     const J = win.querySelector('.sel-j').value;
                     const tK = (J === 'im') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
-                    let cost = tK * hK;
+                    subSet += (tK * hK);
                     details.push(`KAIN ${nK.toUpperCase()} (${tK.toFixed(2)}m): Rp ${Math.round(tK*hK).toLocaleString('id-ID')}`);
+                    subSet += (tK * PR.jahit);
+                    details.push(`JAHIT KAIN (${tK.toFixed(2)}m): Rp ${Math.round(tK*PR.jahit).toLocaleString('id-ID')}`);
 
                     if (isV) {
                         const vModel = win.querySelector('.sel-vm').value;
                         const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
                         if (vModel === 'spiral') {
-                            const vl = parseFloat(win.querySelector('.in-vl').value) || (L + 0.2);
-                            const tV = vl * 3;
-                            cost += (tV * hV * vQty) + (PR.stick * vQty);
+                            const valInputV = parseFloat(win.querySelector('.in-vl').value);
+                            const lebarDasarVit = (isNaN(valInputV) ? L : valInputV) + 0.2;
+                            const tV = lebarDasarVit * 3;
+                            
+                            subSet += (tV * hV * vQty);
                             details.push(`VITRASE ${nV.toUpperCase()} (${tV.toFixed(2)}m x ${vQty}): Rp ${Math.round(tV*hV*vQty).toLocaleString('id-ID')}`);
+                            subSet += (tV * PR.jahit * vQty);
+                            details.push(`JAHIT VITRASE SPIRAL (${(tV*vQty).toFixed(2)}m): Rp ${Math.round(tV*PR.jahit*vQty).toLocaleString('id-ID')}`);
+                            subSet += (PR.stick * vQty);
                             details.push(`STICK VITRASE (${vQty} SET): Rp ${Math.round(PR.stick * vQty).toLocaleString('id-ID')}`);
                         } else {
                             const tV = (L + 0.2) * 3;
-                            cost += (tV * hV) + (Math.max(L,1) * PR.rell);
+                            subSet += (tV * hV);
                             details.push(`VITRASE ${nV.toUpperCase()} (${tV.toFixed(2)}m): Rp ${Math.round(tV*hV).toLocaleString('id-ID')}`);
+                            subSet += (tV * PR.jahit);
+                            details.push(`JAHIT VITRASE (${tV.toFixed(2)}m): Rp ${Math.round(tV*PR.jahit).toLocaleString('id-ID')}`);
+                            subSet += (Math.max(L,1) * PR.rell);
                             details.push(`RELL VITRASE (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rell).toLocaleString('id-ID')}`);
                         }
                     }
                     
                     if (M === 'smokring') {
                         let smok = Math.ceil(L * 24); if(smok % 2 !== 0) smok++; 
-                        cost += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
+                        subSet += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
                         details.push(`SMOKRING (${smok}pcs): Rp ${Math.round(smok*PR.smokring).toLocaleString('id-ID')}`);
                         details.push(`ROLLET (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rollet).toLocaleString('id-ID')}`);
                     } else if (M === 'spiral') {
+                        // Spiral murni (tanpa kain utama)
+                        subSet = 0; // Reset as baseline
                         const tV = (L+0.2)*3;
-                        cost = (tV*hV) + (tV*PR.jahit) + PR.stick + PR.instal;
+                        subSet = (tV*hV) + (tV*PR.jahit) + PR.stick + PR.instal;
                         details = [`VITRASE SPIRAL (${tV.toFixed(2)}m): Rp ${Math.round(tV*hV).toLocaleString('id-ID')}`, `JAHIT SPIRAL: Rp ${Math.round(tV*PR.jahit).toLocaleString('id-ID')}`, `STICK (1 SET): Rp ${PR.stick.toLocaleString('id-ID')}`, `INSTALASI: Rp ${PR.instal.toLocaleString('id-ID')}`];
                     } else {
-                        cost += Math.max(L,1) * PR.rell;
+                        subSet += Math.max(L,1) * PR.rell;
                         details.push(`RELL GORDEN (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rell).toLocaleString('id-ID')}`);
                     }
                     
                     if(M !== 'spiral') {
-                        const vm = win.querySelector('.sel-vm').value;
-                        const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
-                        const tV_jahit = (isV && vm === 'spiral') ? ((parseFloat(win.querySelector('.in-vl').value) || (L+0.2))*3*vQty) : (isV ? (L+0.2)*3 : 0);
-                        const totJ = tK + tV_jahit;
-                        cost += PR.hook + PR.tali + (totJ * PR.jahit) + PR.instal;
-                        details.push(`JAHIT (${totJ.toFixed(2)}m): Rp ${Math.round(totJ*PR.jahit).toLocaleString('id-ID')}`);
+                        subSet += PR.hook + PR.tali + PR.instal;
                         details.push(`HOOK & TALI: Rp ${(PR.hook+PR.tali).toLocaleString('id-ID')}`);
                         details.push(`INSTALASI: Rp ${PR.instal.toLocaleString('id-ID')}`);
                     }
-                    subSet = cost;
                     allW.push({ id: i+1, type: 'gorden', subSet, subTotal: subSet * Qty, spec: {l:L, t:T, q:Qty, nk:nK, nv:isV?nV:'-', m:M, p:Pan}, details });
                 }
                 win.querySelector('.sub-txt').innerText = "Rp " + Math.round(subSet * Qty).toLocaleString('id-ID');
@@ -292,9 +299,9 @@
                 const winEl = document.querySelectorAll('.window-item')[index];
                 let html = `<div class="item-box"><b>ITEM ${w.id}</b><br>`;
                 if(w.type === 'gorden') {
-                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${ Pan = w.spec.p} PANEL)`;
+                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()} (${w.spec.p} PANEL)`;
                     if(winEl.querySelector('.sel-v-toggle').value === 'ya' && winEl.querySelector('.sel-vm').value === 'spiral') {
-                        html += `<br>-- DETAIL VITRASE SPIRAL --<br>UKURAN VIT : ${winEl.querySelector('.in-vl').value} X ${winEl.querySelector('.in-vt').value} (QTY: ${winEl.querySelector('.in-vq').value})`;
+                        html += `<br>-- DETAIL VITRASE SPIRAL --<br>UKURAN VIT : ${winEl.querySelector('.in-vl').value || w.spec.l} X ${winEl.querySelector('.in-vt').value} (QTY: ${winEl.querySelector('.in-vq').value})`;
                     }
                 } else { html += `TYPE: ${w.spec.bn.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}`; }
                 html += `<br>QTY: ${w.spec.q} SET`;
