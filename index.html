@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Yeny Gorden - High Contrast Print</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <style>
+        :root {
+            --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
+            --text-main: #ffffff; --text-dim: #fbbf24; --accent: #3b82f6;
+            --success: #22c55e; --danger: #ef4444; --border: #475569;
+        }
+        * { box-sizing: border-box; }
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Arial', sans-serif; margin: 0; padding: 10px; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        .global-card, .footer-card { background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--border); margin-bottom: 15px; }
+        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--accent); }
+        .grid { display: grid; gap: 12px; margin-bottom: 10px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        label { font-size: 11px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        input, select { width: 100%; background: var(--bg-input); border: 2px solid var(--border); color: white; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 700; }
+        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 20px; }
+        .btn-del { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; border: 2px solid white; width: 32px; height: 32px; border-radius: 50%; font-weight: 900; cursor: pointer; }
+        .grand-total { color: var(--success); font-size: 26px; font-weight: 900; text-align: center; margin: 10px 0; }
+        .hidden { display: none !important; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
+        .modal-content { background: #fff; color: #000; max-width: 750px; margin: 0 auto; padding: 25px; border-radius: 15px; }
+        .modal-header { display: flex; align-items: center; gap: 20px; border-bottom: 4px solid #000; padding-bottom: 15px; margin-bottom: 15px; }
+        #app-logo-print { width: 130px; height: 130px; object-fit: contain; }
+        
+        .header-info h2 { margin: 0; font-size: 28px; font-weight: 900; color: #000; }
+        .header-info p { margin: 2px 0; font-weight: 700; font-size: 16px; color: #000; }
+        #modal-title { text-align: center; text-decoration: underline; font-size: 22px; font-weight: 900; margin-bottom: 20px; color: #000; }
+        
+        .item-box { border: 3px solid #000; padding: 15px; margin-bottom: 12px; font-family: 'Arial Black', Gadget, sans-serif; font-size: 16px; line-height: 1.4; color: #000; }
+        .item-box b { font-size: 18px; text-decoration: underline; }
+        #p-total { font-size: 28px; font-weight: 900; color: #000; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .modal { position: relative !important; display: block !important; padding: 0 !important; }
+            .modal-content { border: none !important; width: 100% !important; margin:0 !important; padding:0 !important; }
+            #app-logo-print { display: block !important; -webkit-print-color-adjust: exact; }
+            .item-box { page-break-inside: avoid; border: 3px solid #000 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container no-print">
+        <div class="global-card">
+            <h2 style="margin:0; text-align:center; color:var(--accent); font-weight: 900;">YENY GORDEN</h2>
+            <div style="margin-top: 15px;"><label>Ambil Logo Dari Galeri/Internal (Simpan Permanen)</label>
+            <input type="file" id="cfg-logo" accept="image/*" onchange="uploadLogo(this)"></div>
+        </div>
+
+        <div class="global-card">
+            <div class="grid grid-2">
+                <div>
+                    <label>Kain Utama</label>
+                    <input type="text" id="global-nama-kain" placeholder="Nama/Kode" oninput="calculateAll()">
+                    <label style="margin-top:8px;">Harga (Rp/m)</label>
+                    <input type="number" id="global-harga-kain" oninput="calculateAll()">
+                </div>
+                <div>
+                    <label>Vitrase</label>
+                    <input type="text" id="global-nama-vitrase" placeholder="Nama/Kode" oninput="calculateAll()">
+                    <label style="margin-top:8px;">Harga (Rp/m)</label>
+                    <input type="number" id="global-harga-vitrase" oninput="calculateAll()">
+                </div>
+            </div>
+        </div>
+
+        <div id="window-container"></div>
+        <button class="btn-add" onclick="addWindow()">+ TAMBAH ITEM</button>
+
+        <div class="footer-card">
+            <div id="grand-total" class="grand-total">TOTAL: Rp 0</div>
+            <div class="grid grid-3">
+                <button onclick="showMode('estimasi')" style="padding: 15px 5px; background: #8b5cf6; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">ESTIMASI</button>
+                <button onclick="showMode('spk')" style="padding: 15px 5px; background: var(--success); color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">SPK / SJ</button>
+                <button onclick="showMode('rincian')" style="padding: 15px 5px; background: #f97316; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">RINCIAN PAKAI</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-detail" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="" id="app-logo-print" alt="Logo">
+                <div class="header-info">
+                    <h2>YENY GORDEN</h2>
+                    <p>WhatsApp: 0895-0421-5020</p>
+                    <p id="p-date"></p>
+                    <p id="p-valid" style="color: #000; font-style: italic;"></p>
+                </div>
+            </div>
+            <h3 id="modal-title"></h3>
+            <div id="modal-list"></div>
+            <div id="p-total-container" style="margin-top:20px; text-align:right; border-top:5px solid #000; padding-top:10px;">
+                <h3 id="p-total"></h3>
+            </div>
+            <div class="no-print" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:25px;">
+                <button onclick="window.print()" style="background:#000; color:#fff; padding:18px; border:none; font-weight:900; border-radius:8px;">CETAK / PDF</button>
+                <button onclick="closeModal()" style="background:var(--danger); color:white; padding:18px; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
+            </div>
+        </div>
+    </div>
+
+    <template id="win-tmp">
+        <div class="window-item">
+            <button class="btn-del" onclick="this.parentElement.remove(); calculateAll();">×</button>
+            <div class="grid grid-3">
+                <div><label>Lebar (m)</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
+                <div><label>Tinggi (m)</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
+                <div><label>Qty (Set)</label><input type="number" class="in-qty" value="1" oninput="calculateAll()"></div>
+            </div>
+            <div class="grid grid-2">
+                <div><label>Model Produk</label><select class="sel-m" onchange="handleM(this)"><option value="smokring">Smokring</option><option value="plisket">Plisket</option><option value="spiral">Spiral</option><option value="blinds">Blinds</option></select></div>
+                <div class="std-f"><label>Metode Jahit</label><select class="sel-j" onchange="calculateAll()"><option value="im">Import</option><option value="lo">Lokal</option></select></div>
+            </div>
+            <div class="blinds-sec hidden">
+                <div class="grid grid-2">
+                    <div><label>Type Rollerblind</label><input type="text" class="in-bn" placeholder="Contoh: SP603" oninput="calculateAll()"></div>
+                    <div><label>Harga (Rp/m)</label><input type="number" class="in-bh" oninput="calculateAll()"></div>
+                </div>
+            </div>
+            <div class="grid grid-2 std-f">
+                <div><label>Jumlah Panel</label><select class="sel-p" onchange="calculateAll()"><option value="1">1 Panel</option><option value="2">2 Panel</option><option value="3">3 Panel</option><option value="4">4 Panel</option></select></div>
+                <div><label>Tambahkan Vitrase?</label><select class="sel-v-toggle" onchange="togVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA (+ VITRASE)</option></select></div>
+            </div>
+            <div class="vit-sec hidden" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin-top:10px;">
+                <label>Model Vitrase</label>
+                <select class="sel-vm" onchange="handleVM(this)"><option value="plisket">Plisket</option><option value="spiral">Spiral</option></select>
+                <div class="v-spiral-input hidden" style="margin-top:10px;">
+                    <div class="grid grid-3">
+                        <div><label>L Vitras</label><input type="number" class="in-vl" oninput="calculateAll()"></div>
+                        <div><label>T Vitras</label><input type="number" class="in-vt" oninput="calculateAll()"></div>
+                        <div><label>Qty Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align:right; margin-top:10px;"><span class="sub-txt" style="font-weight:900; color:var(--success); font-size:18px;">Rp 0</span></div>
+        </div>
+    </template>
+
+    <script>
+        const PR = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
+        let allW = [];
+
+        function uploadLogo(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    localStorage.setItem('y_logo_permanent', e.target.result);
+                    document.getElementById('app-logo-print').src = e.target.result;
+                    alert("Logo Berhasil Disimpan!");
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        window.onload = () => { 
+            const saved = localStorage.getItem('y_logo_permanent');
+            if(saved) document.getElementById('app-logo-print').src = saved;
+            addWindow(); 
+        };
+
+        function addWindow() { document.getElementById('window-container').appendChild(document.getElementById('win-tmp').content.cloneNode(true)); calculateAll(); }
+        function handleM(el) { const win = el.closest('.window-item'); const isB = el.value === 'blinds'; win.querySelectorAll('.std-f').forEach(f => f.classList.toggle('hidden', el.value === 'spiral' || isB)); win.querySelector('.blinds-sec').classList.toggle('hidden', !isB); if(el.value === 'spiral' || isB) win.querySelector('.sel-v-toggle').value = 'tidak'; togVit(win.querySelector('.sel-v-toggle')); calculateAll(); }
+        function togVit(el) { el.closest('.window-item').querySelector('.vit-sec').classList.toggle('hidden', el.value === 'tidak'); calculateAll(); }
+        function handleVM(el) { el.closest('.vit-sec').querySelector('.v-spiral-input').classList.toggle('hidden', el.value !== 'spiral'); calculateAll(); }
+
+        function calculateAll() {
+            let totalOverall = 0; allW = [];
+            const hK = parseFloat(document.getElementById('global-harga-kain').value) || 0, hV = parseFloat(document.getElementById('global-harga-vitrase').value) || 0;
+            const nK = document.getElementById('global-nama-kain').value || "-";
+            const nV = document.getElementById('global-nama-vitrase').value || "-";
+
+            document.querySelectorAll('.window-item').forEach((win, i) => {
+                const L = parseFloat(win.querySelector('.in-l').value) || 0;
+                const T = parseFloat(win.querySelector('.in-t').value) || 0;
+                const Qty = parseInt(win.querySelector('.in-qty').value) || 1;
+                const M = win.querySelector('.sel-m').value;
+                const isV = win.querySelector('.sel-v-toggle').value === 'ya';
+                const Pan = win.querySelector('.sel-p').value;
+                let subSet = 0; let details = [];
+
+                if (M === 'blinds') {
+                    const bN = win.querySelector('.in-bn').value || "ROLLERBLIND";
+                    const bH = parseFloat(win.querySelector('.in-bh').value) || 0;
+                    const lB = L < 1 ? 1 : L; const tB = T < 1 ? 1 : T;
+                    subSet = lB * tB * bH;
+                    details.push(`${bN.toUpperCase()} (${lB}x${tB}m): Rp ${Math.round(subSet).toLocaleString('id-ID')}`);
+                    allW.push({ id: i+1, type: 'blind', subSet, subTotal: subSet * Qty, spec: {l:L, t:T, q:Qty, bn: bN}, details });
+                } else {
+                    const J = win.querySelector('.sel-j').value;
+                    const tK = (J === 'im') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
+                    let cost = tK * hK;
+                    details.push(`KAIN ${nK.toUpperCase()} (${tK.toFixed(2)}m): Rp ${Math.round(tK*hK).toLocaleString('id-ID')}`);
+                    if (isV) {
+                        const vModel = win.querySelector('.sel-vm').value;
+                        const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
+                        if (vModel === 'spiral') {
+                            const vl = parseFloat(win.querySelector('.in-vl').value) || (L + 0.2);
+                            const tV = vl * 3;
+                            cost += (tV * hV * vQty) + (PR.stick * vQty);
+                            details.push(`VITRASE ${nV.toUpperCase()} (${tV.toFixed(2)}m x ${vQty}): Rp ${Math.round(tV*hV*vQty).toLocaleString('id-ID')}`);
+                        } else {
+                            const tV = (L + 0.2) * 3;
+                            cost += (tV * hV) + (Math.max(L,1) * PR.rell);
+                        }
+                    }
+                    if (M === 'smokring') {
+                        let smok = Math.ceil(L * 24); if(smok % 2 !== 0) smok++; 
+                        cost += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
+                    } else if (M === 'spiral') {
+                        const tV = (L+0.2)*3;
+                        cost = (tV*hV) + (tV*PR.jahit) + PR.stick + PR.instal;
+                    } else {
+                        cost += Math.max(L,1) * PR.rell;
+                    }
+                    subSet = cost;
+                    allW.push({ id: i+1, type: 'gorden', subSet, subTotal: subSet * Qty, spec: {l:L, t:T, q:Qty, nk:nK, nv:isV?nV:'-', m:M, p:Pan}, details });
+                }
+                win.querySelector('.sub-txt').innerText = "Rp " + Math.round(subSet * Qty).toLocaleString('id-ID');
+                totalOverall += (subSet * Qty);
+            });
+            document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(totalOverall).toLocaleString('id-ID');
+        }
+
+        function showMode(mode) {
+            const list = document.getElementById('modal-list'); list.innerHTML = "";
+            const now = new Date();
+            document.getElementById('p-date').innerText = "Tanggal: " + now.toLocaleDateString('id-ID');
+            document.getElementById('p-valid').innerText = mode === 'estimasi' ? "Berlaku s/d: " + new Date(now.getTime() + 7*24*60*60*1000).toLocaleDateString('id-ID') : "";
+            document.getElementById('modal-title').innerText = mode==='estimasi'?"ESTIMASI PENAWARAN":mode==='spk'?"SURAT PERINTAH KERJA (SPK)":"RINCIAN PEMAKAIAN ITEM";
+            allW.forEach((w, index) => {
+                let html = `<div class="item-box"><b>ITEM ${w.id}</b><br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>QTY: ${w.spec.q} SET<br>TOTAL: Rp ${Math.round(w.subTotal).toLocaleString('id-ID')}</div>`;
+                list.innerHTML += html;
+            });
+            document.getElementById('p-total').innerText = document.getElementById('grand-total').innerText;
+            document.getElementById('modal-detail').style.display = "block";
+        }
+        function closeModal() { document.getElementById('modal-detail').style.display = "none"; }
+
+        // --- SCRIPT PENDAFTARAN SERVICE WORKER ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+            });
+        }
+    </script>
+</body>
+</html>
