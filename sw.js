@@ -1,22 +1,5 @@
-const cacheName = 'yeny-gorden-v1';
-const assets = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      return cache.addAll(assets);
-    })
-  );
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(res => {
-      return res || fetch(e.request);
-    })
-  );
+// Service Worker Minimal agar PWA bisa diinstal
+self.addEventListener('fetch', function(event) {
+    // Biarkan aplikasi mengambil data dari internet secara normal
+    event.respondWith(fetch(event.request));
 });
