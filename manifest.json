@@ -1,18 +1,22 @@
 {
-  "short_name": "YenyGorden",
   "name": "Kalkulator Yeny Gorden",
-  "description": "Kalkulator Gorden dan Blinds",
+  "short_name": "Yeny Gorden",
+  "description": "Kalkulator Gorden Professional by Yeny Gorden",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1000/1000939.png",
+      "src": "https://via.placeholder.com/192/3b82f6/ffffff?text=YG",
+      "sizes": "192x192",
       "type": "image/png",
-      "sizes": "512x512",
       "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512/3b82f6/ffffff?text=Yeny+Gorden",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ],
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "portrait",
-  "theme_color": "#0f172a",
-  "background_color": "#0f172a"
+  ]
 }
