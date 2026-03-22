@@ -14,38 +14,45 @@
         * { box-sizing: border-box; }
         body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Arial', sans-serif; margin: 0; padding: 10px; }
         
-        .container { max-width: 800px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; }
         .global-card, .footer-card { background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--border); margin-bottom: 15px; }
         .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--accent); }
-        .grid { display: grid; gap: 12px; margin-bottom: 10px; }
+        
+        /* Grid Layout */
+        .grid { display: grid; gap: 10px; margin-bottom: 10px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        label { font-size: 11px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; background: var(--bg-input); border: 2px solid var(--border); color: white; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 700; }
+        
+        label { font-size: 10px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; text-align: center; }
+        
+        input, select { 
+            width: 100%; background: var(--bg-input); border: 2px solid var(--border); 
+            color: white; padding: 10px; border-radius: 8px; font-size: 14px; 
+            font-weight: 700; text-align: center; 
+        }
+        input::placeholder { color: #475569; font-weight: 400; font-size: 12px; }
+
         .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 20px; }
-        .btn-del { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; border: 2px solid white; width: 32px; height: 32px; border-radius: 50%; font-weight: 900; cursor: pointer; }
-        .grand-total { color: var(--success); font-size: 26px; font-weight: 900; text-align: center; margin: 10px 0; }
+        .btn-del { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; border: 2px solid white; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; cursor: pointer; z-index: 10; }
+        .grand-total { color: var(--success); font-size: 24px; font-weight: 900; text-align: center; margin: 10px 0; }
         .hidden { display: none !important; }
 
+        /* Modal & Print */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
-        .modal-content { background: #fff; color: #000; max-width: 750px; margin: 0 auto; padding: 25px; border-radius: 15px; }
-        .modal-header { display: flex; align-items: center; gap: 20px; border-bottom: 4px solid #000; padding-bottom: 15px; margin-bottom: 15px; }
-        #app-logo-print { width: 130px; height: 130px; object-fit: contain; }
+        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 15px; }
+        .modal-header { display: flex; align-items: center; gap: 15px; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        #app-logo-print { width: 90px; height: 90px; object-fit: contain; }
+        .header-info h2 { margin: 0; font-size: 22px; font-weight: 900; color: #000; }
+        .header-info p { margin: 1px 0; font-weight: 700; font-size: 13px; color: #000; }
         
-        .header-info h2 { margin: 0; font-size: 28px; font-weight: 900; color: #000; }
-        .header-info p { margin: 2px 0; font-weight: 700; font-size: 16px; color: #000; }
-        #modal-title { text-align: center; text-decoration: underline; font-size: 22px; font-weight: 900; margin-bottom: 20px; color: #000; }
-        
-        .item-box { border: 3px solid #000; padding: 15px; margin-bottom: 12px; font-family: 'Arial Black', Gadget, sans-serif; font-size: 16px; line-height: 1.4; color: #000; }
-        .item-box b { font-size: 18px; text-decoration: underline; }
-        #p-total { font-size: 28px; font-weight: 900; color: #000; }
+        .item-box { border: 2px solid #000; padding: 12px; margin-bottom: 10px; font-family: 'Arial', sans-serif; font-size: 14px; color: #000; line-height: 1.4; }
+        .item-box b { font-size: 15px; text-transform: uppercase; }
 
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; }
             .modal { position: relative !important; display: block !important; padding: 0 !important; }
-            .modal-content { border: none !important; width: 100% !important; margin:0 !important; padding:0 !important; }
-            .item-box { page-break-inside: avoid; border: 3px solid #000 !important; }
+            .modal-content { border: none !important; width: 100% !important; margin:0 !important; }
         }
     </style>
 </head>
@@ -53,9 +60,9 @@
 
     <div class="container no-print">
         <div class="global-card">
-            <h2 style="margin:0; text-align:center; color:var(--accent); font-weight: 900;">YENY GORDEN</h2>
-            <div style="margin-top: 15px;">
-                <label>Ambil Logo Dari Galeri/Internal (Simpan Permanen)</label>
+            <h2 style="margin:0; text-align:center; color:var(--accent); font-weight: 900; letter-spacing: 2px;">YENY GORDEN</h2>
+            <div style="margin-top: 10px;">
+                <label>Upload Logo Bengkel</label>
                 <input type="file" id="cfg-logo" accept="image/*" onchange="uploadLogo(this)">
             </div>
         </div>
@@ -63,29 +70,29 @@
         <div class="global-card">
             <div class="grid grid-2">
                 <div>
-                    <label>Kain Utama</label>
-                    <input type="text" id="global-nama-kain" placeholder="Nama/Kode" oninput="calculateAll()">
-                    <label style="margin-top:8px;">Harga (Rp/m)</label>
-                    <input type="number" id="global-harga-kain" oninput="calculateAll()">
+                    <label>Nama Kain</label>
+                    <input type="text" id="global-nama-kain" placeholder="Nama Kain" oninput="calculateAll()">
+                    <label style="margin-top:5px;">Harga Kain (Rp/m)</label>
+                    <input type="number" id="global-harga-kain" placeholder="0" oninput="calculateAll()">
                 </div>
                 <div>
-                    <label>Vitrase</label>
-                    <input type="text" id="global-nama-vitrase" placeholder="Nama/Kode" oninput="calculateAll()">
-                    <label style="margin-top:8px;">Harga (Rp/m)</label>
-                    <input type="number" id="global-harga-vitrase" oninput="calculateAll()">
+                    <label>Nama Vitrase</label>
+                    <input type="text" id="global-nama-vitrase" placeholder="Nama Vitrase" oninput="calculateAll()">
+                    <label style="margin-top:5px;">Harga Vitrase (Rp/m)</label>
+                    <input type="number" id="global-harga-vitrase" placeholder="0" oninput="calculateAll()">
                 </div>
             </div>
         </div>
 
         <div id="window-container"></div>
-        <button class="btn-add" onclick="addWindow()">+ TAMBAH ITEM</button>
+        <button class="btn-add" onclick="addWindow()">+ TAMBAH JENDELA</button>
 
         <div class="footer-card">
             <div id="grand-total" class="grand-total">TOTAL: Rp 0</div>
             <div class="grid grid-3">
-                <button onclick="showMode('estimasi')" style="padding: 15px 5px; background: #8b5cf6; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">ESTIMASI</button>
-                <button onclick="showMode('spk')" style="padding: 15px 5px; background: var(--success); color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">SPK / SJ</button>
-                <button onclick="showMode('rincian')" style="padding: 15px 5px; background: #f97316; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">RINCIAN PAKAI</button>
+                <button onclick="showMode('estimasi')" style="padding: 15px 2px; background: #8b5cf6; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">ESTIMASI</button>
+                <button onclick="showMode('spk')" style="padding: 15px 2px; background: var(--success); color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">SPK / SJ</button>
+                <button onclick="showMode('rincian')" style="padding: 15px 2px; background: #f97316; color: #fff; border: none; font-size: 11px; cursor:pointer; font-weight: 900; border-radius: 8px;">RINCIAN</button>
             </div>
         </div>
     </div>
@@ -101,17 +108,14 @@
                     <p id="p-valid"></p>
                 </div>
             </div>
-            
-            <h3 id="modal-title"></h3>
+            <h3 id="modal-title" style="text-align:center; text-decoration:underline; font-size: 18px;"></h3>
             <div id="modal-list"></div>
-
-            <div id="p-total-container" style="margin-top:20px; text-align:right; border-top:5px solid #000; padding-top:10px;">
-                <h3 id="p-total"></h3>
+            <div id="p-total-container" style="margin-top:15px; text-align:right; border-top:4px solid #000; padding-top:10px;">
+                <h3 id="p-total" style="font-size: 22px; font-weight: 900;"></h3>
             </div>
-
-            <div class="no-print" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:25px;">
-                <button onclick="window.print()" style="background:#000; color:#fff; padding:18px; border:none; font-weight:900; border-radius:8px;">CETAK / PDF</button>
-                <button onclick="closeModal()" style="background:var(--danger); color:white; padding:18px; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
+            <div class="no-print" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+                <button onclick="window.print()" style="background:#000; color:#fff; padding:15px; border:none; font-weight:900; border-radius:8px;">CETAK / PDF</button>
+                <button onclick="closeModal()" style="background:var(--danger); color:white; padding:15px; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
             </div>
         </div>
     </div>
@@ -120,48 +124,40 @@
         <div class="window-item">
             <button class="btn-del" onclick="this.parentElement.remove(); calculateAll();">×</button>
             <div class="grid grid-3">
-                <div><label>Lebar (m)</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
-                <div><label>Tinggi (m)</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
-                <div><label>Qty (Set)</label><input type="number" class="in-qty" value="1" oninput="calculateAll()"></div>
+                <div><label>Lebar (m)</label><input type="number" step="0.01" class="in-l" placeholder="0.00" oninput="calculateAll()"></div>
+                <div><label>Tinggi (m)</label><input type="number" step="0.01" class="in-t" placeholder="0.00" oninput="calculateAll()"></div>
+                <div><label>Panel</label><input type="number" class="in-p" placeholder="0" value="1" oninput="calculateAll()"></div>
             </div>
-            <div class="grid grid-2">
-                <div><label>Model Produk</label><select class="sel-m" onchange="handleM(this)"><option value="smokring">Smokring</option><option value="plisket">Plisket</option><option value="spiral">Spiral</option><option value="blinds">Blinds</option></select></div>
-                <div class="std-f"><label>Metode Jahit</label><select class="sel-j" onchange="calculateAll()"><option value="im">Import</option><option value="lo">Lokal</option></select></div>
+            <div class="grid grid-3">
+                <div><label>Tipe/Model</label><select class="sel-m" onchange="handleM(this)"><option value="smokring">Smokring</option><option value="plisket">Plisket</option><option value="spiral">Spiral</option><option value="blinds">Blinds</option></select></div>
+                <div class="std-f"><label>Pilih Kain</label><select class="sel-j" onchange="calculateAll()"><option value="im">Import</option><option value="lo">Lokal</option></select></div>
+                <div><label>Pakai Vitrase?</label><select class="sel-v-toggle" onchange="togVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA</option></select></div>
             </div>
             <div class="blinds-sec hidden">
                 <div class="grid grid-2">
-                    <div><label>Type Rollerblind</label><input type="text" class="in-bn" placeholder="Contoh: SP603" oninput="calculateAll()"></div>
-                    <div><label>Harga (Rp/m)</label><input type="number" class="in-bh" oninput="calculateAll()"></div>
+                    <div><label>Type Blinds</label><input type="text" class="in-bn" placeholder="Kode" oninput="calculateAll()"></div>
+                    <div><label>Harga (Rp/m)</label><input type="number" class="in-bh" placeholder="0" oninput="calculateAll()"></div>
                 </div>
             </div>
-            <div class="grid grid-2 std-f">
-                <div><label>Jumlah Panel</label><select class="sel-p" onchange="calculateAll()"><option value="1">1 Panel</option><option value="2">2 Panel</option><option value="3">3 Panel</option><option value="4">4 Panel</option></select></div>
-                <div>
-                    <label>Tambahkan Vitrase?</label>
-                    <select class="sel-v-toggle" onchange="togVit(this)">
-                        <option value="tidak">TIDAK</option>
-                        <option value="ya">YA (+ VITRASE)</option>
-                    </select>
+            <div class="vit-sec hidden" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-top:5px; border: 1px dashed var(--border);">
+                <div class="grid grid-2">
+                    <div><label>Model Vit</label><select class="sel-vm" onchange="handleVM(this)"><option value="plisket">Plisket</option><option value="spiral">Spiral</option></select></div>
+                    <div class="v-spiral-input hidden"><label>Qty Set Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
                 </div>
-            </div>
-            <div class="vit-sec hidden" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin-top:10px;">
-                <label>Model Vitrase</label>
-                <select class="sel-vm" onchange="handleVM(this)"><option value="plisket">Plisket</option><option value="spiral">Spiral</option></select>
-                <div class="v-spiral-input hidden" style="margin-top:10px;">
-                    <div class="grid grid-3">
-                        <div><label>L Vitras</label><input type="number" class="in-vl" oninput="calculateAll()"></div>
-                        <div><label>T Vitras</label><input type="number" class="in-vt" oninput="calculateAll()"></div>
-                        <div><label>Qty Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                <div class="v-spiral-input hidden" style="margin-top:5px;">
+                    <div class="grid grid-2">
+                        <div><label>L Vit (m)</label><input type="number" step="0.01" class="in-vl" placeholder="0.00" oninput="calculateAll()"></div>
+                        <div><label>T Vit (m)</label><input type="number" step="0.01" class="in-vt" placeholder="0.00" oninput="calculateAll()"></div>
                     </div>
                 </div>
             </div>
-            <div style="text-align:right; margin-top:10px;"><span class="sub-txt" style="font-weight:900; color:var(--success); font-size:18px;">Rp 0</span></div>
+            <div style="text-align:right; margin-top:8px;"><span class="sub-txt" style="font-weight:900; color:var(--success); font-size:16px;">Rp 0</span></div>
         </div>
     </template>
 
     <script>
         const PR = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
-        let allW = [];
+        let allItems = [];
 
         function uploadLogo(input) {
             if (input.files && input.files[0]) {
@@ -169,7 +165,6 @@
                 reader.onload = e => {
                     localStorage.setItem('y_logo_permanent', e.target.result);
                     document.getElementById('app-logo-print').src = e.target.result;
-                    alert("Logo Berhasil Disimpan!");
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -182,7 +177,6 @@
         };
 
         function addWindow() { document.getElementById('window-container').appendChild(document.getElementById('win-tmp').content.cloneNode(true)); calculateAll(); }
-        
         function handleM(el) {
             const win = el.closest('.window-item');
             const isB = el.value === 'blinds';
@@ -191,12 +185,19 @@
             if(el.value === 'spiral' || isB) win.querySelector('.sel-v-toggle').value = 'tidak';
             togVit(win.querySelector('.sel-v-toggle')); calculateAll();
         }
-
-        function togVit(el) { el.closest('.window-item').querySelector('.vit-sec').classList.toggle('hidden', el.value === 'tidak'); calculateAll(); }
-        function handleVM(el) { el.closest('.vit-sec').querySelector('.v-spiral-input').classList.toggle('hidden', el.value !== 'spiral'); calculateAll(); }
+        function togVit(el) { 
+            const sec = el.closest('.window-item').querySelector('.vit-sec');
+            sec.classList.toggle('hidden', el.value === 'tidak'); 
+            calculateAll(); 
+        }
+        function handleVM(el) { 
+            const vis = el.value === 'spiral';
+            el.closest('.vit-sec').querySelectorAll('.v-spiral-input').forEach(i => i.classList.toggle('hidden', !vis));
+            calculateAll(); 
+        }
 
         function calculateAll() {
-            let totalOverall = 0; allW = [];
+            let totalOverall = 0; allItems = [];
             const hK = parseFloat(document.getElementById('global-harga-kain').value) || 0;
             const hV = parseFloat(document.getElementById('global-harga-vitrase').value) || 0;
             const nK = document.getElementById('global-nama-kain').value || "-";
@@ -205,77 +206,77 @@
             document.querySelectorAll('.window-item').forEach((win, i) => {
                 const L = parseFloat(win.querySelector('.in-l').value) || 0;
                 const T = parseFloat(win.querySelector('.in-t').value) || 0;
-                const Qty = parseInt(win.querySelector('.in-qty').value) || 1;
+                const Pan = win.querySelector('.in-p').value || 0;
                 const M = win.querySelector('.sel-m').value;
                 const isV = win.querySelector('.sel-v-toggle').value === 'ya';
                 let subSet = 0; let details = [];
 
                 if (M === 'blinds') {
-                    const bN = win.querySelector('.in-bn').value || "ROLLERBLIND";
+                    const bN = win.querySelector('.in-bn').value || "BLINDS";
                     const bH = parseFloat(win.querySelector('.in-bh').value) || 0;
-                    const lB = L < 1 ? 1 : L; const tB = T < 1 ? 1 : T;
-                    subSet = lB * tB * bH;
-                    details.push(`${bN.toUpperCase()} (${lB}x${tB}m): Rp ${Math.round(subSet).toLocaleString('id-ID')}`);
-                    allW.push({ id: i+1, type: 'blind', subSet, subTotal: subSet * Qty, spec: {l:L, t:T, q:Qty, bn: bN}, details });
+                    subSet = (L < 1 ? 1 : L) * (T < 1 ? 1 : T) * bH;
+                    details.push({ n: bN.toUpperCase(), v: subSet });
+                    allItems.push({ id: i+1, type: 'blind', subSet, spec: {l:L, t:T, bn: bN, key: `bl-${bN}-${L}-${T}`}, details });
                 } else {
                     const J = win.querySelector('.sel-j').value;
+                    const vModel = win.querySelector('.sel-vm').value;
+                    const vL = parseFloat(win.querySelector('.in-vl').value) || 0;
+                    const vT = parseFloat(win.querySelector('.in-vt').value) || 0;
+                    const vQ = parseInt(win.querySelector('.in-vq').value) || 1;
+
+                    // Kain
                     const tK = (J === 'im') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
-                    subSet += (tK * hK);
-                    details.push(`KAIN ${nK.toUpperCase()} (${tK.toFixed(2)}m): Rp ${Math.round(tK*hK).toLocaleString('id-ID')}`);
-                    subSet += (tK * PR.jahit);
-                    details.push(`JAHIT KAIN (${tK.toFixed(2)}m): Rp ${Math.round(tK*PR.jahit).toLocaleString('id-ID')}`);
+                    const costK = tK * hK;
+                    const costJ = tK * PR.jahit;
+                    subSet += costK + costJ;
+                    details.push({ n: `Bahan Kain (${tK.toFixed(2)}m)`, v: costK });
+                    details.push({ n: `Jahit Kain`, v: costJ });
 
                     if (isV) {
-                        const vModel = win.querySelector('.sel-vm').value;
-                        const vQty = parseFloat(win.querySelector('.in-vq').value) || 1;
-                        let lDasar, tDasar;
-
+                        let lD = (vModel === 'spiral') ? vL : L;
+                        let tV = (lD + 0.2) * 3;
+                        let costVK = tV * hV * vQ;
+                        let costVJ = tV * PR.jahit * vQ;
+                        subSet += costVK + costVJ;
+                        details.push({ n: `Bahan Vitrase (${tV.toFixed(2)}m x ${vQ})`, v: costVK });
+                        details.push({ n: `Jahit Vitrase`, v: costVJ });
                         if (vModel === 'spiral') {
-                            lDasar = parseFloat(win.querySelector('.in-vl').value) || 0;
-                            tDasar = parseFloat(win.querySelector('.in-vt').value) || 0;
+                            subSet += (PR.stick * vQ);
+                            details.push({ n: `Stick Vitrase (${vQ} set)`, v: PR.stick * vQ });
                         } else {
-                            lDasar = L; tDasar = T;
-                        }
-
-                        const tV = (lDasar + 0.2) * 3;
-                        subSet += (tV * hV * vQty);
-                        details.push(`VITRASE ${nV.toUpperCase()} (${tV.toFixed(2)}m x ${vQty}): Rp ${Math.round(tV*hV*vQty).toLocaleString('id-ID')}`);
-                        subSet += (tV * PR.jahit * vQty);
-                        details.push(`JAHIT VITRASE ${vModel.toUpperCase()} (${(tV*vQty).toFixed(2)}m): Rp ${Math.round(tV*PR.jahit*vQty).toLocaleString('id-ID')}`);
-
-                        if (vModel === 'spiral') {
-                            subSet += (PR.stick * vQty);
-                            details.push(`STICK VITRASE (${vQty} SET): Rp ${Math.round(PR.stick * vQty).toLocaleString('id-ID')}`);
-                        } else {
-                            subSet += (Math.max(lDasar, 1) * PR.rell);
-                            details.push(`RELL VITRASE (${Math.max(lDasar, 1)}m): Rp ${Math.round(Math.max(lDasar, 1)*PR.rell).toLocaleString('id-ID')}`);
+                            subSet += (Math.max(lD, 1) * PR.rell);
+                            details.push({ n: `Rell Vitrase (${Math.max(lD,1)}m)`, v: Math.max(lD,1) * PR.rell });
                         }
                     }
                     
                     if (M === 'smokring') {
                         let smok = Math.ceil(L * 24); if(smok % 2 !== 0) smok++; 
                         subSet += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
-                        details.push(`SMOKRING (${smok}pcs): Rp ${Math.round(smok*PR.smokring).toLocaleString('id-ID')}`);
-                        details.push(`ROLLET (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rollet).toLocaleString('id-ID')}`);
+                        details.push({ n: `Smokring (${smok} pcs)`, v: smok * PR.smokring });
+                        details.push({ n: `Rollet (${Math.max(L,1)}m)`, v: Math.max(L,1) * PR.rollet });
                     } else if (M === 'spiral') {
-                        subSet = 0; 
-                        const tV = (L + 0.2) * 3;
-                        subSet = (tV * hV) + (tV * PR.jahit) + PR.stick + PR.instal;
-                        details = [`VITRASE SPIRAL (${tV.toFixed(2)}m): Rp ${Math.round(tV*hV).toLocaleString('id-ID')}`, `JAHIT SPIRAL: Rp ${Math.round(tV*PR.jahit).toLocaleString('id-ID')}`, `STICK (1 SET): Rp ${PR.stick.toLocaleString('id-ID')}`, `INSTALASI: Rp ${PR.instal.toLocaleString('id-ID')}`];
+                        subSet += PR.stick;
+                        details.push({ n: `Stick Gorden`, v: PR.stick });
                     } else {
                         subSet += Math.max(L,1) * PR.rell;
-                        details.push(`RELL GORDEN (${Math.max(L,1)}m): Rp ${Math.round(Math.max(L,1)*PR.rell).toLocaleString('id-ID')}`);
+                        details.push({ n: `Rell Gorden`, v: Math.max(L,1) * PR.rell });
                     }
                     
                     if(M !== 'spiral') {
                         subSet += PR.hook + PR.tali + PR.instal;
-                        details.push(`HOOK & TALI: Rp ${(PR.hook+PR.tali).toLocaleString('id-ID')}`);
-                        details.push(`INSTALASI: Rp ${PR.instal.toLocaleString('id-ID')}`);
+                        details.push({ n: `Hook`, v: PR.hook });
+                        details.push({ n: `Tali`, v: PR.tali });
+                        details.push({ n: `Instalasi`, v: PR.instal });
                     }
-                    allW.push({ id: i+1, type: 'gorden', subSet, subTotal: subSet * Qty, spec: {l:L, t:T, q:Qty, nk:nK, nv:isV?nV:'-', m:M, p:win.querySelector('.sel-p').value}, details });
+
+                    allItems.push({ 
+                        id: i+1, type: 'gorden', subSet, 
+                        spec: {l:L, t:T, nk:nK, nv:isV?nV:'-', m:M, p:Pan, vm:vModel, vl:vL, vt:vT, vq:vQ, isV, key: `${nK}-${L}-${T}-${M}-${Pan}-${isV?vModel:'no'}`}, 
+                        details 
+                    });
                 }
-                win.querySelector('.sub-txt').innerText = "Rp " + Math.round(subSet * Qty).toLocaleString('id-ID');
-                totalOverall += (subSet * Qty);
+                win.querySelector('.sub-txt').innerText = "Rp " + Math.round(subSet).toLocaleString('id-ID');
+                totalOverall += subSet;
             });
             document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(totalOverall).toLocaleString('id-ID');
         }
@@ -283,43 +284,45 @@
         function showMode(mode) {
             const list = document.getElementById('modal-list'); list.innerHTML = "";
             const now = new Date();
-            document.getElementById('p-date').innerText = "Tanggal: " + now.toLocaleDateString('id-ID');
-            document.getElementById('p-valid').innerText = mode === 'estimasi' ? "Berlaku s/d: " + new Date(now.getTime() + 7*24*60*60*1000).toLocaleDateString('id-ID') : "";
-            document.getElementById('modal-title').innerText = mode==='estimasi'?"ESTIMASI PENAWARAN":mode==='spk'?"SURAT PERINTAH KERJA (SPK)":"RINCIAN PEMAKAIAN ITEM";
-            document.getElementById('p-total-container').style.display = (mode==='estimasi'||mode==='rincian')?'block':'none';
+            document.getElementById('p-date').innerText = "Tgl: " + now.toLocaleDateString('id-ID');
+            document.getElementById('p-valid').innerText = mode === 'estimasi' ? "Valid s/d: " + new Date(now.getTime() + 7*24*60*60*1000).toLocaleDateString('id-ID') : "";
+            document.getElementById('modal-title').innerText = mode.toUpperCase() + (mode==='spk'?' (SURAT KERJA)':'');
+            document.getElementById('p-total-container').style.display = (mode==='spk') ? 'none' : 'block';
 
-            allW.forEach((w, index) => {
-                const winEl = document.querySelectorAll('.window-item')[index];
-                let html = `<div class="item-box"><b>ITEM ${w.id}</b><br>`;
-                if(w.type === 'gorden') {
-                    html += `KAIN: ${w.spec.nk.toUpperCase()}<br>VITRAS: ${w.spec.nv.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}<br>MODEL: ${w.spec.m.toUpperCase()}`;
-                    if(winEl.querySelector('.sel-v-toggle').value === 'ya' && winEl.querySelector('.sel-vm').value === 'spiral') {
-                        html += `<br>-- DETAIL VITRASE SPIRAL --<br>UKURAN VIT : ${winEl.querySelector('.in-vl').value || 0} X ${winEl.querySelector('.in-vt').value || 0} (QTY: ${winEl.querySelector('.in-vq').value || 1})`;
+            if (mode === 'rincian') {
+                allItems.forEach(w => {
+                    let html = `<div class="item-box"><b>JENDELA ${w.id}</b><br>`;
+                    w.details.forEach(d => html += `<div style="display:flex; justify-content:space-between; font-size:12px;"><span>${d.n}</span><span>Rp ${Math.round(d.v).toLocaleString('id-ID')}</span></div>`);
+                    html += `<div style="text-align:right; font-weight:bold; border-top:1px solid #ddd; margin-top:5px;">Total: Rp ${Math.round(w.subSet).toLocaleString('id-ID')}</div></div>`;
+                    list.innerHTML += html;
+                });
+            } else {
+                const groups = {};
+                allItems.forEach(item => {
+                    if (!groups[item.spec.key]) groups[item.spec.key] = { ids: [], data: item };
+                    groups[item.spec.key].ids.push(item.id);
+                });
+
+                for (let key in groups) {
+                    const g = groups[key]; const d = g.data;
+                    let html = `<div class="item-box"><b>JENDELA: ${g.ids.join(", ")} (${g.ids.length} Set)</b><br>`;
+                    if(d.type === 'gorden') {
+                        html += `• ${d.spec.nk.toUpperCase()} (${d.spec.l}x${d.spec.t}) - ${d.spec.m.toUpperCase()} (${d.spec.p} PNL)<br>`;
+                        if(d.spec.isV) {
+                            html += `• VIT: ${d.spec.nv.toUpperCase()} (${d.spec.vm==='spiral'?d.spec.vl+'x'+d.spec.vt+' Qty:'+d.spec.vq : 'Ikut Utama'}) - ${d.spec.vm.toUpperCase()}<br>`;
+                        }
+                    } else { html += `• ${d.spec.bn.toUpperCase()} (${d.spec.l}x${d.spec.t})`; }
+                    
+                    if(mode === 'estimasi') {
+                        html += `<div style="text-align:right; margin-top:5px; font-weight:900;">Rp ${Math.round(d.subSet * g.ids.length).toLocaleString('id-ID')}</div>`;
                     }
-                } else { html += `TYPE: ${w.spec.bn.toUpperCase()}<br>UKURAN: ${w.spec.l} X ${w.spec.t}`; }
-                html += `<br>QTY: ${w.spec.q} SET`;
-                if(mode==='estimasi') html += `<br>HARGA/SET : Rp ${Math.round(w.subSet).toLocaleString('id-ID')}<br>SUB TOTAL : Rp ${Math.round(w.subTotal).toLocaleString('id-ID')}`;
-                else if(mode==='rincian') {
-                    html += `<div style="margin-top:8px; border-top:1px dashed #000; padding-top:5px; font-size:14px;">`;
-                    w.details.forEach(d => html += `• ${d}<br>`);
-                    html += `<b>TOTAL/SET: Rp ${Math.round(w.subSet).toLocaleString('id-ID')}</b></div>`;
+                    list.innerHTML += html + `</div>`;
                 }
-                list.innerHTML += html + `</div>`;
-            });
+            }
             document.getElementById('p-total').innerText = document.getElementById('grand-total').innerText;
             document.getElementById('modal-detail').style.display = "block";
         }
         function closeModal() { document.getElementById('modal-detail').style.display = "none"; }
-    </script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker terdaftar!', reg))
-            .catch(err => console.error('Gagal daftar Service Worker:', err));
-        });
-      }
     </script>
 </body>
 </html>
