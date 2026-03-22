@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Yeny Gorden Pro</title>
+    <title>Kalkulator Yeny Gorden Pro - Editable</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <style>
@@ -20,7 +20,14 @@
         .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--accent); transition: all 0.3s ease; }
         
         .win-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .win-number { font-weight: 900; color: #ffffff; font-size: 14px; text-transform: uppercase; }
+        
+        /* Input Nama Jendela yang bisa diedit */
+        .win-name-input { 
+            background: transparent; border: none; color: #fff; 
+            font-weight: 900; font-size: 14px; text-transform: uppercase;
+            width: 80%; outline: none; border-bottom: 1px dashed transparent;
+        }
+        .win-name-input:focus { border-bottom-color: var(--accent); color: var(--text-dim); }
 
         .grid { display: grid; gap: 10px; margin-bottom: 10px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
@@ -127,7 +134,7 @@
     <template id="win-tmp">
         <div class="window-item">
             <div class="win-header">
-                <span class="win-number">Jendela #</span>
+                <input type="text" class="win-name-input" value="" placeholder="Nama Jendela..." oninput="calculateAll()">
                 <button class="btn-del" onclick="removeWindow(this)">×</button>
             </div>
             <div class="grid grid-3">
@@ -163,13 +170,6 @@
     </template>
 
     <script>
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registered')).catch(err => console.log('SW Error'));
-            });
-        }
-
         const PR = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
         let allItems = [];
 
@@ -191,7 +191,9 @@
         };
 
         function addWindow() { 
-            document.getElementById('window-container').appendChild(document.getElementById('win-tmp').content.cloneNode(true)); 
+            const container = document.getElementById('window-container');
+            const clone = document.getElementById('win-tmp').content.cloneNode(true);
+            container.appendChild(clone);
             reorderWindows();
             calculateAll(); 
         }
@@ -207,7 +209,11 @@
         function reorderWindows() {
             const items = document.querySelectorAll('.window-item');
             items.forEach((item, index) => {
-                item.querySelector('.win-number').innerText = `Jendela #${index + 1}`;
+                const inputName = item.querySelector('.win-name-input');
+                // Hanya beri nama otomatis jika masih kosong atau mengandung teks default
+                if (inputName.value === "" || inputName.value.startsWith("JENDELA #")) {
+                    inputName.value = `JENDELA #${index + 1}`;
+                }
             });
         }
 
@@ -241,6 +247,7 @@
             const nV = document.getElementById('global-nama-vitrase').value || "-";
 
             document.querySelectorAll('.window-item').forEach((win, i) => {
+                const customName = win.querySelector('.win-name-input').value;
                 const L = parseFloat(win.querySelector('.in-l').value) || 0;
                 const T = parseFloat(win.querySelector('.in-t').value) || 0;
                 const Pan = win.querySelector('.in-p').value || 0;
@@ -253,7 +260,7 @@
                     const bH = parseFloat(win.querySelector('.in-bh').value) || 0;
                     subSet = (L < 1 ? 1 : L) * (T < 1 ? 1 : T) * bH;
                     details.push({ n: bN.toUpperCase(), v: subSet });
-                    allItems.push({ id: i+1, type: 'blind', subSet, spec: {l:L, t:T, bn: bN, key: `bl-${bN}-${L}-${T}`}, details });
+                    allItems.push({ id: i+1, cName: customName, type: 'blind', subSet, spec: {l:L, t:T, bn: bN, key: `bl-${bN}-${L}-${T}`}, details });
                 } else {
                     const J = win.querySelector('.sel-j').value;
                     const vModel = win.querySelector('.sel-vm').value;
@@ -261,7 +268,6 @@
                     const vT = parseFloat(win.querySelector('.in-vt').value) || 0;
                     const vQ = parseInt(win.querySelector('.in-vq').value) || 1;
 
-                    // Hitungan Kain
                     const tK = (J === 'im') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
                     const costK = tK * hK;
                     const costJ = tK * PR.jahit;
@@ -269,7 +275,6 @@
                     details.push({ n: `Bahan Kain (${tK.toFixed(2)}m)`, v: costK });
                     details.push({ n: `Jahit Kain`, v: costJ });
 
-                    // Hitungan Vitrase (Jika ada)
                     if (isV) {
                         let lD = (vModel === 'spiral') ? vL : L;
                         let tV = (lD + 0.2) * 3;
@@ -287,7 +292,6 @@
                         }
                     }
                     
-                    // Komponen Aksesoris Gorden
                     if (M === 'smokring') {
                         let smok = Math.ceil(L * 24); if(smok % 2 !== 0) smok++; 
                         subSet += (smok * PR.smokring) + (Math.max(L,1) * PR.rollet);
@@ -309,7 +313,7 @@
                     }
 
                     allItems.push({ 
-                        id: i+1, type: 'gorden', subSet, 
+                        id: i+1, cName: customName, type: 'gorden', subSet, 
                         spec: {l:L, t:T, nk:nK, nv:isV?nV:'-', m:M, p:Pan, vm:vModel, vl:vL, vt:vT, vq:vQ, isV, key: `${nK}-${L}-${T}-${M}-${Pan}-${isV?vModel:'no'}`}, 
                         details 
                     });
@@ -330,7 +334,7 @@
 
             if (mode === 'rincian') {
                 allItems.forEach(w => {
-                    let html = `<div class="item-box"><b>JENDELA ${w.id}</b><br>`;
+                    let html = `<div class="item-box"><b>${w.cName}</b><br>`;
                     w.details.forEach(d => html += `<div style="display:flex; justify-content:space-between; font-size:12px;"><span>${d.n}</span><span>Rp ${Math.round(d.v).toLocaleString('id-ID')}</span></div>`);
                     html += `<div style="text-align:right; font-weight:bold; border-top:1px solid #ddd; margin-top:5px;">Total: Rp ${Math.round(w.subSet).toLocaleString('id-ID')}</div></div>`;
                     list.innerHTML += html;
@@ -338,13 +342,15 @@
             } else {
                 const groups = {};
                 allItems.forEach(item => {
-                    if (!groups[item.spec.key]) groups[item.spec.key] = { ids: [], data: item };
-                    groups[item.spec.key].ids.push(item.id);
+                    if (!groups[item.spec.key]) groups[item.spec.key] = { names: [], data: item, count: 0, totalSub: 0 };
+                    groups[item.spec.key].names.push(item.cName);
+                    groups[item.spec.key].count++;
+                    groups[item.spec.key].totalSub += item.subSet;
                 });
 
                 for (let key in groups) {
                     const g = groups[key]; const d = g.data;
-                    let html = `<div class="item-box"><b>JENDELA: ${g.ids.join(", ")} (${g.ids.length} Set)</b><br>`;
+                    let html = `<div class="item-box"><b>${g.names.join(", ")} (${g.count} Set)</b><br>`;
                     if(d.type === 'gorden') {
                         html += `• ${d.spec.nk.toUpperCase()} (${d.spec.l}x${d.spec.t}) - ${d.spec.m.toUpperCase()} (${d.spec.p} PNL)<br>`;
                         if(d.spec.isV) {
@@ -353,7 +359,7 @@
                     } else { html += `• ${d.spec.bn.toUpperCase()} (${d.spec.l}x${d.spec.t})`; }
                     
                     if(mode === 'estimasi') {
-                        html += `<div style="text-align:right; margin-top:5px; font-weight:900;">Rp ${Math.round(d.subSet * g.ids.length).toLocaleString('id-ID')}</div>`;
+                        html += `<div style="text-align:right; margin-top:5px; font-weight:900;">Rp ${Math.round(g.totalSub).toLocaleString('id-ID')}</div>`;
                     }
                     list.innerHTML += html + `</div>`;
                 }
