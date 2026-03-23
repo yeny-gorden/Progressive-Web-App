@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Yeny Gorden Pro - Editable</title>
+    <title>Kalkulator Yeny Gorden Pro - Smart Grouping</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <style>
@@ -21,7 +21,6 @@
         
         .win-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         
-        /* Input Nama Jendela yang bisa diedit */
         .win-name-input { 
             background: transparent; border: none; color: #fff; 
             font-weight: 900; font-size: 14px; text-transform: uppercase;
@@ -41,7 +40,6 @@
             font-weight: 700; text-align: center; 
         }
         input:focus { border-color: var(--accent); outline: none; }
-        input::placeholder { color: #475569; font-weight: 400; font-size: 12px; }
 
         .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 20px; }
         .btn-del { background: var(--danger); color: white; border: 2px solid white; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -57,7 +55,7 @@
         .header-info p { margin: 1px 0; font-weight: 700; font-size: 13px; color: #000; }
         
         .item-box { border: 2px solid #000; padding: 12px; margin-bottom: 10px; font-family: 'Arial', sans-serif; font-size: 14px; color: #000; line-height: 1.4; }
-        .item-box b { font-size: 15px; text-transform: uppercase; }
+        .item-box b { font-size: 15px; text-transform: uppercase; border-bottom: 1px solid #ddd; display: block; margin-bottom: 5px; }
 
         @media print {
             .no-print { display: none !important; }
@@ -210,7 +208,6 @@
             const items = document.querySelectorAll('.window-item');
             items.forEach((item, index) => {
                 const inputName = item.querySelector('.win-name-input');
-                // Hanya beri nama otomatis jika masih kosong atau mengandung teks default
                 if (inputName.value === "" || inputName.value.startsWith("JENDELA #")) {
                     inputName.value = `JENDELA #${index + 1}`;
                 }
@@ -324,6 +321,31 @@
             document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(totalOverall).toLocaleString('id-ID');
         }
 
+        function formatGroupNames(names) {
+            if (names.length === 0) return "";
+            const prefixMap = {};
+            names.forEach(name => {
+                const match = name.match(/^(.*?)\s*#?(\d+)$/);
+                if (match) {
+                    const base = match[1].trim();
+                    const num = match[2];
+                    if (!prefixMap[base]) prefixMap[base] = [];
+                    prefixMap[base].push(num);
+                } else {
+                    if (!prefixMap[name]) prefixMap[name] = [];
+                }
+            });
+            let results = [];
+            for (let base in prefixMap) {
+                if (prefixMap[base].length > 0) {
+                    results.push(`${base} ${prefixMap[base].join(", ")}`);
+                } else {
+                    results.push(base);
+                }
+            }
+            return results.join(" | ");
+        }
+
         function showMode(mode) {
             const list = document.getElementById('modal-list'); list.innerHTML = "";
             const now = new Date();
@@ -342,7 +364,7 @@
             } else {
                 const groups = {};
                 allItems.forEach(item => {
-                    if (!groups[item.spec.key]) groups[item.spec.key] = { names: [], data: item, count: 0, totalSub: 0 };
+                    if (!groups[item.spec.key]) groups[item.spec.key] = { names: [], data: item, count: 0, totalSub: 0, pricePerSet: item.subSet };
                     groups[item.spec.key].names.push(item.cName);
                     groups[item.spec.key].count++;
                     groups[item.spec.key].totalSub += item.subSet;
@@ -350,16 +372,23 @@
 
                 for (let key in groups) {
                     const g = groups[key]; const d = g.data;
-                    let html = `<div class="item-box"><b>${g.names.join(", ")} (${g.count} Set)</b><br>`;
+                    const groupTitle = formatGroupNames(g.names);
+                    let html = `<div class="item-box"><b>${groupTitle} (${g.count} Set)</b><br>`;
+                    
                     if(d.type === 'gorden') {
                         html += `• ${d.spec.nk.toUpperCase()} (${d.spec.l}x${d.spec.t}) - ${d.spec.m.toUpperCase()} (${d.spec.p} PNL)<br>`;
                         if(d.spec.isV) {
                             html += `• VIT: ${d.spec.nv.toUpperCase()} (${d.spec.vm==='spiral'?d.spec.vl+'x'+d.spec.vt+' Qty:'+d.spec.vq : 'Ikut Utama'}) - ${d.spec.vm.toUpperCase()}<br>`;
                         }
-                    } else { html += `• ${d.spec.bn.toUpperCase()} (${d.spec.l}x${d.spec.t})`; }
+                    } else { 
+                        html += `• ${d.spec.bn.toUpperCase()} (${d.spec.l}x${d.spec.t})`; 
+                    }
                     
                     if(mode === 'estimasi') {
-                        html += `<div style="text-align:right; margin-top:5px; font-weight:900;">Rp ${Math.round(g.totalSub).toLocaleString('id-ID')}</div>`;
+                        html += `<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px; border-top:1px dashed #ccc; padding-top:4px;">
+                                    <span>Harga @ Rp ${Math.round(g.pricePerSet).toLocaleString('id-ID')}</span>
+                                    <span style="font-weight:900;">Sub: Rp ${Math.round(g.totalSub).toLocaleString('id-ID')}</span>
+                                 </div>`;
                     }
                     list.innerHTML += html + `</div>`;
                 }
