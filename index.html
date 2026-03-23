@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Yeny Gorden Pro - Smart Grouping</title>
+    <title id="app-title">Kalkulator Yeny Gorden Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <style>
@@ -64,7 +64,7 @@
         .item-box b { font-size: 15px; text-transform: uppercase; border-bottom: 1px solid #ddd; display: block; margin-bottom: 5px; }
 
         @media print {
-            .no-print, #modal-input-customer { display: none !important; } /* Memaksa input data tidak ikut tercetak */
+            .no-print, #modal-input-customer { display: none !important; }
             body { background: white !important; margin: 0; padding: 0; }
             .modal { position: absolute !important; display: block !important; padding: 0 !important; top: 0; left: 0; background: white !important; overflow: visible !important; }
             .modal-content { border: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; }
@@ -190,6 +190,7 @@
     <script>
         const PR = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
         let allItems = [];
+        const ORIGINAL_APP_TITLE = "Kalkulator Yeny Gorden Pro";
 
         function uploadLogo(input) {
             if (input.files && input.files[0]) {
@@ -360,12 +361,25 @@
         }
 
         function showMode(mode) {
-            if(mode === 'rincian') { generateReport(mode, "-", "-", "-"); return; }
+            if(mode === 'rincian') { 
+                document.title = "Rincian Kalkulasi";
+                generateReport(mode, "-", "-", "-"); 
+                return; 
+            }
             document.getElementById('modal-input-customer').style.display = "block";
             document.getElementById('btn-confirm-print').onclick = () => {
                 const name = document.getElementById('cust-name').value || "-";
-                const phone = document.getElementById('cust-phone').value || "-";
+                const phone = document.getElementById('cust-phone').value || "";
                 const addr = document.getElementById('cust-address').value || "-";
+                
+                // LANGSUNG GANTI JUDUL HALAMAN DI SINI
+                let prefix = (mode === 'estimasi') ? 'Est' : 'Spk';
+                let cleanName = name.replace(/[/\\?%*:|"<>]/g, '');
+                let cleanPhone = phone.replace(/[/\\?%*:|"<>]/g, '');
+                
+                // INI YANG MEMAKSA NAMA FILE PDF BERUBAH
+                document.title = `${prefix} ${cleanName} ${cleanPhone}`.trim();
+
                 generateReport(mode, name, phone, addr);
                 closeInputModal();
             };
@@ -445,7 +459,12 @@
         }
 
         function closeInputModal() { document.getElementById('modal-input-customer').style.display = "none"; }
-        function closeModal() { document.getElementById('modal-detail').style.display = "none"; }
+        
+        function closeModal() { 
+            document.getElementById('modal-detail').style.display = "none"; 
+            // Kembalikan Judul App saat modal ditutup
+            document.title = ORIGINAL_APP_TITLE;
+        }
     </script>
 </body>
 </html>
