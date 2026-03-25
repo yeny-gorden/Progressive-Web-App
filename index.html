@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeny Gorden Pro - Kasir Digital</title>
+    <title>Yeny Gorden Pro - Ultimate Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -11,70 +11,59 @@
             --text-main: #ffffff; --text-dim: #fbbf24; --accent: #3b82f6;
             --success: #22c55e; --danger: #ef4444; --border: #475569;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; line-height: 1.4; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; }
         .container { max-width: 800px; margin: 0 auto; }
 
-        /* Dashboard & Menu */
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; transition: 0.2s; }
-        .menu-card.active { border-color: var(--accent); background: #2563eb; transform: scale(1.02); }
-
         /* Tutorial Box */
-        .tutorial-box { background: rgba(59, 130, 246, 0.1); border: 2px dashed var(--accent); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .tutorial-box h4 { margin: 0 0 8px 0; color: var(--danger); font-size: 14px; text-transform: uppercase; font-weight: 900; }
-        .tutorial-box ul { margin: 0; padding-left: 20px; font-size: 12px; color: #cbd5e1; font-weight: 700; }
-        .tutorial-box li { margin-bottom: 5px; }
+        .tutorial-box { background: rgba(59, 130, 246, 0.1); border: 2px dashed var(--accent); padding: 12px; border-radius: 10px; margin-bottom: 15px; }
+        .tutorial-box h4 { margin: 0 0 5px 0; color: var(--danger); font-size: 13px; font-weight: 900; }
+        .tutorial-box ul { margin: 0; padding-left: 18px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
 
-        /* Card Jendela */
-        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
-        .header-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .win-name { background: transparent; border: none; color: var(--text-dim); font-weight: 900; font-size: 16px; width: 70%; border-bottom: 1px solid transparent; }
-        .win-name:focus { border-bottom: 1px solid var(--text-dim); outline: none; }
-        
-        /* Grid System */
+        /* UI Cards */
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; }
+        .menu-card.active { border-color: var(--accent); background: #2563eb; }
+
+        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); }
         .grid { display: grid; gap: 8px; margin-bottom: 8px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         .grid-custom { grid-template-columns: 2fr 1fr 0.6fr 0.4fr; align-items: end; }
         
-        label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
-        input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 700; text-align: center; }
+        label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        input, select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 700; text-align: center; }
 
-        /* Item Tambahan Dinamis */
-        .extra-box { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
-        .extra-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .extra-title { font-size: 10px; font-weight: 900; color: var(--text-dim); }
+        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 10px; }
+        .btn-del { background: var(--danger); color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
         
-        /* Buttons */
-        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 10px; font-size: 14px; }
-        .btn-plus { background: var(--success); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .btn-del-mini { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
-        /* Footer & Grand Total */
-        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; margin-top: 40px; }
-        .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 12px; }
+        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; }
+        .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* Modals & PDF Area */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 10px; overflow-y: auto; }
-        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 12px; }
-        
-        #report-area { background: white; padding: 20px; color: black; min-height: 400px; }
-        .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .rep-logo { width: 60px; height: 60px; object-fit: contain; margin-right: 15px; }
-        .rep-store-info h2 { margin: 0; font-size: 22px; text-transform: uppercase; font-weight: 900; }
-        .rep-item { border-bottom: 1px dashed #999; padding: 10px 0; font-size: 13px; }
-        .rep-line { margin-bottom: 4px; }
-        
-        @media print { .no-print { display: none !important; } .modal { position: static; display: block; background: none; } }
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; padding: 10px; overflow-y: auto; }
+        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; position: relative; }
+
+        /* REPORT AREA (PDF TARGET) */
+        #report-area { 
+            background: #ffffff !important; 
+            color: #000000 !important; 
+            padding: 30px; 
+            width: 100%; 
+            min-height: 100%; /* Penting agar tidak putih di bawah */
+        }
+        .rep-header { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        .rep-logo { width: 60px; height: 60px; margin-right: 15px; }
+        .rep-item { border-bottom: 1px dashed #999; padding: 12px 0; font-size: 14px; page-break-inside: avoid; }
+        .rep-subtotal { text-align: right; font-weight: bold; margin-top: 5px; font-size: 15px; }
     </style>
 </head>
 <body>
 
     <div class="container no-print">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 id="display-store-name" style="margin:0; color:var(--accent); font-weight:900; text-transform: uppercase;">YENY GORDEN</h2>
+            <h2 id="display-store-name" style="color:var(--accent); font-weight:900;">YENY GORDEN</h2>
             <button onclick="openSettings()" style="background:none; border:none; font-size:24px; cursor:pointer;">⚙️</button>
         </div>
 
@@ -84,16 +73,14 @@
             <div class="menu-card" id="btn-bl" onclick="setMode('bl')">🪟 BLINDS</div>
         </div>
 
-        <div id="tutorial-box" class="tutorial-box">
+        <div class="tutorial-box">
             <h4>⚠️ PENTING: CARA PAKAI</h4>
             <ul>
                 <li>Pilih mode <b>(LOKAL/IMPORT/BLINDS)</b>.</li>
-                <li>Tekan <b>+ TAMBAH ITEM BARU</b> untuk menambahkan jendela baru.</li>
-                <li>Isi data <b>LEBAR</b>, <b>TINGGI</b>, dan <b>MODEL</b> serta data vitras tambahan.</li>
-                <li>Gunakan <b>+Item Tambahan</b> untuk aksesoris tambahan yang dibutuhkan.</li>
-                <li style="color: var(--text-dim); margin-top: 5px; border-top: 1px solid var(--border); padding-top: 5px;">
-                    <b>ULANGI DARI POIN 1 SETIAP MENAMBAHKAN JENDELA BARU</b>
-                </li>
+                <li>Tekan <b>+ TAMBAH ITEM BARU</b>.</li>
+                <li>Isi <b>LEBAR</b>, <b>TINGGI</b>, <b>MODEL</b> & Vitrase.</li>
+                <li>Gunakan <b>+ ITEM TAMBAHAN</b> untuk aksesoris.</li>
+                <li style="color: var(--text-dim);"><b>ULANGI DARI AWAL UNTUK JENDELA BERIKUTNYA!</b></li>
             </ul>
         </div>
 
@@ -113,9 +100,9 @@
     <div id="modal-cust" class="modal" style="display:none; align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="text-align:center">Data Konsumen</h3>
-            <label style="color:#666">Nama Pelanggan</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important; border: 1px solid #ccc;"><br>
-            <label style="color:#666">No. HP / WhatsApp</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important; border: 1px solid #ccc;"><br>
-            <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important; border: 1px solid #ccc;"></textarea><br><br>
+            <label>Nama Pelanggan</label><input type="text" id="c-name" style="background:#eee; color:#000 !important; border:1px solid #ccc;"><br>
+            <label>WhatsApp</label><input type="number" id="c-phone" style="background:#eee; color:#000 !important; border:1px solid #ccc;"><br>
+            <label>Alamat</label><textarea id="c-addr" style="width:100%; background:#eee; padding:10px; border-radius:8px; border:1px solid #ccc;"></textarea><br><br>
             <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px; cursor:pointer;">LANJUT</button>
         </div>
     </div>
@@ -123,18 +110,11 @@
     <div id="modal-report" class="modal">
         <div class="modal-content">
             <div id="report-area">
-                <div id="rep-branding"></div>
-                <div id="rep-date-box" style="display: flex; justify-content: space-between; font-size:12px; margin-bottom:10px;">
-                    <div id="rep-date-now"></div>
-                    <div id="rep-date-exp" style="color: red; font-weight: 900;"></div>
-                </div>
-                <div id="rep-cust-info" style="margin-bottom:15px; font-size:14px; line-height: 1.5; border: 1px solid #eee; padding: 10px; border-radius: 5px;"></div>
-                <div id="rep-list"></div>
-                <div id="rep-footer"></div>
+                <div id="rep-body-content"></div>
             </div>
             <div class="no-print" style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px; cursor:pointer;">DOWNLOAD PDF</button>
-                <button onclick="document.getElementById('modal-report').style.display='none'" style="padding:15px; background:var(--danger); color:#fff; border:none; font-weight:900; border-radius:8px; cursor:pointer;">TUTUP</button>
+                <button id="btn-download" onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">DOWNLOAD PDF</button>
+                <button onclick="document.getElementById('modal-report').style.display='none'" style="padding:15px; background:var(--danger); color:#fff; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
             </div>
         </div>
     </div>
@@ -143,214 +123,158 @@
         <div class="window-item">
             <div class="header-item">
                 <input type="text" class="win-name" value="Jendela Baru">
-                <button class="btn-del-mini" style="border-radius:50%; width:32px; height:32px; padding:0;" onclick="removeItem(this)">×</button>
+                <button class="btn-del" onclick="removeItem(this)">×</button>
             </div>
-            
-            <div class="f-inputs">
-                <div class="grid grid-2">
-                    <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
-                    <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
-                </div>
-                <div class="grid grid-3">
-                    <div><label>Lebar</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
-                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
-                    <div><label>Panel</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
-                </div>
-                <div class="grid grid-2">
-                    <div><label>Model</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                    <div><label>Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA</option></select></div>
-                </div>
-
-                <div class="vit-box hidden" style="border:1px dashed var(--border); padding:10px; border-radius:8px; margin-top:10px; background: rgba(255,255,255,0.03);">
-                    <div class="grid grid-2">
-                        <div><label>Nama Vitrase</label><input type="text" class="in-nv" oninput="calculateAll()"></div>
-                        <div><label>Model Vit</label><select class="sel-mv" onchange="toggleVitModel(this)"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                    </div>
-                    <div class="grid grid-2">
-                        <div><label>Harga Vit</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
-                        <div class="vit-spiral-input hidden">
-                             <div class="grid grid-3">
-                                <div><label>L</label><input type="number" step="0.01" class="in-vl" oninput="calculateAll()"></div>
-                                <div><label>T</label><input type="number" step="0.01" class="in-vt" oninput="calculateAll()"></div>
-                                <div><label>Qty</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
-                             </div>
-                        </div>
-                    </div>
+            <div class="grid grid-2">
+                <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
+                <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
+            </div>
+            <div class="grid grid-3">
+                <div><label>L</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
+                <div><label>T</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
+                <div><label>Pnl</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
+            </div>
+            <div class="grid grid-2">
+                <div><label>Model</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
+                <div><label>Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA</option></select></div>
+            </div>
+            <div class="vit-box hidden" style="border:1px dashed #666; padding:10px; margin-top:10px;">
+                <input type="text" class="in-nv" placeholder="Nama Vitras" oninput="calculateAll()">
+                <div class="grid grid-2" style="margin-top:5px;">
+                    <input type="number" class="in-hv" placeholder="Harga Vitras" oninput="calculateAll()">
+                    <select class="sel-mv" onchange="calculateAll()"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select>
                 </div>
             </div>
-
             <div class="extra-box">
-                <div class="extra-header">
-                    <span class="extra-title">ITEM TAMBAHAN</span>
-                    <button class="btn-plus" onclick="addExtraRow(this)">+ TAMBAH</button>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-size:10px; font-weight:900;">TAMBAHAN</span>
+                    <button onclick="addExtraRow(this)" style="font-size:10px; padding:2px 8px; background:var(--success); color:white; border:none; border-radius:4px; cursor:pointer;">+ TAMBAH</button>
                 </div>
                 <div class="extra-list-container"></div>
             </div>
-
-            <div style="text-align:right; margin-top:12px; color:var(--success); font-weight:900; font-size:16px;" class="sub-total">Rp 0</div>
+            <div class="sub-total" style="text-align:right; color:var(--success); font-weight:900; margin-top:10px;">Rp 0</div>
         </div>
     </template>
 
     <template id="tmp-extra-row">
         <div class="grid grid-custom extra-row">
-            <div><label>Nama Item</label><input type="text" class="ex-name" oninput="calculateAll()"></div>
-            <div><label>Harga</label><input type="number" class="ex-price" value="0" oninput="calculateAll()"></div>
-            <div><label>Qty</label><input type="number" class="ex-qty" value="1" oninput="calculateAll()"></div>
-            <button class="btn-del-mini" onclick="removeExtraRow(this)">×</button>
+            <input type="text" class="ex-name" placeholder="Item" oninput="calculateAll()">
+            <input type="number" class="ex-price" placeholder="Harga" oninput="calculateAll()">
+            <input type="number" class="ex-qty" value="1" oninput="calculateAll()">
+            <button class="btn-del" onclick="this.closest('.extra-row').remove(); calculateAll()">×</button>
         </div>
     </template>
 
     <script>
         let currentMode = 'lo';
         let itemCount = 0;
-        let activeRepName = 'ESTIMASI';
+        let activeRepType = '';
         const P = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
 
-        window.onload = () => { loadSettings(); };
-
-        function setMode(m) {
-            currentMode = m;
-            document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('btn-'+m).classList.add('active');
-        }
-
+        function setMode(m) { currentMode = m; document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+m).classList.add('active'); }
         function toggleVit(sel) { sel.closest('.window-item').querySelector('.vit-box').classList.toggle('hidden', sel.value==='tidak'); calculateAll(); }
-        function toggleVitModel(sel) { sel.closest('.vit-box').querySelector('.vit-spiral-input').classList.toggle('hidden', sel.value !== 'Spiral'); calculateAll(); }
-        function addExtraRow(btn) { btn.closest('.extra-box').querySelector('.extra-list-container').appendChild(document.getElementById('tmp-extra-row').content.cloneNode(true)); calculateAll(); }
-        function removeExtraRow(btn) { btn.closest('.extra-row').remove(); calculateAll(); }
-
-        function addWindow() {
-            itemCount++;
-            const container = document.getElementById('window-container');
-            const clone = document.getElementById('tmp-win').content.cloneNode(true);
-            const winItem = clone.querySelector('.window-item');
-            winItem.querySelector('.win-name').value = "Jendela #" + itemCount;
-            winItem.dataset.mode = currentMode;
-            container.appendChild(winItem);
-            calculateAll();
-        }
-
+        function addWindow() { itemCount++; const clone = document.getElementById('tmp-win').content.cloneNode(true); clone.querySelector('.win-name').value = "Jendela " + itemCount; document.getElementById('window-container').appendChild(clone); calculateAll(); }
         function removeItem(btn) { btn.closest('.window-item').remove(); calculateAll(); }
+        function addExtraRow(btn) { btn.closest('.extra-box').querySelector('.extra-list-container').appendChild(document.getElementById('tmp-extra-row').content.cloneNode(true)); calculateAll(); }
 
         function calculateAll() {
             let grand = 0; window.finalData = [];
             document.querySelectorAll('.window-item').forEach(el => {
                 let sub = 0, item = { name: el.querySelector('.win-name').value, main:{}, vit:{}, extras:[] };
-                const nk = el.querySelector('.in-nk').value || "Bahan", hk = parseFloat(el.querySelector('.in-hk').value)||0;
-                const l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0;
-                const m = el.querySelector('.sel-m').value, pan = el.querySelector('.in-p').value;
-                
-                // Hitung Kain
+                const hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, m = el.querySelector('.sel-m').value;
                 let mtr = (currentMode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
                 sub = (mtr*hk) + (mtr*P.jahit);
-                item.main = { n:nk, u:`${l}x${t}`, m:m, p:pan };
-                
-                // Hardware
-                if(m==='Smokring'){ 
-                    let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); 
-                } else { sub += Math.max(l,1)*P.rell; }
-
-                // Vitrase
+                item.main = { n: el.querySelector('.in-nk').value||"-", u:`${l}x${t}`, m:m, p:el.querySelector('.in-p').value };
+                if(m==='Smokring'){ let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); } else { sub += Math.max(l,1)*P.rell; }
                 if(el.querySelector('.sel-v').value==='ya'){
-                    const hv = parseFloat(el.querySelector('.in-hv').value)||0, mv = el.querySelector('.sel-mv').value, nv = el.querySelector('.in-nv').value || "Vitras";
-                    let mtrV, vL=l, vT=t, vQ=1;
-                    if(mv==='Spiral'){
-                        vL=parseFloat(el.querySelector('.in-vl').value)||0; vT=parseFloat(el.querySelector('.in-vt').value)||0; vQ=parseFloat(el.querySelector('.in-vq').value)||1;
-                        mtrV = (vL+0.2)*3*vQ; sub += (mtrV*hv) + (mtrV*P.jahit) + (vQ*P.stick);
-                    } else {
-                        mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
-                    }
-                    item.vit = { n:nv, u:`${vL}x${vT}`, m:mv, q:vQ };
+                    const hv = parseFloat(el.querySelector('.in-hv').value)||0;
+                    let mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
+                    item.vit = { n: el.querySelector('.in-nv').value||"Vitras", u:`${l}x${t}`, m:el.querySelector('.sel-mv').value };
                 }
-                
                 sub += P.hook + P.tali + P.instal;
-
-                // Item Tambahan Dinamis
                 el.querySelectorAll('.extra-row').forEach(row => {
-                    const en = row.querySelector('.ex-name').value || "Item", ep = parseFloat(row.querySelector('.ex-price').value)||0, eq = parseFloat(row.querySelector('.ex-qty').value)||1;
-                    sub += (ep*eq);
-                    if(ep > 0) item.extras.push(`${en} (x${eq})`);
+                    let ep = parseFloat(row.querySelector('.ex-price').value)||0, eq = parseFloat(row.querySelector('.ex-qty').value)||1;
+                    sub += (ep*eq); if(ep>0) item.extras.push(`${row.querySelector('.ex-name').value||'Item'} (${eq})`);
                 });
-
                 el.querySelector('.sub-total').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
                 item.total = sub; grand += sub; window.finalData.push(item);
             });
             document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(grand).toLocaleString('id-ID');
         }
 
-        function prepReport(m) { activeRepName = m.toUpperCase(); document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = () => showReport(m); }
+        function prepReport(type) { activeRepType = type; document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = showReport; }
 
-        function showReport(mode) {
+        function showReport() {
             document.getElementById('modal-cust').style.display = 'none';
-            const isEst = (mode === 'estimasi');
-            const sName = localStorage.getItem('y_name') || "YENY GORDEN";
-            const sWa = localStorage.getItem('y_wa') || "";
-            const sLogo = localStorage.getItem('y_logo') || "";
-
-            document.getElementById('rep-branding').innerHTML = `
-                <div class="rep-header-box">
-                    <img src="${sLogo}" class="rep-logo" onerror="this.style.display='none'">
-                    <div class="rep-store-info"><h2>${sName}</h2><p>WA: ${sWa}</p></div>
+            const isEst = (activeRepType === 'estimasi');
+            const now = new Date(); const exp = new Date(); exp.setDate(now.getDate() + 7);
+            
+            let html = `
+                <div class="rep-header">
+                    <div style="flex-grow:1">
+                        <h2 style="margin:0">${localStorage.getItem('y_name')||'YENY GORDEN'}</h2>
+                        <p style="margin:0; font-size:12px;">WA: ${localStorage.getItem('y_wa')||'-'}</p>
+                    </div>
+                    <div style="text-align:right">
+                        <h3 style="margin:0; text-transform:uppercase;">${activeRepType}</h3>
+                    </div>
                 </div>
-                <h4 style="text-align:center; margin:10px 0; text-decoration: underline;">LAPORAN ${mode.toUpperCase()}</h4>`;
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:15px;">
+                    <div>Tgl: ${now.toLocaleDateString('id-ID')}</div>
+                    <div style="color:red; font-weight:bold;">${isEst?'Berlaku s/d: '+exp.toLocaleDateString('id-ID'):''}</div>
+                </div>
+                <div style="border:1px solid #000; padding:10px; margin-bottom:20px; font-size:14px; line-height:1.6;">
+                    <b>${isEst?'Nama':'Pesanan'}:</b> ${document.getElementById('c-name').value || '-'}<br>
+                    <b>WhatsApp:</b> ${document.getElementById('c-phone').value || '-'}<br>
+                    <b>Alamat:</b> ${document.getElementById('c-addr').value || '-'}
+                </div>
+            `;
 
-            const now = new Date();
-            const exp = new Date(); exp.setDate(now.getDate() + 7);
-            document.getElementById('rep-date-now').innerText = "Tgl Cetak: " + now.toLocaleDateString('id-ID');
-            document.getElementById('rep-date-exp').innerHTML = isEst ? `Masa Berlaku s/d: <b>${exp.toLocaleDateString('id-ID')}</b> (1 Minggu)` : "";
-
-            const n = document.getElementById('c-name').value || "-";
-            const p = document.getElementById('c-phone').value || "-";
-            const a = document.getElementById('c-addr').value || "-";
-            document.getElementById('rep-cust-info').innerHTML = `<b>${isEst?'Nama':'Pesanan'}:</b> ${n} (${p})<br><b>Alamat:</b> ${a}`;
-
-            const list = document.getElementById('rep-list'); list.innerHTML = "";
             window.finalData.forEach(item => {
-                let h = `<div class="rep-item">
-                    <div class="rep-line"><b>${item.name}</b></div>
-                    <div class="rep-line">${item.main.n} | ${item.main.u} | ${item.main.m} | ${item.main.p} Pnl</div>`;
-                if(item.vit.n) h += `<div class="rep-line">${item.vit.n} | ${item.vit.u} | ${item.vit.m} | Qty: ${item.vit.q}</div>`;
-                if(item.extras.length > 0) h += `<div class="rep-line" style="font-size:11px; color:#555;">+ ${item.extras.join(', ')}</div>`;
-                if(isEst) h += `<div style="text-align:right; font-weight:bold; margin-top:5px;">Sub: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
-                h += `</div>`;
-                list.innerHTML += h;
+                html += `
+                    <div class="rep-item">
+                        <b>${item.name}</b><br>
+                        ${item.main.n} | ${item.main.u} | ${item.main.m} | ${item.main.p} Pnl
+                        ${item.vit.n ? `<br>${item.vit.n} | ${item.vit.u} | ${item.vit.m}` : ''}
+                        ${item.extras.length > 0 ? `<br><small style="color:#555">+ ${item.extras.join(', ')}</small>` : ''}
+                        ${isEst ? `<div class="rep-subtotal">Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>` : ''}
+                    </div>
+                `;
             });
 
-            document.getElementById('rep-footer').innerHTML = isEst ? `<h3 style="text-align:right; border-top:2px solid #000; padding-top:10px;">GRAND TOTAL: Rp ${Math.round(window.finalData.reduce((a,b)=>a+b.total,0)).toLocaleString('id-ID')}</h3>` : "";
+            if(isEst) {
+                const totalGrand = window.finalData.reduce((a,b)=>a+b.total,0);
+                html += `<h2 style="text-align:right; border-top:3px solid #000; margin-top:20px; padding-top:10px;">TOTAL: Rp ${Math.round(totalGrand).toLocaleString('id-ID')}</h2>`;
+            }
+
+            document.getElementById('rep-body-content').innerHTML = html;
             document.getElementById('modal-report').style.display = 'block';
         }
 
         async function downloadPDF() {
-            const area = document.getElementById('report-area');
-            const n = (document.getElementById('c-name').value || "KONSUMEN").toUpperCase();
-            const p = document.getElementById('c-phone').value || "";
-            const filename = `${activeRepName} ${n} ${p}.pdf`;
-
+            const element = document.getElementById('report-area');
+            const name = document.getElementById('c-name').value || 'KONSUMEN';
             const opt = {
-                margin: 0.3,
-                filename: filename,
+                margin: 0.2,
+                filename: `${activeRepType.toUpperCase()}_${name.toUpperCase()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-
+            
+            document.getElementById('btn-download').innerText = "SABAR...";
             try {
-                await html2pdf().set(opt).from(area).save();
-            } catch (e) {
-                alert("Gagal membuat PDF. Coba ulangi.");
+                await html2pdf().set(opt).from(element).save();
+            } finally {
+                document.getElementById('btn-download').innerText = "DOWNLOAD PDF";
             }
         }
 
         function openSettings() {
-            const n = prompt("Nama Toko:", localStorage.getItem('y_name') || "YENY GORDEN");
-            const w = prompt("WA Toko:", localStorage.getItem('y_wa') || "");
+            const n = prompt("Nama Toko:", localStorage.getItem('y_name')||"YENY GORDEN");
+            const w = prompt("WA Toko:", localStorage.getItem('y_wa')||"");
             if(n) { localStorage.setItem('y_name', n); document.getElementById('display-store-name').innerText = n; }
             if(w) localStorage.setItem('y_wa', w);
-            alert("Pengaturan Toko Berhasil Disimpan!");
-        }
-
-        function loadSettings() {
-            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "YENY GORDEN";
         }
     </script>
 </body>
