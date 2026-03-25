@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeny Gorden Pro - Ultimate Fix</title>
+    <title>Yeny Gorden Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -15,55 +15,52 @@
         body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; }
         .container { max-width: 800px; margin: 0 auto; }
 
-        /* Tutorial Box */
-        .tutorial-box { background: rgba(59, 130, 246, 0.1); border: 2px dashed var(--accent); padding: 12px; border-radius: 10px; margin-bottom: 15px; }
-        .tutorial-box h4 { margin: 0 0 5px 0; color: var(--danger); font-size: 13px; font-weight: 900; }
-        .tutorial-box ul { margin: 0; padding-left: 18px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
-
-        /* UI Cards */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; }
         .menu-card.active { border-color: var(--accent); background: #2563eb; }
 
-        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); }
-        .grid { display: grid; gap: 8px; margin-bottom: 8px; }
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        .grid-custom { grid-template-columns: 2fr 1fr 0.6fr 0.4fr; align-items: end; }
+        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; }
         
-        label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-        input, select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 700; text-align: center; }
+        .extra-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
+        .extra-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .extra-title { font-size: 10px; font-weight: 900; color: var(--text-dim); text-transform: uppercase; }
+        .btn-add-small { background: var(--success); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .extra-row { display: grid; grid-template-columns: 1fr 80px 50px 30px; gap: 5px; margin-bottom: 5px; }
+        .btn-del-small { background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
+        input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 8px; border-radius: 6px; font-size: 14px; font-weight: 700; text-align: center; }
 
         .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 10px; }
-        .btn-del { background: var(--danger); color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
         
-        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; }
+        .header-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .item-tag { font-size: 12px; font-weight: 900; color: var(--text-dim); background: rgba(251, 191, 36, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--text-dim); }
+        .btn-del { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        
+        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; margin-top: 50px; }
         .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; padding: 10px; overflow-y: auto; }
-        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; position: relative; }
-
-        /* REPORT AREA (PDF TARGET) */
-        #report-area { 
-            background: #ffffff !important; 
-            color: #000000 !important; 
-            padding: 30px; 
-            width: 100%; 
-            min-height: 100%; /* Penting agar tidak putih di bawah */
-        }
-        .rep-header { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .rep-logo { width: 60px; height: 60px; margin-right: 15px; }
-        .rep-item { border-bottom: 1px dashed #999; padding: 12px 0; font-size: 14px; page-break-inside: avoid; }
-        .rep-subtotal { text-align: right; font-weight: bold; margin-top: 5px; font-size: 15px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
+        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
+        
+        #report-area { background: white; color: black; padding: 20px; border-radius: 5px; }
+        /* Header Merapat */
+        .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 10px; gap: 15px; }
+        .rep-store-info h2 { margin: 0; font-size: 22px; }
+        .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; }
+        .rep-logo { width: 80px; height: 80px; object-fit: contain; }
+        .rep-item { border: 1px solid #000; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+        .grid { display: grid; gap: 8px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
     </style>
 </head>
 <body>
 
     <div class="container no-print">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 id="display-store-name" style="color:var(--accent); font-weight:900;">YENY GORDEN</h2>
+            <h2 id="display-store-name" style="margin:0; color:var(--accent); font-weight:900;">YENY GORDEN</h2>
             <button onclick="openSettings()" style="background:none; border:none; font-size:24px; cursor:pointer;">⚙️</button>
         </div>
 
@@ -71,17 +68,6 @@
             <div class="menu-card active" id="btn-lo" onclick="setMode('lo')">🏠 LOKAL</div>
             <div class="menu-card" id="btn-im" onclick="setMode('im')">✈️ IMPORT</div>
             <div class="menu-card" id="btn-bl" onclick="setMode('bl')">🪟 BLINDS</div>
-        </div>
-
-        <div class="tutorial-box">
-            <h4>⚠️ PENTING: CARA PAKAI</h4>
-            <ul>
-                <li>Pilih mode <b>(LOKAL/IMPORT/BLINDS)</b>.</li>
-                <li>Tekan <b>+ TAMBAH ITEM BARU</b>.</li>
-                <li>Isi <b>LEBAR</b>, <b>TINGGI</b>, <b>MODEL</b> & Vitrase.</li>
-                <li>Gunakan <b>+ ITEM TAMBAHAN</b> untuk aksesoris.</li>
-                <li style="color: var(--text-dim);"><b>ULANGI DARI AWAL UNTUK JENDELA BERIKUTNYA!</b></li>
-            </ul>
         </div>
 
         <div id="window-container"></div>
@@ -97,23 +83,36 @@
         </div>
     </div>
 
-    <div id="modal-cust" class="modal" style="display:none; align-items:center; justify-content:center;">
+    <div id="modal-cust" class="modal">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="text-align:center">Data Konsumen</h3>
-            <label>Nama Pelanggan</label><input type="text" id="c-name" style="background:#eee; color:#000 !important; border:1px solid #ccc;"><br>
-            <label>WhatsApp</label><input type="number" id="c-phone" style="background:#eee; color:#000 !important; border:1px solid #ccc;"><br>
-            <label>Alamat</label><textarea id="c-addr" style="width:100%; background:#eee; padding:10px; border-radius:8px; border:1px solid #ccc;"></textarea><br><br>
-            <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px; cursor:pointer;">LANJUT</button>
+            <label style="color:#666">Nama Pelanggan</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">No. HP / WhatsApp</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important;"></textarea><br><br>
+            <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px;">LANJUT</button>
+        </div>
+    </div>
+
+    <div id="modal-settings" class="modal">
+        <div class="modal-content" style="max-width:350px; background:var(--bg-card); color:#fff;">
+            <h3 style="text-align:center">PENGATURAN TOKO</h3>
+            <label>Nama Toko</label><input type="text" id="set-name"><br>
+            <label>WhatsApp Toko</label><input type="number" id="set-wa"><br>
+            <label>Logo Toko</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><br>
+            <button onclick="saveSettings()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; font-weight:bold; border-radius:5px;">SIMPAN</button>
         </div>
     </div>
 
     <div id="modal-report" class="modal">
         <div class="modal-content">
             <div id="report-area">
-                <div id="rep-body-content"></div>
+                <div id="rep-branding"></div>
+                <div id="rep-info" style="font-size:12px; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:5px;"></div>
+                <div id="rep-list"></div>
+                <div id="rep-footer"></div>
             </div>
             <div class="no-print" style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button id="btn-download" onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">DOWNLOAD PDF</button>
+                <button onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">DOWNLOAD PDF</button>
                 <button onclick="document.getElementById('modal-report').style.display='none'" style="padding:15px; background:var(--danger); color:#fff; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
             </div>
         </div>
@@ -122,159 +121,248 @@
     <template id="tmp-win">
         <div class="window-item">
             <div class="header-item">
-                <input type="text" class="win-name" value="Jendela Baru">
-                <button class="btn-del" onclick="removeItem(this)">×</button>
+                <input type="text" class="win-name" style="background:transparent; border:none; color:var(--text-dim); text-align:left; font-weight:900; font-size:16px; width:60%;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="item-tag">LOKAL</div>
+                    <button class="btn-del" onclick="removeItem(this)">×</button>
+                </div>
             </div>
-            <div class="grid grid-2">
-                <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
-                <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
+            <div class="f-gorden">
+                <div class="grid grid-2">
+                    <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
+                    <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
+                </div>
+                <div class="grid grid-3">
+                    <div><label>Lebar</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
+                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
+                    <div><label>Panel</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
+                </div>
+                <div class="grid grid-2">
+                    <div><label>Model Gorden</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
+                    <div><label>Pakai Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="Plisket">YA - PLISKET</option><option value="Spiral">YA - SPIRAL</option></select></div>
+                </div>
+                <div class="vit-box hidden" style="border:1px dashed var(--border); padding:8px; border-radius:8px; margin-top:8px;">
+                    <div class="grid grid-2">
+                        <div><label>Nama Vitrase</label><input type="text" class="in-nv" oninput="calculateAll()"></div>
+                        <div><label>Harga Vit/m</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
+                    </div>
+                    <div class="vit-spiral-input hidden">
+                        <div class="grid grid-3">
+                            <div><label>Lebar Vit</label><input type="number" step="0.01" class="in-vl" oninput="calculateAll()"></div>
+                            <div><label>Tinggi Vit</label><input type="number" step="0.01" class="in-vt" oninput="calculateAll()"></div>
+                            <div><label>Qty Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="grid grid-3">
-                <div><label>L</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
-                <div><label>T</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
-                <div><label>Pnl</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
-            </div>
-            <div class="grid grid-2">
-                <div><label>Model</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                <div><label>Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA</option></select></div>
-            </div>
-            <div class="vit-box hidden" style="border:1px dashed #666; padding:10px; margin-top:10px;">
-                <input type="text" class="in-nv" placeholder="Nama Vitras" oninput="calculateAll()">
-                <div class="grid grid-2" style="margin-top:5px;">
-                    <input type="number" class="in-hv" placeholder="Harga Vitras" oninput="calculateAll()">
-                    <select class="sel-mv" onchange="calculateAll()"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select>
+            <div class="f-blinds hidden">
+                <div class="grid grid-2">
+                    <div><label>Nama Blinds</label><input type="text" class="in-bl-n" oninput="calculateAll()"></div>
+                    <div><label>Harga/m</label><input type="number" class="in-bl-h" oninput="calculateAll()"></div>
+                </div>
+                <div class="grid grid-2">
+                    <div><label>Lebar</label><input type="number" step="0.01" class="in-bl-l" oninput="calculateAll()"></div>
+                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-bl-t" oninput="calculateAll()"></div>
                 </div>
             </div>
             <div class="extra-box">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span style="font-size:10px; font-weight:900;">TAMBAHAN</span>
-                    <button onclick="addExtraRow(this)" style="font-size:10px; padding:2px 8px; background:var(--success); color:white; border:none; border-radius:4px; cursor:pointer;">+ TAMBAH</button>
-                </div>
-                <div class="extra-list-container"></div>
+                <div class="extra-header"><span class="extra-title">+ AKSESORIS / ITEM TAMBAHAN</span><button class="btn-add-small" onclick="addExtraRow(this)">+ TAMBAH</button></div>
+                <div class="extra-list"></div>
             </div>
-            <div class="sub-total" style="text-align:right; color:var(--success); font-weight:900; margin-top:10px;">Rp 0</div>
-        </div>
-    </template>
-
-    <template id="tmp-extra-row">
-        <div class="grid grid-custom extra-row">
-            <input type="text" class="ex-name" placeholder="Item" oninput="calculateAll()">
-            <input type="number" class="ex-price" placeholder="Harga" oninput="calculateAll()">
-            <input type="number" class="ex-qty" value="1" oninput="calculateAll()">
-            <button class="btn-del" onclick="this.closest('.extra-row').remove(); calculateAll()">×</button>
+            <div style="text-align:right; margin-top:10px; color:var(--success); font-weight:900;" class="sub-total">Rp 0</div>
         </div>
     </template>
 
     <script>
         let currentMode = 'lo';
+        let currentReportType = '';
         let itemCount = 0;
-        let activeRepType = '';
         const P = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
 
-        function setMode(m) { currentMode = m; document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+m).classList.add('active'); }
-        function toggleVit(sel) { sel.closest('.window-item').querySelector('.vit-box').classList.toggle('hidden', sel.value==='tidak'); calculateAll(); }
-        function addWindow() { itemCount++; const clone = document.getElementById('tmp-win').content.cloneNode(true); clone.querySelector('.win-name').value = "Jendela " + itemCount; document.getElementById('window-container').appendChild(clone); calculateAll(); }
-        function removeItem(btn) { btn.closest('.window-item').remove(); calculateAll(); }
-        function addExtraRow(btn) { btn.closest('.extra-box').querySelector('.extra-list-container').appendChild(document.getElementById('tmp-extra-row').content.cloneNode(true)); calculateAll(); }
+        window.onload = () => { loadSettings(); };
+
+        function setMode(m) {
+            currentMode = m;
+            document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('btn-'+m).classList.add('active');
+        }
+
+        function toggleVit(sel) {
+            const win = sel.closest('.window-item');
+            const box = win.querySelector('.vit-box');
+            const spiralIn = win.querySelector('.vit-spiral-input');
+            box.classList.toggle('hidden', sel.value==='tidak');
+            spiralIn.classList.toggle('hidden', sel.value!=='Spiral');
+            calculateAll();
+        }
+
+        function addWindow() {
+            itemCount++;
+            let nameInput = prompt("Nama Jendela:", "Jendela #" + itemCount);
+            if (nameInput === null) { itemCount--; return; }
+            const container = document.getElementById('window-container');
+            const clone = document.getElementById('tmp-win').content.cloneNode(true);
+            const el = clone.querySelector('.window-item');
+            el.dataset.mode = currentMode;
+            el.querySelector('.win-name').value = nameInput || "Jendela #" + itemCount;
+            const tag = el.querySelector('.item-tag');
+            tag.innerText = (currentMode==='lo'?'LOKAL':currentMode==='im'?'IMPOR':'BLINDS');
+            if(currentMode==='bl'){ 
+                el.querySelector('.f-gorden').classList.add('hidden'); 
+                el.querySelector('.f-blinds').classList.remove('hidden'); 
+            }
+            container.appendChild(el);
+            calculateAll();
+        }
+
+        function addExtraRow(btn) {
+            const list = btn.closest('.extra-box').querySelector('.extra-list');
+            const div = document.createElement('div');
+            div.className = 'extra-row';
+            div.innerHTML = `<input type="text" placeholder="Item" class="ex-n" oninput="calculateAll()"><input type="number" placeholder="Harga" class="ex-h" oninput="calculateAll()"><input type="number" placeholder="Qty" class="ex-q" value="1" oninput="calculateAll()"><button class="btn-del-small" onclick="this.parentElement.remove(); calculateAll();">×</button>`;
+            list.appendChild(div);
+        }
+
+        function removeItem(btn) {
+            btn.closest('.window-item').remove();
+            calculateAll();
+        }
 
         function calculateAll() {
             let grand = 0; window.finalData = [];
             document.querySelectorAll('.window-item').forEach(el => {
-                let sub = 0, item = { name: el.querySelector('.win-name').value, main:{}, vit:{}, extras:[] };
-                const hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, m = el.querySelector('.sel-m').value;
-                let mtr = (currentMode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
-                sub = (mtr*hk) + (mtr*P.jahit);
-                item.main = { n: el.querySelector('.in-nk').value||"-", u:`${l}x${t}`, m:m, p:el.querySelector('.in-p').value };
-                if(m==='Smokring'){ let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); } else { sub += Math.max(l,1)*P.rell; }
-                if(el.querySelector('.sel-v').value==='ya'){
-                    const hv = parseFloat(el.querySelector('.in-hv').value)||0;
-                    let mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
-                    item.vit = { n: el.querySelector('.in-nv').value||"Vitras", u:`${l}x${t}`, m:el.querySelector('.sel-mv').value };
+                const mode = el.dataset.mode;
+                let sub = 0, details = [], extras = [], item = { name: el.querySelector('.win-name').value, mode: mode };
+
+                if(mode==='bl'){
+                    const l = parseFloat(el.querySelector('.in-bl-l').value)||0, t = parseFloat(el.querySelector('.in-bl-t').value)||0, h = parseFloat(el.querySelector('.in-bl-h').value)||0, name = el.querySelector('.in-bl-n').value;
+                    let val = Math.max(l,1) * Math.max(t,1) * h;
+                    sub = val + P.instal;
+                    item.kain = `${name} (${l}x${t})`; item.modelK = "Blinds"; item.panel = "-";
+                    details.push({ n: `Blinds (${l}x${t})`, v: val }, { n: "Instalasi", v: P.instal });
+                } else {
+                    const nk = el.querySelector('.in-nk').value, hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, p = el.querySelector('.in-p').value, m = el.querySelector('.sel-m').value;
+                    let mtr = (mode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
+                    sub = (mtr*hk) + (mtr*P.jahit);
+                    item.kain = nk; item.ukuranK = `${l}x${t}`; item.modelK = m; item.panel = p;
+                    details.push({ n: `Bahan (${mtr.toFixed(1)}m)`, v: mtr*hk }, { n: "Jahit", v: mtr*P.jahit });
+                    if(m==='Smokring'){ 
+                        let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet);
+                        details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring}, {n:"Rollet", v:Math.max(l,1)*P.rollet});
+                    } else { sub += Math.max(l,1)*P.rell; details.push({n:"Rell", v:Math.max(l,1)*P.rell}); }
+                    
+                    const vMod = el.querySelector('.sel-v').value;
+                    if(vMod !== 'tidak'){
+                        const nv = el.querySelector('.in-nv').value, hv = parseFloat(el.querySelector('.in-hv').value)||0;
+                        if(vMod === 'Plisket'){
+                            let mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
+                            item.vit = nv; item.ukuranV = `${l}x${t}`; item.modelV = "Plisket"; item.qtyV = 1;
+                            details.push({n:`Vitrase Plisket`, v:mtrV*hv}, {n:"Jahit Vit", v:mtrV*P.jahit}, {n:"Rell Vit", v:Math.max(l,1)*P.rell});
+                        } else {
+                            const vl = parseFloat(el.querySelector('.in-vl').value)||0, vt = parseFloat(el.querySelector('.in-vt').value)||0, vq = parseFloat(el.querySelector('.in-vq').value)||1;
+                            let mtrV = (vl+0.1)*3; sub += ((mtrV*hv) + (mtrV*P.jahit) + (mtrV*P.stick))*vq;
+                            item.vit = nv; item.ukuranV = `${vl}x${vt}`; item.modelV = "Spiral"; item.qtyV = vq;
+                            details.push({n:`Vitrase Spiral`, v:((mtrV*hv)+(mtrV*P.jahit)+(mtrV*P.stick))*vq});
+                        }
+                    }
+                    sub += P.hook + P.tali + P.instal;
+                    details.push({n:"Hook", v:P.hook}, {n:"Tali", v:P.tali}, {n:"Instalasi", v:P.instal});
                 }
-                sub += P.hook + P.tali + P.instal;
                 el.querySelectorAll('.extra-row').forEach(row => {
-                    let ep = parseFloat(row.querySelector('.ex-price').value)||0, eq = parseFloat(row.querySelector('.ex-qty').value)||1;
-                    sub += (ep*eq); if(ep>0) item.extras.push(`${row.querySelector('.ex-name').value||'Item'} (${eq})`);
+                    const nEx = row.querySelector('.ex-n').value || "Tambahan";
+                    const pEx = parseFloat(row.querySelector('.ex-h').value) || 0, qEx = parseFloat(row.querySelector('.ex-q').value) || 1;
+                    if(pEx > 0) { 
+                        sub += (pEx*qEx); 
+                        details.push({ n: nEx, v: pEx*qEx });
+                        extras.push({ n: nEx, q: qEx, v: pEx*qEx });
+                    }
                 });
                 el.querySelector('.sub-total').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
-                item.total = sub; grand += sub; window.finalData.push(item);
+                item.total = sub; item.details = details; item.extras = extras; finalData.push(item); grand += sub;
             });
             document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(grand).toLocaleString('id-ID');
         }
 
-        function prepReport(type) { activeRepType = type; document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = showReport; }
+        function prepReport(m) { document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = () => showReport(m); }
 
-        function showReport() {
-            document.getElementById('modal-cust').style.display = 'none';
-            const isEst = (activeRepType === 'estimasi');
-            const now = new Date(); const exp = new Date(); exp.setDate(now.getDate() + 7);
+        function showReport(mode) {
+            currentReportType = mode;
+            document.getElementById('modal-cust').style.display='none';
+            const sName = localStorage.getItem('y_name') || "Yeny Gorden", sWa = localStorage.getItem('y_wa') || "", sLogo = localStorage.getItem('y_logo') || "";
+            const n = document.getElementById('c-name').value||"-", p = document.getElementById('c-phone').value||"-", a = document.getElementById('c-addr').value||"-";
+            const tgl = new Date().toLocaleDateString('id-ID');
+
+            document.getElementById('rep-branding').innerHTML = `
+                <div class="rep-header-box">
+                    <img src="${sLogo}" class="rep-logo" onerror="this.style.display='none'">
+                    <div class="rep-store-info">
+                        <h2>${sName}</h2>
+                        <p>WA: ${sWa}</p>
+                    </div>
+                </div>
+                <h3 style="text-align:center; margin:5px 0; border-bottom:1px solid #000; padding-bottom:5px;">${mode.toUpperCase()}</h3>`;
             
-            let html = `
-                <div class="rep-header">
-                    <div style="flex-grow:1">
-                        <h2 style="margin:0">${localStorage.getItem('y_name')||'YENY GORDEN'}</h2>
-                        <p style="margin:0; font-size:12px;">WA: ${localStorage.getItem('y_wa')||'-'}</p>
-                    </div>
-                    <div style="text-align:right">
-                        <h3 style="margin:0; text-transform:uppercase;">${activeRepType}</h3>
-                    </div>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:15px;">
-                    <div>Tgl: ${now.toLocaleDateString('id-ID')}</div>
-                    <div style="color:red; font-weight:bold;">${isEst?'Berlaku s/d: '+exp.toLocaleDateString('id-ID'):''}</div>
-                </div>
-                <div style="border:1px solid #000; padding:10px; margin-bottom:20px; font-size:14px; line-height:1.6;">
-                    <b>${isEst?'Nama':'Pesanan'}:</b> ${document.getElementById('c-name').value || '-'}<br>
-                    <b>WhatsApp:</b> ${document.getElementById('c-phone').value || '-'}<br>
-                    <b>Alamat:</b> ${document.getElementById('c-addr').value || '-'}
-                </div>
-            `;
+            if(mode === 'estimasi'){
+                document.getElementById('rep-info').innerHTML = `<b>Nama:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl Cetak:</b> ${tgl}<br><b>Masa Berlaku:</b> 7 Hari`;
+            } else if(mode === 'spk'){
+                document.getElementById('rep-info').innerHTML = `<b>Pesanan:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl SPK:</b> ${tgl}`;
+            } else {
+                document.getElementById('rep-info').innerHTML = `<b>Pelanggan:</b> ${n}<br><b>Tanggal:</b> ${tgl}`;
+            }
 
-            window.finalData.forEach(item => {
-                html += `
-                    <div class="rep-item">
-                        <b>${item.name}</b><br>
-                        ${item.main.n} | ${item.main.u} | ${item.main.m} | ${item.main.p} Pnl
-                        ${item.vit.n ? `<br>${item.vit.n} | ${item.vit.u} | ${item.vit.m}` : ''}
-                        ${item.extras.length > 0 ? `<br><small style="color:#555">+ ${item.extras.join(', ')}</small>` : ''}
-                        ${isEst ? `<div class="rep-subtotal">Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>` : ''}
-                    </div>
-                `;
+            const list = document.getElementById('rep-list'); list.innerHTML = "";
+            finalData.forEach(item => {
+                let html = `<div class="rep-item" style="font-size:12px;"><b>${item.name}</b><br>`;
+                html += `Kain: ${item.kain||'-'} | Uk: ${item.ukuranK||'-'} | Mod: ${item.modelK||'-'} | Pan: ${item.panel||'-'}<br>`;
+                if(item.vit) html += `Vit: ${item.vit} | Uk: ${item.ukuranV} | Mod: ${item.modelV} | Qty: ${item.qtyV}<br>`;
+                if(item.extras.length > 0) {
+                    item.extras.forEach(ex => { html += `+ ${ex.n} (Qty: ${ex.q})${mode!=='spk' ? ' - Rp '+Math.round(ex.v).toLocaleString('id-ID') : ''}<br>`; });
+                }
+                if(mode==='rincian'){
+                    html += `<div style="margin-top:5px; border-top:0.5px solid #ccc; padding-top:2px;">`;
+                    item.details.forEach(d => { html += `<div style="display:flex; justify-content:space-between; font-size:10px;"><span>- ${d.n}</span><span>Rp ${Math.round(d.v).toLocaleString('id-ID')}</span></div>`; });
+                    html += `</div>`;
+                }
+                if(mode !== 'spk') html += `<div style="text-align:right; font-weight:bold; border-top:1px solid #000; margin-top:5px;">Sub: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
+                html += `</div>`;
+                list.innerHTML += html;
             });
-
-            if(isEst) {
-                const totalGrand = window.finalData.reduce((a,b)=>a+b.total,0);
-                html += `<h2 style="text-align:right; border-top:3px solid #000; margin-top:20px; padding-top:10px;">TOTAL: Rp ${Math.round(totalGrand).toLocaleString('id-ID')}</h2>`;
-            }
-
-            document.getElementById('rep-body-content').innerHTML = html;
-            document.getElementById('modal-report').style.display = 'block';
-        }
-
-        async function downloadPDF() {
-            const element = document.getElementById('report-area');
-            const name = document.getElementById('c-name').value || 'KONSUMEN';
-            const opt = {
-                margin: 0.2,
-                filename: `${activeRepType.toUpperCase()}_${name.toUpperCase()}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
             
-            document.getElementById('btn-download').innerText = "SABAR...";
-            try {
-                await html2pdf().set(opt).from(element).save();
-            } finally {
-                document.getElementById('btn-download').innerText = "DOWNLOAD PDF";
+            if(mode !== 'spk') {
+                document.getElementById('rep-footer').innerHTML = `<h3 style="text-align:right; border-top:2px solid #000;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>`;
+            } else {
+                document.getElementById('rep-footer').innerHTML = ""; 
             }
+            document.getElementById('modal-report').style.display='block';
         }
 
-        function openSettings() {
-            const n = prompt("Nama Toko:", localStorage.getItem('y_name')||"YENY GORDEN");
-            const w = prompt("WA Toko:", localStorage.getItem('y_wa')||"");
-            if(n) { localStorage.setItem('y_name', n); document.getElementById('display-store-name').innerText = n; }
-            if(w) localStorage.setItem('y_wa', w);
+        function downloadPDF() {
+            const n = document.getElementById('c-name').value || "Pelanggan";
+            const p = document.getElementById('c-phone').value || "";
+            const prefix = currentReportType.toUpperCase();
+            const element = document.getElementById('report-area');
+            const opt = { 
+                margin: 0.3, 
+                filename: prefix + ' ' + n + '' + p + '.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true }, 
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function openSettings() { document.getElementById('modal-settings').style.display='flex'; }
+        function saveSettings() {
+            localStorage.setItem('y_name', document.getElementById('set-name').value);
+            localStorage.setItem('y_wa', document.getElementById('set-wa').value);
+            document.getElementById('display-store-name').innerText = document.getElementById('set-name').value;
+            document.getElementById('modal-settings').style.display='none';
+        }
+        function uploadLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => localStorage.setItem('y_logo', e.target.result); reader.readAsDataURL(input.files[0]); } }
+        function loadSettings() {
+            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "Yeny Gorden";
+            document.getElementById('set-name').value = localStorage.getItem('y_name') || "";
+            document.getElementById('set-wa').value = localStorage.getItem('y_wa') || "";
         }
     </script>
 </body>
