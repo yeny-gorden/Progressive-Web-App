@@ -44,15 +44,26 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
         .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
         
-        #report-area { background: white; color: black; padding: 20px; border-radius: 5px; }
+        /* Area Report Cetak */
+        #report-area { background: white; color: black; padding: 20px; border-radius: 5px; min-height: 200px; }
         .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 10px; gap: 15px; }
-        .rep-store-info h2 { margin: 0; font-size: 22px; }
-        .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; }
-        .rep-logo { width: 80px; height: 80px; object-fit: contain; }
-        .rep-item { border: 1px solid #000; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+        .rep-store-info h2 { margin: 0; font-size: 22px; color: black !important; }
+        .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; color: black !important; }
+        .rep-logo { width: 80px; height: 80px; object-fit: contain; display: block; }
+        
+        .rep-item { 
+            border: 1px solid #000; padding: 8px; margin-bottom: 10px; 
+            page-break-inside: avoid !important; /* Mencegah terpotong */
+            break-inside: avoid;
+        }
         .grid { display: grid; gap: 8px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
@@ -106,7 +117,7 @@
         <div class="modal-content">
             <div id="report-area">
                 <div id="rep-branding"></div>
-                <div id="rep-info" style="font-size:12px; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:5px;"></div>
+                <div id="rep-info" style="font-size:12px; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:5px; color: black !important;"></div>
                 <div id="rep-list"></div>
                 <div id="rep-footer"></div>
             </div>
@@ -293,13 +304,13 @@
 
             document.getElementById('rep-branding').innerHTML = `
                 <div class="rep-header-box">
-                    <img src="${sLogo}" class="rep-logo" onerror="this.style.display='none'">
+                    ${sLogo ? `<img src="${sLogo}" class="rep-logo">` : ''}
                     <div class="rep-store-info">
                         <h2>${sName}</h2>
                         <p>WA: ${sWa}</p>
                     </div>
                 </div>
-                <h3 style="text-align:center; margin:5px 0; border-bottom:1px solid #000; padding-bottom:5px;">${mode.toUpperCase()}</h3>`;
+                <h3 style="text-align:center; margin:5px 0; border-bottom:1px solid #000; padding-bottom:5px; color: black;">${mode.toUpperCase()}</h3>`;
             
             if(mode === 'estimasi'){
                 document.getElementById('rep-info').innerHTML = `<b>Nama:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl Cetak:</b> ${tgl}<br><b>Masa Berlaku:</b> 7 Hari`;
@@ -311,7 +322,7 @@
 
             const list = document.getElementById('rep-list'); list.innerHTML = "";
             finalData.forEach(item => {
-                let html = `<div class="rep-item" style="font-size:12px;"><b>${item.name}</b><br>`;
+                let html = `<div class="rep-item" style="font-size:12px; color: black;"><b>${item.name}</b><br>`;
                 html += `Kain: ${item.kain||'-'} | Uk: ${item.ukuranK||'-'} | Mod: ${item.modelK||'-'} | Pan: ${item.panel||'-'}<br>`;
                 if(item.vit) html += `Vit: ${item.vit} | Uk: ${item.ukuranV} | Mod: ${item.modelV} | Qty: ${item.qtyV}<br>`;
                 if(item.extras.length > 0) {
@@ -328,46 +339,41 @@
             });
             
             if(mode !== 'spk') {
-                document.getElementById('rep-footer').innerHTML = `<h3 style="text-align:right; border-top:2px solid #000;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>`;
+                document.getElementById('rep-footer').innerHTML = `<h3 style="text-align:right; border-top:2px solid #000; color: black;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>`;
             } else {
                 document.getElementById('rep-footer').innerHTML = ""; 
             }
             document.getElementById('modal-report').style.display='block';
         }
 
-        // FUNGSI DOWNLOAD PDF DIPERBARUI
-        function downloadPDF() {
+        // --- FUNGSI DOWNLOAD PDF FIXED ---
+        async function downloadPDF() {
             const n = document.getElementById('c-name').value || "PELANGGAN";
             const p = document.getElementById('c-phone').value || "";
+            let prefix = currentReportType === 'spk' ? "SPK" : (currentReportType === 'estimasi' ? "EST" : "RINCIAN");
             
-            // Logika Penamaan File
-            let prefix = "";
-            if (currentReportType === 'spk') {
-                prefix = "SPK";
-            } else if (currentReportType === 'estimasi') {
-                prefix = "EST";
-            } else {
-                prefix = "RINCIAN";
-            }
-
             const fileName = `${prefix} ${n.toUpperCase()} ${p}.pdf`.trim();
             const element = document.getElementById('report-area');
             
             const opt = { 
-                margin: [0.4, 0.4, 0.6, 0.4], // Atur margin agar tidak terpotong
+                margin: [0.5, 0.4], 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 0.98 }, 
                 html2canvas: { 
                     scale: 2, 
                     backgroundColor: '#ffffff', 
-                    useCORS: true 
+                    useCORS: true,
+                    allowTaint: true,
+                    scrollY: 0
                 }, 
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                // Mencegah elemen item terpotong di tengah baris
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.rep-item' }
             };
-            
-            html2pdf().set(opt).from(element).save();
+
+            // Tunggu 500ms agar gambar logo benar-benar ter-render oleh browser
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save();
+            }, 500);
         }
 
         function openSettings() { document.getElementById('modal-settings').style.display='flex'; }
@@ -376,8 +382,18 @@
             localStorage.setItem('y_wa', document.getElementById('set-wa').value);
             document.getElementById('display-store-name').innerText = document.getElementById('set-name').value;
             document.getElementById('modal-settings').style.display='none';
+            alert("Pengaturan Berhasil Disimpan!");
         }
-        function uploadLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => localStorage.setItem('y_logo', e.target.result); reader.readAsDataURL(input.files[0]); } }
+        function uploadLogo(input) { 
+            if (input.files && input.files[0]) { 
+                const reader = new FileReader(); 
+                reader.onload = e => {
+                    localStorage.setItem('y_logo', e.target.result);
+                    alert("Logo Berhasil Diupload!");
+                };
+                reader.readAsDataURL(input.files[0]); 
+            } 
+        }
         function loadSettings() {
             document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "YENY GORDEN";
             document.getElementById('set-name').value = localStorage.getItem('y_name') || "";
