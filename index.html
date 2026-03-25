@@ -22,9 +22,10 @@
         body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px 10px 160px 10px; }
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* Area Data Pembeli */
-        .buyer-box { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
-        
+        .config-box { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+        .logo-preview-dash { width: 60px; height: 60px; border: 1px dashed var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-input); }
+        .logo-preview-dash img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
         .window-item { background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; border-left: 5px solid var(--accent); }
         .window-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
         .window-title-input { background: transparent; border: none; color: var(--accent); font-weight: bold; font-size: 16px; width: 100%; outline: none; border-bottom: 1px dashed #334155; }
@@ -48,11 +49,16 @@
         .footer { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; padding: 15px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
         .grand-total { color: var(--success); font-size: 24px; font-weight: bold; }
 
-        /* MODAL PREVIEW PDF */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; overflow-y: auto; }
-        #print-area { background: #fff; color: #000; padding: 30px; width: 100%; max-width: 800px; margin: 0 auto; }
+        #print-area { background: #fff; color: #000; padding: 40px; width: 100%; max-width: 800px; margin: 0 auto; min-height: 100%; border-radius: 4px; }
         .pdf-row { border-bottom: 1px solid #eee; padding: 10px 0; color: #000; }
-        #pdf-exp { font-size: 12px; font-weight: bold; color: red; margin: 0; }
+        
+        /* PDF Header Styles */
+        .pdf-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+        .shop-info h1 { margin: 0; color: #000; font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+        .shop-info p { margin: 2px 0; font-size: 14px; font-weight: 600; color: #334155; }
+        .doc-info { text-align: right; }
+        .doc-info h2 { margin: 0; text-transform: uppercase; font-size: 18px; color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -60,12 +66,21 @@
     <div class="container">
         <h2 style="text-align: center; color: var(--accent); letter-spacing: 2px; margin-bottom: 20px;">YENY GORDEN</h2>
         
-        <div class="buyer-box">
-            <label style="color: var(--accent); margin-bottom: 10px;">Data Pembeli (Tersimpan Otomatis)</label>
+        <div class="config-box">
+            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                <div class="logo-preview-dash" id="dash-logo-container">
+                    <span style="font-size: 8px; color: #64748b;">NO LOGO</span>
+                </div>
+                <div style="flex: 1;">
+                    <label>Upload Logo (Tampil di PDF)</label>
+                    <input type="file" id="logo-input" accept="image/*" onchange="loadLogo(event)">
+                </div>
+            </div>
+
             <div class="grid-row">
-                <div><label>Nama</label><input type="text" id="cust-nama" placeholder="Nama Pembeli" oninput="saveCustomer()"></div>
+                <div><label>Nama Pembeli</label><input type="text" id="cust-nama" placeholder="Nama" oninput="saveCustomer()"></div>
                 <div><label>Alamat</label><input type="text" id="cust-alamat" placeholder="Alamat" oninput="saveCustomer()"></div>
-                <div><label>Telepon</label><input type="number" id="cust-telp" placeholder="Nomor WA/HP" oninput="saveCustomer()"></div>
+                <div><label>Telepon</label><input type="number" id="cust-telp" placeholder="Nomor WA" oninput="saveCustomer()"></div>
             </div>
         </div>
 
@@ -88,18 +103,28 @@
 
     <div id="modal-cetak" class="modal">
         <div style="text-align:center; margin-bottom: 15px;">
-            <button onclick="closeModal()" style="padding:10px; background:var(--danger); color:white; border:none; border-radius:5px; cursor:pointer;">BATAL</button>
-            <button id="download-btn" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">💾 SIMPAN PDF</button>
+            <button onclick="closeModal()" style="padding:10px 20px; background:var(--danger); color:white; border:none; border-radius:5px; cursor:pointer;">KEMBALI</button>
+            <button id="download-btn" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold; margin-left:10px;">💾 DOWNLOAD PDF</button>
         </div>
         <div id="print-area">
-            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
-                <h2 id="pdf-title" style="margin:0; text-transform: uppercase;"></h2>
-                <p id="pdf-date" style="font-size:12px; margin:5px;"></p>
-                <p id="pdf-exp"></p>
+            <div class="pdf-header-grid">
+                <div class="shop-info">
+                    <div id="pdf-logo-wrap" style="margin-bottom: 8px;"></div>
+                    <h1>YENY GORDEN</h1>
+                    <p>📞 089504215020</p>
+                </div>
+                <div class="doc-info">
+                    <h2 id="pdf-title"></h2>
+                    <p id="pdf-date" style="font-size:13px; margin:5px 0; font-weight: bold;"></p>
+                    <p id="pdf-exp" style="font-size: 12px; font-weight: bold; color: #dc2626; margin: 0;"></p>
+                </div>
             </div>
-            <div id="pdf-buyer" style="font-size:13px; margin-bottom:15px; line-height:1.6; color: #000;"></div>
+            
+            <div id="pdf-buyer" style="font-size:14px; margin-bottom:20px; line-height:1.4; color: #000; background: #f1f5f9; padding: 12px; border-radius: 5px; border: 1px solid #cbd5e1;"></div>
+            
             <div id="pdf-content"></div>
-            <div id="pdf-total" style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-top:15px; font-size:18px; font-weight:bold; color: #000;"></div>
+            
+            <div id="pdf-total" style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-top:20px; font-size:20px; font-weight:bold; color: #000;"></div>
         </div>
     </div>
 
@@ -143,7 +168,7 @@
 
                     <div class="v-spiral-box hidden" style="margin-top:10px; background: rgba(59, 130, 246, 0.1); padding: 10px; border-radius: 5px;">
                         <div class="grid-row" style="margin-bottom:0;">
-                            <div><label>Nama Vitras</label><input type="text" placeholder="VPAB WH" class="w-nv" oninput="calculateAll()"></div>
+                            <div><label>Nama Vitras</label><input type="text" placeholder="Warna" class="w-nv" oninput="calculateAll()"></div>
                             <div><label>Harga Vitras</label><input type="number" placeholder="100000" class="w-hv" oninput="calculateAll()"></div>
                             <div><label>L Kaca</label><input type="number" placeholder="0.5" step="0.01" class="v-sl" oninput="calculateAll()"></div>
                             <div><label>T Kaca</label><input type="number" placeholder="1.6" step="0.01" class="v-st" oninput="calculateAll()"></div>
@@ -153,7 +178,7 @@
                     
                     <div class="v-plisket-box hidden" style="margin-top:10px;">
                         <div class="grid-row">
-                            <div><label>Nama Vitras</label><input type="text" placeholder="VPAB WH" class="w-nv-p" oninput="calculateAll()"></div>
+                            <div><label>Nama Vitras</label><input type="text" placeholder="Warna" class="w-nv-p" oninput="calculateAll()"></div>
                             <div><label>Harga Vitras</label><input type="number" placeholder="100000" class="w-hv-p" oninput="calculateAll()"></div>
                         </div>
                     </div>
@@ -164,8 +189,10 @@
     </template>
 
     <script>
-        const HARGA = { smokring: 4500, rollet: 65000, rell: 45000, stick: 50000, hook: 40000, tali: 38000, jahit: 20000, instal: 50000 };
+        // Data Harga Default
+        const HARGA = { smokring: 4500, rollet: 65000, rell: 50000, stick: 50000, hook: 40000, tali: 38000, jahit: 20000, instal: 50000 };
         let allData = [];
+        let logoDataURL = "";
 
         window.onload = () => {
             document.getElementById('cust-nama').value = localStorage.getItem('yeny_nama') || '';
@@ -173,6 +200,15 @@
             document.getElementById('cust-telp').value = localStorage.getItem('yeny_telp') || '';
             addWindow();
         };
+
+        function loadLogo(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                logoDataURL = reader.result;
+                document.getElementById('dash-logo-container').innerHTML = `<img src="${logoDataURL}">`;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
 
         function saveCustomer() {
             localStorage.setItem('yeny_nama', document.getElementById('cust-nama').value);
@@ -216,9 +252,8 @@
                 
                 let sub = 0;
                 let data = { title, l, t, m, panel, nk:"", hk:0, nv:"", hv:0, sub:0, isSpiralVit: false, vsq: 0 };
-
                 const hk = parseFloat(win.querySelector('.w-hk').value) || 0;
-                data.nk = win.querySelector('.w-nk').value || "Kain Utama";
+                data.nk = win.querySelector('.w-nk').value || "Kain";
 
                 let pk = (jn === 'import') ? (l + 0.2) * 3 : Math.ceil((l + 0.2) / 0.4) * (t + 0.3);
                 sub += (pk * hk) + (pk * HARGA.jahit);
@@ -250,11 +285,8 @@
                         data.nv = win.querySelector('.w-nv-p').value || "Vitras Plisket";
                     }
                 }
-
                 win.querySelector('.w-sub').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
-                data.sub = sub;
-                grandTotal += sub;
-                allData.push(data);
+                data.sub = sub; grandTotal += sub; allData.push(data);
             });
 
             const dVal = parseFloat(document.getElementById('d-val').value) || 0;
@@ -267,37 +299,38 @@
             const modal = document.getElementById('modal-cetak');
             const today = new Date();
             
-            document.getElementById('pdf-title').innerText = type === 'estimasi' ? "ESTIMASI PENAWARAN GORDEN" : "SURAT PERINTAH KERJA (SPK)";
+            // Tampilkan Logo di PDF jika ada
+            const logoWrap = document.getElementById('pdf-logo-wrap');
+            logoWrap.innerHTML = logoDataURL ? `<img src="${logoDataURL}" style="max-height:60px;">` : "";
+
+            document.getElementById('pdf-title').innerText = type === 'estimasi' ? "ESTIMASI PENAWARAN" : "SPK (PERINTAH KERJA)";
             document.getElementById('pdf-date').innerText = "Tanggal: " + today.toLocaleDateString('id-ID');
             
-            // LOGIKA HAPUS MASA BERLAKU PADA SPK
             const expEl = document.getElementById('pdf-exp');
             if (type === 'estimasi') {
                 const expDate = new Date(); expDate.setDate(today.getDate() + 7);
                 expEl.innerText = "Berlaku s/d: " + expDate.toLocaleDateString('id-ID');
                 expEl.style.display = "block";
             } else {
-                expEl.innerText = "";
                 expEl.style.display = "none";
             }
             
             document.getElementById('pdf-buyer').innerHTML = `
-                <strong>Kepada Yth:</strong><br>
-                Nama: ${document.getElementById('cust-nama').value || '-'}<br>
+                Nama: <strong>${document.getElementById('cust-nama').value || '-'}</strong><br>
                 Alamat: ${document.getElementById('cust-alamat').value || '-'}<br>
-                Telepon: ${document.getElementById('cust-telp').value || '-'}
+                Telp: ${document.getElementById('cust-telp').value || '-'}
             `;
 
             let content = "";
             allData.forEach(d => {
                 content += `
                 <div class="pdf-row">
-                    <div style="font-weight:bold; color: #000;">${d.title.toUpperCase()}</div>
-                    <div style="font-size:12px; color: #333;">
-                        Kain: ${d.nk} / ${d.l}x${d.t}m / ${d.m} ${d.m !== 'Spiral' ? '/ '+d.panel+' Panel' : ''}
-                        ${d.nv ? `<br>Vitras: ${d.nv} ${d.isSpiralVit ? '(Spiral '+d.vsq+' set)' : '/ Plisket'}` : ''}
+                    <div style="font-weight:bold; color: #000; font-size: 14px; margin-bottom: 4px;">${d.title.toUpperCase()}</div>
+                    <div style="font-size:13px; color: #334155; line-height: 1.5;">
+                        Gorden: ${d.nk} (${d.l}x${d.t}m) - Model: ${d.m} ${d.m !== 'Spiral' ? '['+d.panel+' Panel]' : ''}
+                        ${d.nv ? `<br>Vitras: ${d.nv} ${d.isSpiralVit ? '(Spiral '+d.vsq+' set)' : '[Plisket]'}` : ''}
                     </div>
-                    ${type === 'estimasi' ? `<div style="text-align:right; font-weight:bold; color: #000;">Rp ${Math.round(d.sub).toLocaleString('id-ID')}</div>` : ''}
+                    ${type === 'estimasi' ? `<div style="text-align:right; font-weight:bold; color: #000; font-size: 14px; margin-top:5px;">Subtotal: Rp ${Math.round(d.sub).toLocaleString('id-ID')}</div>` : ''}
                 </div>`;
             });
             document.getElementById('pdf-content').innerHTML = content;
@@ -305,18 +338,16 @@
             
             modal.style.display = "block";
 
-            // LOGIKA NAMA FILE PDF: JENIS_NAMA_TANGGAL
             document.getElementById('download-btn').onclick = () => {
                 const element = document.getElementById('print-area');
                 const namaCust = document.getElementById('cust-nama').value.toUpperCase().replace(/\s+/g, '_') || 'PELANGGAN';
-                const tglFile = today.toLocaleDateString('id-ID').replace(/\//g, '-');
                 const kode = type === 'estimasi' ? 'EST' : 'SPK';
                 
                 window.scrollTo(0,0);
                 html2pdf().set({
-                    margin: 0.5,
-                    filename: `${kode}_${namaCust}_${tglFile}.pdf`,
-                    html2canvas: { scale: 2, scrollY: 0 },
+                    margin: [0.5, 0.5],
+                    filename: `${kode}_${namaCust}.pdf`,
+                    html2canvas: { scale: 2, scrollY: 0, useCORS: true },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
                 }).from(element).save();
             };
