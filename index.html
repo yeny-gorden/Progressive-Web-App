@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeny Gorden Pro - Hybrid Official</title>
+    <title>Yeny Gorden Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
@@ -14,41 +15,45 @@
         body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; }
         .container { max-width: 800px; margin: 0 auto; }
 
-        /* UI Dashboard */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; }
         .menu-card.active { border-color: var(--accent); background: #2563eb; }
 
-        /* Window Items */
-        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .grid { display: grid; gap: 8px; margin-bottom: 8px; }
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; }
         
+        .extra-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
+        .extra-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .extra-title { font-size: 10px; font-weight: 900; color: var(--text-dim); text-transform: uppercase; }
+        .btn-add-small { background: var(--success); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .extra-row { display: grid; grid-template-columns: 1fr 80px 50px 30px; gap: 5px; margin-bottom: 5px; }
+        .btn-del-small { background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
         label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 8px; border-radius: 6px; font-size: 14px; font-weight: 700; text-align: center; }
 
-        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 120px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 10px; }
         
-        /* Tombol Hapus & Label Status */
         .header-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .item-tag { font-size: 14px; font-weight: 900; color: var(--text-dim); background: rgba(251, 191, 36, 0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--text-dim); }
-        .btn-del { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 18px; }
+        .item-tag { font-size: 12px; font-weight: 900; color: var(--text-dim); background: rgba(251, 191, 36, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--text-dim); }
+        .btn-del { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
         
-        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; }
+        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; margin-top: 50px; }
         .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* Report Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
         .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
-        .rep-header-box { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
-        .rep-logo { width: 60px; height: 60px; object-fit: contain; margin-right: 12px; }
-        .rep-item { border: 1px solid #000; padding: 10px; margin-bottom: 10px; }
         
-        @media print { .no-print { display: none !important; } .modal { position: absolute; display: block; background: white; width: 100%; } }
+        #report-area { background: white; color: black; padding: 20px; border-radius: 5px; }
+        /* Header Merapat */
+        .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 10px; gap: 15px; }
+        .rep-store-info h2 { margin: 0; font-size: 22px; }
+        .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; }
+        .rep-logo { width: 80px; height: 80px; object-fit: contain; }
+        .rep-item { border: 1px solid #000; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+        .grid { display: grid; gap: 8px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
     </style>
 </head>
 <body>
@@ -72,44 +77,42 @@
             <div id="grand-total" class="grand-total">TOTAL: Rp 0</div>
             <div class="grid grid-3">
                 <button onclick="prepReport('estimasi')" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">ESTIMASI</button>
-                <button onclick="prepReport('spk')" style="background:var(--success); color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">SPK / SJ</button>
+                <button onclick="prepReport('spk')" style="background:var(--success); color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">SPK</button>
                 <button onclick="showReport('rincian')" style="background:#f97316; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">RINCIAN</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-settings" class="modal" style="display:none; align-items:center; justify-content:center;">
-        <div class="modal-content" style="max-width:350px; background:var(--bg-card); color:#fff;">
-            <h3 style="text-align:center">PENGATURAN TOKO</h3>
-            <label>Nama Toko</label><input type="text" id="set-name"><br>
-            <label>WhatsApp</label><input type="number" id="set-wa"><br>
-            <label>Logo</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><br>
-            <button onclick="saveSettings()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; font-weight:bold; border-radius:5px;">SIMPAN</button>
-        </div>
-    </div>
-
-    <div id="modal-cust" class="modal" style="display:none; align-items:center; justify-content:center;">
+    <div id="modal-cust" class="modal">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="text-align:center">Data Konsumen</h3>
-            <label style="color:#666">Nama</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important;"><br>
-            <label style="color:#666">No. HP</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">Nama Pelanggan</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">No. HP / WhatsApp</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important;"><br>
             <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important;"></textarea><br><br>
             <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px;">LANJUT</button>
         </div>
     </div>
 
+    <div id="modal-settings" class="modal">
+        <div class="modal-content" style="max-width:350px; background:var(--bg-card); color:#fff;">
+            <h3 style="text-align:center">PENGATURAN TOKO</h3>
+            <label>Nama Toko</label><input type="text" id="set-name"><br>
+            <label>WhatsApp Toko</label><input type="number" id="set-wa"><br>
+            <label>Logo Toko</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><br>
+            <button onclick="saveSettings()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; font-weight:bold; border-radius:5px;">SIMPAN</button>
+        </div>
+    </div>
+
     <div id="modal-report" class="modal">
         <div class="modal-content">
-            <div id="rep-branding"></div>
-            <div id="rep-date" style="display: flex; justify-content: space-between; font-size:10px; margin-bottom:10px;">
-                <div id="rep-date-now"></div>
-                <div id="rep-date-exp" style="color: red; font-weight: bold;"></div>
+            <div id="report-area">
+                <div id="rep-branding"></div>
+                <div id="rep-info" style="font-size:12px; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:5px;"></div>
+                <div id="rep-list"></div>
+                <div id="rep-footer"></div>
             </div>
-            <div id="rep-cust" style="margin-bottom:15px; font-size:12px;"></div>
-            <div id="rep-list"></div>
-            <div id="rep-footer"></div>
             <div class="no-print" style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button onclick="window.print()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">PRINT PDF</button>
+                <button onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">DOWNLOAD PDF</button>
                 <button onclick="document.getElementById('modal-report').style.display='none'" style="padding:15px; background:var(--danger); color:#fff; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
             </div>
         </div>
@@ -121,10 +124,9 @@
                 <input type="text" class="win-name" style="background:transparent; border:none; color:var(--text-dim); text-align:left; font-weight:900; font-size:16px; width:60%;">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <div class="item-tag">LOKAL</div>
-                    <button class="btn-del" onclick="this.closest('.window-item').remove(); calculateAll();">×</button>
+                    <button class="btn-del" onclick="removeItem(this)">×</button>
                 </div>
             </div>
-
             <div class="f-gorden">
                 <div class="grid grid-2">
                     <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
@@ -136,25 +138,23 @@
                     <div><label>Panel</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
                 </div>
                 <div class="grid grid-2">
-                    <div><label>Model</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                    <div><label>Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="ya">YA</option></select></div>
+                    <div><label>Model Gorden</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
+                    <div><label>Pakai Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="Plisket">YA - PLISKET</option><option value="Spiral">YA - SPIRAL</option></select></div>
                 </div>
                 <div class="vit-box hidden" style="border:1px dashed var(--border); padding:8px; border-radius:8px; margin-top:8px;">
                     <div class="grid grid-2">
                         <div><label>Nama Vitrase</label><input type="text" class="in-nv" oninput="calculateAll()"></div>
-                        <div><label>Harga Vit</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
+                        <div><label>Harga Vit/m</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
                     </div>
-                    <div class="grid grid-2">
-                        <div><label>Model Vit</label><select class="sel-vm" onchange="toggleSpiral(this)"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                        <div class="sp-qty hidden"><label>Qty</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                    <div class="vit-spiral-input hidden">
+                        <div class="grid grid-3">
+                            <div><label>Lebar Vit</label><input type="number" step="0.01" class="in-vl" oninput="calculateAll()"></div>
+                            <div><label>Tinggi Vit</label><input type="number" step="0.01" class="in-vt" oninput="calculateAll()"></div>
+                            <div><label>Qty Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                        </div>
                     </div>
-                    <div class="sp-dim hidden" style="margin-top:5px;"><div class="grid grid-2">
-                        <div><label>L Spiral</label><input type="number" step="0.01" class="in-vl" oninput="calculateAll()"></div>
-                        <div><label>T Spiral</label><input type="number" step="0.01" class="in-vt" oninput="calculateAll()"></div>
-                    </div></div>
                 </div>
             </div>
-
             <div class="f-blinds hidden">
                 <div class="grid grid-2">
                     <div><label>Nama Blinds</label><input type="text" class="in-bl-n" oninput="calculateAll()"></div>
@@ -165,12 +165,17 @@
                     <div><label>Tinggi</label><input type="number" step="0.01" class="in-bl-t" oninput="calculateAll()"></div>
                 </div>
             </div>
+            <div class="extra-box">
+                <div class="extra-header"><span class="extra-title">+ AKSESORIS / ITEM TAMBAHAN</span><button class="btn-add-small" onclick="addExtraRow(this)">+ TAMBAH</button></div>
+                <div class="extra-list"></div>
+            </div>
             <div style="text-align:right; margin-top:10px; color:var(--success); font-weight:900;" class="sub-total">Rp 0</div>
         </div>
     </template>
 
     <script>
         let currentMode = 'lo';
+        let currentReportType = '';
         let itemCount = 0;
         const P = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
 
@@ -182,11 +187,12 @@
             document.getElementById('btn-'+m).classList.add('active');
         }
 
-        function toggleVit(sel) { sel.closest('.window-item').querySelector('.vit-box').classList.toggle('hidden', sel.value==='tidak'); calculateAll(); }
-        function toggleSpiral(sel) {
-            const el = sel.closest('.window-item');
-            el.querySelector('.sp-qty').classList.toggle('hidden', sel.value!=='Spiral');
-            el.querySelector('.sp-dim').classList.toggle('hidden', sel.value!=='Spiral');
+        function toggleVit(sel) {
+            const win = sel.closest('.window-item');
+            const box = win.querySelector('.vit-box');
+            const spiralIn = win.querySelector('.vit-spiral-input');
+            box.classList.toggle('hidden', sel.value==='tidak');
+            spiralIn.classList.toggle('hidden', sel.value!=='Spiral');
             calculateAll();
         }
 
@@ -194,17 +200,13 @@
             itemCount++;
             let nameInput = prompt("Nama Jendela:", "Jendela #" + itemCount);
             if (nameInput === null) { itemCount--; return; }
-            if (nameInput.trim() === "") nameInput = "Jendela #" + itemCount;
-
             const container = document.getElementById('window-container');
             const clone = document.getElementById('tmp-win').content.cloneNode(true);
             const el = clone.querySelector('.window-item');
             el.dataset.mode = currentMode;
-            el.querySelector('.win-name').value = nameInput;
+            el.querySelector('.win-name').value = nameInput || "Jendela #" + itemCount;
             const tag = el.querySelector('.item-tag');
             tag.innerText = (currentMode==='lo'?'LOKAL':currentMode==='im'?'IMPOR':'BLINDS');
-            if(currentMode==='im') { tag.style.borderColor = '#22c55e'; tag.style.color = '#22c55e'; }
-            if(currentMode==='bl') { tag.style.borderColor = '#f97316'; tag.style.color = '#f97316'; }
             if(currentMode==='bl'){ 
                 el.querySelector('.f-gorden').classList.add('hidden'); 
                 el.querySelector('.f-blinds').classList.remove('hidden'); 
@@ -213,47 +215,70 @@
             calculateAll();
         }
 
+        function addExtraRow(btn) {
+            const list = btn.closest('.extra-box').querySelector('.extra-list');
+            const div = document.createElement('div');
+            div.className = 'extra-row';
+            div.innerHTML = `<input type="text" placeholder="Item" class="ex-n" oninput="calculateAll()"><input type="number" placeholder="Harga" class="ex-h" oninput="calculateAll()"><input type="number" placeholder="Qty" class="ex-q" value="1" oninput="calculateAll()"><button class="btn-del-small" onclick="this.parentElement.remove(); calculateAll();">×</button>`;
+            list.appendChild(div);
+        }
+
+        function removeItem(btn) {
+            btn.closest('.window-item').remove();
+            calculateAll();
+        }
+
         function calculateAll() {
             let grand = 0; window.finalData = [];
             document.querySelectorAll('.window-item').forEach(el => {
                 const mode = el.dataset.mode;
-                let sub = 0, details = [], item = { name: el.querySelector('.win-name').value, mode: mode };
+                let sub = 0, details = [], extras = [], item = { name: el.querySelector('.win-name').value, mode: mode };
 
                 if(mode==='bl'){
-                    const l = parseFloat(el.querySelector('.in-bl-l').value)||0, t = parseFloat(el.querySelector('.in-bl-t').value)||0, h = parseFloat(el.querySelector('.in-bl-h').value)||0, n = el.querySelector('.in-bl-n').value||"Blinds";
-                    sub = Math.max(l,1) * Math.max(t,1) * h;
-                    item.desc = `${n.toUpperCase()} (${l}x${t})`;
-                    details.push({ n: `${n.toUpperCase()} (${l}x${t})`, v: sub });
+                    const l = parseFloat(el.querySelector('.in-bl-l').value)||0, t = parseFloat(el.querySelector('.in-bl-t').value)||0, h = parseFloat(el.querySelector('.in-bl-h').value)||0, name = el.querySelector('.in-bl-n').value;
+                    let val = Math.max(l,1) * Math.max(t,1) * h;
+                    sub = val + P.instal;
+                    item.kain = `${name} (${l}x${t})`; item.modelK = "Blinds"; item.panel = "-";
+                    details.push({ n: `Blinds (${l}x${t})`, v: val }, { n: "Instalasi", v: P.instal });
                 } else {
-                    const nk = el.querySelector('.in-nk').value||"Kain", hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, m = el.querySelector('.sel-m').value, useV = el.querySelector('.sel-v').value==='ya';
-                    let mtrK;
-                    if(mode==='lo') mtrK = Math.ceil((l+0.2)/0.4)*(t+0.3);
-                    else mtrK = (l+0.2)*3;
-                    sub = (mtrK*hk) + (mtrK*P.jahit);
-                    details.push({ n: `Bahan ${mode==='lo'?'Lokal':'Impor'} ${nk} (${mtrK.toFixed(1)}m)`, v: mtrK*hk }, { n: `Jahit Gorden (${mtrK.toFixed(1)}m)`, v: mtrK*P.jahit });
+                    const nk = el.querySelector('.in-nk').value, hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, p = el.querySelector('.in-p').value, m = el.querySelector('.sel-m').value;
+                    let mtr = (mode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
+                    sub = (mtr*hk) + (mtr*P.jahit);
+                    item.kain = nk; item.ukuranK = `${l}x${t}`; item.modelK = m; item.panel = p;
+                    details.push({ n: `Bahan (${mtr.toFixed(1)}m)`, v: mtr*hk }, { n: "Jahit", v: mtr*P.jahit });
                     if(m==='Smokring'){ 
-                        let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); 
-                        details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring},{n:`Rollet (${Math.max(l,1)}m)`, v:Math.max(l,1)*P.rollet}); 
-                    } else if(m==='Spiral'){ sub += P.stick; details.push({n:"Stick Gorden (1 set)", v:P.stick}); }
-                    else { sub += Math.max(l,1)*P.rell; details.push({n:`Rell Gorden (${Math.max(l,1)}m)`, v:Math.max(l,1)*P.rell}); }
-                    if(useV){
-                        const nv = el.querySelector('.in-nv').value||"Vitrase", hv = parseFloat(el.querySelector('.in-hv').value)||0, vm = el.querySelector('.sel-vm').value;
-                        let vl = l, vt = t, vq = (vm==='Spiral')?parseInt(el.querySelector('.in-vq').value)||1 : 1;
-                        if(vm==='Spiral'){ vl=parseFloat(el.querySelector('.in-vl').value)||0; vt=parseFloat(el.querySelector('.in-vt').value)||0; }
-                        const mtrV = (vl+0.2)*3; sub += (mtrV*hv*vq) + (mtrV*P.jahit*vq);
-                        details.push({ n: `Bahan ${nv} (${mtrV.toFixed(1)}m x${vq})`, v: mtrV*hv*vq }, { n: `Jahit Vitrase`, v: mtrV*P.jahit*vq });
-                        if(vm==='Spiral'){ sub+=(P.stick*vq); details.push({n:`Stick Vit (${vq} set)`, v:P.stick*vq}); }
-                        else { sub+=Math.max(vl,1)*P.rell; details.push({n:`Rell Vit (${Math.max(vl,1)}m)`, v:Math.max(vl,1)*P.rell}); }
-                        item.vitDesc = `VITRAS (${vl}x${vt}) (${vm.toUpperCase()})`;
+                        let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet);
+                        details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring}, {n:"Rollet", v:Math.max(l,1)*P.rollet});
+                    } else { sub += Math.max(l,1)*P.rell; details.push({n:"Rell", v:Math.max(l,1)*P.rell}); }
+                    
+                    const vMod = el.querySelector('.sel-v').value;
+                    if(vMod !== 'tidak'){
+                        const nv = el.querySelector('.in-nv').value, hv = parseFloat(el.querySelector('.in-hv').value)||0;
+                        if(vMod === 'Plisket'){
+                            let mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
+                            item.vit = nv; item.ukuranV = `${l}x${t}`; item.modelV = "Plisket"; item.qtyV = 1;
+                            details.push({n:`Vitrase Plisket`, v:mtrV*hv}, {n:"Jahit Vit", v:mtrV*P.jahit}, {n:"Rell Vit", v:Math.max(l,1)*P.rell});
+                        } else {
+                            const vl = parseFloat(el.querySelector('.in-vl').value)||0, vt = parseFloat(el.querySelector('.in-vt').value)||0, vq = parseFloat(el.querySelector('.in-vq').value)||1;
+                            let mtrV = (vl+0.1)*3; sub += ((mtrV*hv) + (mtrV*P.jahit) + (mtrV*P.stick))*vq;
+                            item.vit = nv; item.ukuranV = `${vl}x${vt}`; item.modelV = "Spiral"; item.qtyV = vq;
+                            details.push({n:`Vitrase Spiral`, v:((mtrV*hv)+(mtrV*P.jahit)+(mtrV*P.stick))*vq});
+                        }
                     }
-                    if(m!=='Spiral'){
-                        sub += P.hook + P.tali + P.instal;
-                        details.push({ n: "Hook", v: P.hook }, { n: "Tali Tasel", v: P.tali }, { n: "Jasa Instalasi", v: P.instal });
-                    } else { sub += P.instal; details.push({ n: "Jasa Instalasi", v: P.instal }); }
-                    item.desc = `${mode==='lo'?'LOKAL':'IMPOR'} (${l}x${t}) (${m.toUpperCase()})`;
+                    sub += P.hook + P.tali + P.instal;
+                    details.push({n:"Hook", v:P.hook}, {n:"Tali", v:P.tali}, {n:"Instalasi", v:P.instal});
                 }
+                el.querySelectorAll('.extra-row').forEach(row => {
+                    const nEx = row.querySelector('.ex-n').value || "Tambahan";
+                    const pEx = parseFloat(row.querySelector('.ex-h').value) || 0, qEx = parseFloat(row.querySelector('.ex-q').value) || 1;
+                    if(pEx > 0) { 
+                        sub += (pEx*qEx); 
+                        details.push({ n: nEx, v: pEx*qEx });
+                        extras.push({ n: nEx, q: qEx, v: pEx*qEx });
+                    }
+                });
                 el.querySelector('.sub-total').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
-                item.total = sub; item.details = details; finalData.push(item); grand += sub;
+                item.total = sub; item.details = details; item.extras = extras; finalData.push(item); grand += sub;
             });
             document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(grand).toLocaleString('id-ID');
         }
@@ -261,53 +286,69 @@
         function prepReport(m) { document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = () => showReport(m); }
 
         function showReport(mode) {
+            currentReportType = mode;
             document.getElementById('modal-cust').style.display='none';
-            const sName = localStorage.getItem('y_name') || "YENY GORDEN";
-            const sWa = localStorage.getItem('y_wa') || "";
-            const sLogo = localStorage.getItem('y_logo') || "";
-            
-            // LOGIKA TANGGAL & MASA BERLAKU
-            const now = new Date();
-            const tglSekarang = now.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-            
-            const expDate = new Date();
-            expDate.setDate(now.getDate() + 7);
-            const tglExpired = expDate.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            const sName = localStorage.getItem('y_name') || "Yeny Gorden", sWa = localStorage.getItem('y_wa') || "", sLogo = localStorage.getItem('y_logo') || "";
+            const n = document.getElementById('c-name').value||"-", p = document.getElementById('c-phone').value||"-", a = document.getElementById('c-addr').value||"-";
+            const tgl = new Date().toLocaleDateString('id-ID');
 
             document.getElementById('rep-branding').innerHTML = `
                 <div class="rep-header-box">
                     <img src="${sLogo}" class="rep-logo" onerror="this.style.display='none'">
-                    <div class="rep-store-info"><h2>${sName}</h2><p>WA: ${sWa}</p></div>
+                    <div class="rep-store-info">
+                        <h2>${sName}</h2>
+                        <p>WA: ${sWa}</p>
+                    </div>
                 </div>
-                <h4 style="text-align:center; text-transform:uppercase; margin:5px 0;">${mode.toUpperCase()}</h4>`;
+                <h3 style="text-align:center; margin:5px 0; border-bottom:1px solid #000; padding-bottom:5px;">${mode.toUpperCase()}</h3>`;
             
-            document.getElementById('rep-date-now').innerHTML = `Tanggal Cetak: ${tglSekarang}`;
-            
-            // Tampilkan Masa Berlaku hanya pada ESTIMASI
-            const expEl = document.getElementById('rep-date-exp');
             if(mode === 'estimasi'){
-                expEl.innerHTML = `Berlaku s/d: ${tglExpired}`;
+                document.getElementById('rep-info').innerHTML = `<b>Nama:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl Cetak:</b> ${tgl}<br><b>Masa Berlaku:</b> 7 Hari`;
+            } else if(mode === 'spk'){
+                document.getElementById('rep-info').innerHTML = `<b>Pesanan:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl SPK:</b> ${tgl}`;
             } else {
-                expEl.innerHTML = "";
+                document.getElementById('rep-info').innerHTML = `<b>Pelanggan:</b> ${n}<br><b>Tanggal:</b> ${tgl}`;
             }
-
-            const n = document.getElementById('c-name').value||"-", p = document.getElementById('c-phone').value||"-", a = document.getElementById('c-addr').value||"-";
-            document.getElementById('rep-cust').innerHTML = `<b>Penerima:</b> ${n} (${p})<br><b>Alamat:</b> ${a}`;
 
             const list = document.getElementById('rep-list'); list.innerHTML = "";
             finalData.forEach(item => {
-                let html = `<div class="rep-item"><b>${item.name}</b><div>${item.desc}</div>`;
-                if(item.vitDesc) html += `<div>${item.vitDesc}</div>`;
-                if(mode==='estimasi' || mode==='rincian') html += `<div style="text-align:right; font-weight:bold; margin-top:5px; border-top:1px solid #eee;">Subtotal: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
-                if(mode==='rincian'){
-                    html += `<table style="width:100%; font-size:10px; margin-top:5px; color:#555;">`;
-                    item.details.forEach(d => { html += `<tr><td>${d.n}</td><td style="text-align:right">Rp ${Math.round(d.v).toLocaleString('id-ID')}</td></tr>`; });
-                    html += `</table>`;
+                let html = `<div class="rep-item" style="font-size:12px;"><b>${item.name}</b><br>`;
+                html += `Kain: ${item.kain||'-'} | Uk: ${item.ukuranK||'-'} | Mod: ${item.modelK||'-'} | Pan: ${item.panel||'-'}<br>`;
+                if(item.vit) html += `Vit: ${item.vit} | Uk: ${item.ukuranV} | Mod: ${item.modelV} | Qty: ${item.qtyV}<br>`;
+                if(item.extras.length > 0) {
+                    item.extras.forEach(ex => { html += `+ ${ex.n} (Qty: ${ex.q})${mode!=='spk' ? ' - Rp '+Math.round(ex.v).toLocaleString('id-ID') : ''}<br>`; });
                 }
-                list.innerHTML += html + `</div>`;
+                if(mode==='rincian'){
+                    html += `<div style="margin-top:5px; border-top:0.5px solid #ccc; padding-top:2px;">`;
+                    item.details.forEach(d => { html += `<div style="display:flex; justify-content:space-between; font-size:10px;"><span>- ${d.n}</span><span>Rp ${Math.round(d.v).toLocaleString('id-ID')}</span></div>`; });
+                    html += `</div>`;
+                }
+                if(mode !== 'spk') html += `<div style="text-align:right; font-weight:bold; border-top:1px solid #000; margin-top:5px;">Sub: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
+                html += `</div>`;
+                list.innerHTML += html;
             });
-            document.getElementById('rep-footer').innerHTML = (mode!=='spk') ? `<h3 style="text-align:right; border-top:2px solid #000; padding-top:10px;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>` : "";
+            
+            if(mode !== 'spk') {
+                document.getElementById('rep-footer').innerHTML = `<h3 style="text-align:right; border-top:2px solid #000;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>`;
+            } else {
+                document.getElementById('rep-footer').innerHTML = ""; 
+            }
             document.getElementById('modal-report').style.display='block';
+        }
+
+        function downloadPDF() {
+            const n = document.getElementById('c-name').value || "Pelanggan";
+            const p = document.getElementById('c-phone').value || "";
+            const prefix = currentReportType.toUpperCase();
+            const element = document.getElementById('report-area');
+            const opt = { 
+                margin: 0.3, 
+                filename: prefix + ' ' + n + '' + p + '.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true }, 
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+            };
+            html2pdf().set(opt).from(element).save();
         }
 
         function openSettings() { document.getElementById('modal-settings').style.display='flex'; }
@@ -317,15 +358,9 @@
             document.getElementById('display-store-name').innerText = document.getElementById('set-name').value;
             document.getElementById('modal-settings').style.display='none';
         }
-        function uploadLogo(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => localStorage.setItem('y_logo', e.target.result);
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        function uploadLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => localStorage.setItem('y_logo', e.target.result); reader.readAsDataURL(input.files[0]); } }
         function loadSettings() {
-            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "YENY GORDEN";
+            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "Yeny Gorden";
             document.getElementById('set-name').value = localStorage.getItem('y_name') || "";
             document.getElementById('set-wa').value = localStorage.getItem('y_wa') || "";
         }
