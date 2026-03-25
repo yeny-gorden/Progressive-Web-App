@@ -45,7 +45,6 @@
         .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
         
         #report-area { background: white; color: black; padding: 20px; border-radius: 5px; }
-        /* Header Merapat */
         .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 10px; gap: 15px; }
         .rep-store-info h2 { margin: 0; font-size: 22px; }
         .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; }
@@ -336,18 +335,38 @@
             document.getElementById('modal-report').style.display='block';
         }
 
+        // FUNGSI DOWNLOAD PDF DIPERBARUI
         function downloadPDF() {
-            const n = document.getElementById('c-name').value || "Pelanggan";
+            const n = document.getElementById('c-name').value || "PELANGGAN";
             const p = document.getElementById('c-phone').value || "";
-            const prefix = currentReportType.toUpperCase();
+            
+            // Logika Penamaan File
+            let prefix = "";
+            if (currentReportType === 'spk') {
+                prefix = "SPK";
+            } else if (currentReportType === 'estimasi') {
+                prefix = "EST";
+            } else {
+                prefix = "RINCIAN";
+            }
+
+            const fileName = `${prefix} ${n.toUpperCase()} ${p}.pdf`.trim();
             const element = document.getElementById('report-area');
+            
             const opt = { 
-                margin: 0.3, 
-                filename: prefix + ' ' + n + '' + p + '.pdf', 
+                margin: [0.4, 0.4, 0.6, 0.4], // Atur margin agar tidak terpotong
+                filename: fileName, 
                 image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true }, 
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+                html2canvas: { 
+                    scale: 2, 
+                    backgroundColor: '#ffffff', 
+                    useCORS: true 
+                }, 
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                // Mencegah elemen item terpotong di tengah baris
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.rep-item' }
             };
+            
             html2pdf().set(opt).from(element).save();
         }
 
@@ -360,7 +379,7 @@
         }
         function uploadLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => localStorage.setItem('y_logo', e.target.result); reader.readAsDataURL(input.files[0]); } }
         function loadSettings() {
-            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "Yeny Gorden";
+            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "YENY GORDEN";
             document.getElementById('set-name').value = localStorage.getItem('y_name') || "";
             document.getElementById('set-wa').value = localStorage.getItem('y_wa') || "";
         }
