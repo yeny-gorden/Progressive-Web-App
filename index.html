@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeny Gorden Pro - Smart Add</title>
+    <title>Yeny Gorden Pro - Hybrid Official</title>
     <style>
         :root {
             --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
@@ -14,14 +14,13 @@
         body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; }
         .container { max-width: 800px; margin: 0 auto; }
 
-        /* UI Elements */
+        /* UI Dashboard */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; }
         .menu-card.active { border-color: var(--accent); background: #2563eb; }
 
-        .card { background: #020617; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        /* Window Items */
         .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; animation: slideIn 0.3s ease-out; }
-        
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .grid { display: grid; gap: 8px; margin-bottom: 8px; }
@@ -30,25 +29,26 @@
         
         label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 8px; border-radius: 6px; font-size: 14px; font-weight: 700; text-align: center; }
-        input::placeholder { color: #475569; }
 
-        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 100px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-        .btn-del { background: var(--danger); color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; position: absolute; top: 10px; right: 10px; z-index: 5; font-weight: bold; }
+        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 120px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
         
-        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+        /* Tombol Hapus & Label Status */
+        .header-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .item-tag { font-size: 14px; font-weight: 900; color: var(--text-dim); background: rgba(251, 191, 36, 0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--text-dim); }
+        .btn-del { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 18px; }
+        
+        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; }
         .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* Report Branding */
-        .rep-header-box { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
-        .rep-logo { width: 60px; height: 60px; object-fit: contain; margin-right: 12px; }
-        .rep-store-info h2 { margin: 0; font-size: 18px; color: #000; }
-        .rep-store-info p { margin: 0; font-size: 11px; color: #333; }
+        /* Report Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
         .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
-        .rep-item { border: 1px solid #000; padding: 10px; margin-bottom: 8px; }
-
-        @media print { .no-print { display: none !important; } .modal { position: absolute; display: block; background: white; } }
+        .rep-header-box { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
+        .rep-logo { width: 60px; height: 60px; object-fit: contain; margin-right: 12px; }
+        .rep-item { border: 1px solid #000; padding: 10px; margin-bottom: 10px; }
+        
+        @media print { .no-print { display: none !important; } .modal { position: absolute; display: block; background: white; width: 100%; } }
     </style>
 </head>
 <body>
@@ -65,9 +65,7 @@
             <div class="menu-card" id="btn-bl" onclick="setMode('bl')">🪟 BLINDS</div>
         </div>
 
-        <div id="window-container">
-            </div>
-        
+        <div id="window-container"></div>
         <button class="btn-add" onclick="addWindow()">+ TAMBAH ITEM BARU</button>
 
         <div class="footer-fixed">
@@ -83,8 +81,8 @@
     <div id="modal-settings" class="modal" style="display:none; align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:350px; background:var(--bg-card); color:#fff;">
             <h3 style="text-align:center">PENGATURAN TOKO</h3>
-            <label>Nama Toko</label><input type="text" id="set-name" placeholder="Nama Toko"><br>
-            <label>WhatsApp</label><input type="number" id="set-wa" placeholder="08xxx"><br>
+            <label>Nama Toko</label><input type="text" id="set-name"><br>
+            <label>WhatsApp</label><input type="number" id="set-wa"><br>
             <label>Logo</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><br>
             <button onclick="saveSettings()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; font-weight:bold; border-radius:5px;">SIMPAN</button>
         </div>
@@ -93,9 +91,9 @@
     <div id="modal-cust" class="modal" style="display:none; align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="text-align:center">Data Konsumen</h3>
-            <label style="color:#666">Nama</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important; margin-bottom:10px;"><br>
-            <label style="color:#666">No. HP</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important; margin-bottom:10px;"><br>
-            <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important; width:100%; height:60px;"></textarea><br><br>
+            <label style="color:#666">Nama</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">No. HP</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important;"><br>
+            <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important;"></textarea><br><br>
             <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px;">LANJUT</button>
         </div>
     </div>
@@ -103,7 +101,10 @@
     <div id="modal-report" class="modal">
         <div class="modal-content">
             <div id="rep-branding"></div>
-            <div id="rep-date" style="text-align:right; font-size:10px; margin-bottom:10px;"></div>
+            <div id="rep-date" style="display: flex; justify-content: space-between; font-size:10px; margin-bottom:10px;">
+                <div id="rep-date-now"></div>
+                <div id="rep-date-exp" style="color: red; font-weight: bold;"></div>
+            </div>
             <div id="rep-cust" style="margin-bottom:15px; font-size:12px;"></div>
             <div id="rep-list"></div>
             <div id="rep-footer"></div>
@@ -116,20 +117,22 @@
 
     <template id="tmp-win">
         <div class="window-item">
-            <button class="btn-del" onclick="this.closest('.window-item').remove(); calculateAll();">×</button>
-            <div class="grid grid-2">
-                <input type="text" class="win-name" style="background:transparent; border:none; color:var(--text-dim); text-align:left; font-weight:900; font-size:16px;">
-                <div style="text-align:right; font-size:10px; color:var(--accent); font-weight:bold;" class="item-tag"></div>
+            <div class="header-item">
+                <input type="text" class="win-name" style="background:transparent; border:none; color:var(--text-dim); text-align:left; font-weight:900; font-size:16px; width:60%;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="item-tag">LOKAL</div>
+                    <button class="btn-del" onclick="this.closest('.window-item').remove(); calculateAll();">×</button>
+                </div>
             </div>
 
             <div class="f-gorden">
-                <div class="grid grid-2" style="margin-top:10px;">
-                    <div><label>Nama Kain</label><input type="text" class="in-nk" placeholder="..." oninput="calculateAll()"></div>
-                    <div><label>Harga/m</label><input type="number" class="in-hk" placeholder="0" oninput="calculateAll()"></div>
+                <div class="grid grid-2">
+                    <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
+                    <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
                 </div>
                 <div class="grid grid-3">
-                    <div><label>Lebar</label><input type="number" step="0.01" class="in-l" placeholder="0" oninput="calculateAll()"></div>
-                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-t" placeholder="0" oninput="calculateAll()"></div>
+                    <div><label>Lebar</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
+                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
                     <div><label>Panel</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
                 </div>
                 <div class="grid grid-2">
@@ -138,8 +141,8 @@
                 </div>
                 <div class="vit-box hidden" style="border:1px dashed var(--border); padding:8px; border-radius:8px; margin-top:8px;">
                     <div class="grid grid-2">
-                        <div><label>Nama Vitrase</label><input type="text" class="in-nv" placeholder="..." oninput="calculateAll()"></div>
-                        <div><label>Harga Vit</label><input type="number" class="in-hv" placeholder="0" oninput="calculateAll()"></div>
+                        <div><label>Nama Vitrase</label><input type="text" class="in-nv" oninput="calculateAll()"></div>
+                        <div><label>Harga Vit</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
                     </div>
                     <div class="grid grid-2">
                         <div><label>Model Vit</label><select class="sel-vm" onchange="toggleSpiral(this)"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
@@ -162,7 +165,7 @@
                     <div><label>Tinggi</label><input type="number" step="0.01" class="in-bl-t" oninput="calculateAll()"></div>
                 </div>
             </div>
-            <div style="text-align:right; margin-top:5px; color:var(--success); font-weight:900;" class="sub-total">Rp 0</div>
+            <div style="text-align:right; margin-top:10px; color:var(--success); font-weight:900;" class="sub-total">Rp 0</div>
         </div>
     </template>
 
@@ -189,27 +192,23 @@
 
         function addWindow() {
             itemCount++;
-            let nameInput = prompt("Masukkan Nama Jendela:", "Jendela #" + itemCount);
-            
-            // Jika user menekan batal (null), jangan tambah item
+            let nameInput = prompt("Nama Jendela:", "Jendela #" + itemCount);
             if (nameInput === null) { itemCount--; return; }
-            
-            // Jika kosong, pakai default
             if (nameInput.trim() === "") nameInput = "Jendela #" + itemCount;
 
             const container = document.getElementById('window-container');
             const clone = document.getElementById('tmp-win').content.cloneNode(true);
             const el = clone.querySelector('.window-item');
-            
             el.dataset.mode = currentMode;
             el.querySelector('.win-name').value = nameInput;
-            el.querySelector('.item-tag').innerText = currentMode.toUpperCase();
-            
+            const tag = el.querySelector('.item-tag');
+            tag.innerText = (currentMode==='lo'?'LOKAL':currentMode==='im'?'IMPOR':'BLINDS');
+            if(currentMode==='im') { tag.style.borderColor = '#22c55e'; tag.style.color = '#22c55e'; }
+            if(currentMode==='bl') { tag.style.borderColor = '#f97316'; tag.style.color = '#f97316'; }
             if(currentMode==='bl'){ 
                 el.querySelector('.f-gorden').classList.add('hidden'); 
                 el.querySelector('.f-blinds').classList.remove('hidden'); 
             }
-            
             container.appendChild(el);
             calculateAll();
         }
@@ -224,14 +223,18 @@
                     const l = parseFloat(el.querySelector('.in-bl-l').value)||0, t = parseFloat(el.querySelector('.in-bl-t').value)||0, h = parseFloat(el.querySelector('.in-bl-h').value)||0, n = el.querySelector('.in-bl-n').value||"Blinds";
                     sub = Math.max(l,1) * Math.max(t,1) * h;
                     item.desc = `${n.toUpperCase()} (${l}x${t})`;
-                    details.push({ n: n, v: sub });
+                    details.push({ n: `${n.toUpperCase()} (${l}x${t})`, v: sub });
                 } else {
-                    const nk = el.querySelector('.in-nk').value||"Kain", hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, p = el.querySelector('.in-p').value, m = el.querySelector('.sel-m').value, useV = el.querySelector('.sel-v').value==='ya';
-                    const mtrK = (mode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
+                    const nk = el.querySelector('.in-nk').value||"Kain", hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, m = el.querySelector('.sel-m').value, useV = el.querySelector('.sel-v').value==='ya';
+                    let mtrK;
+                    if(mode==='lo') mtrK = Math.ceil((l+0.2)/0.4)*(t+0.3);
+                    else mtrK = (l+0.2)*3;
                     sub = (mtrK*hk) + (mtrK*P.jahit);
-                    details.push({ n: `Bahan ${nk} (${mtrK.toFixed(1)}m)`, v: mtrK*hk }, { n: "Jahit Gorden", v: mtrK*P.jahit });
-                    if(m==='Smokring'){ let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring},{n:`Rollet (${Math.max(l,1)}m)`, v:Math.max(l,1)*P.rollet}); }
-                    else if(m==='Spiral'){ sub += P.stick; details.push({n:"Stick Gorden", v:P.stick}); }
+                    details.push({ n: `Bahan ${mode==='lo'?'Lokal':'Impor'} ${nk} (${mtrK.toFixed(1)}m)`, v: mtrK*hk }, { n: `Jahit Gorden (${mtrK.toFixed(1)}m)`, v: mtrK*P.jahit });
+                    if(m==='Smokring'){ 
+                        let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet); 
+                        details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring},{n:`Rollet (${Math.max(l,1)}m)`, v:Math.max(l,1)*P.rollet}); 
+                    } else if(m==='Spiral'){ sub += P.stick; details.push({n:"Stick Gorden (1 set)", v:P.stick}); }
                     else { sub += Math.max(l,1)*P.rell; details.push({n:`Rell Gorden (${Math.max(l,1)}m)`, v:Math.max(l,1)*P.rell}); }
                     if(useV){
                         const nv = el.querySelector('.in-nv').value||"Vitrase", hv = parseFloat(el.querySelector('.in-hv').value)||0, vm = el.querySelector('.sel-vm').value;
@@ -241,11 +244,13 @@
                         details.push({ n: `Bahan ${nv} (${mtrV.toFixed(1)}m x${vq})`, v: mtrV*hv*vq }, { n: `Jahit Vitrase`, v: mtrV*P.jahit*vq });
                         if(vm==='Spiral'){ sub+=(P.stick*vq); details.push({n:`Stick Vit (${vq} set)`, v:P.stick*vq}); }
                         else { sub+=Math.max(vl,1)*P.rell; details.push({n:`Rell Vit (${Math.max(vl,1)}m)`, v:Math.max(vl,1)*P.rell}); }
-                        item.vitDesc = `${nv.toUpperCase()} (${vl}x${vt}) (${vm.toUpperCase()}) (Qty:${vq})`;
+                        item.vitDesc = `VITRAS (${vl}x${vt}) (${vm.toUpperCase()})`;
                     }
-                    if(m!=='Spiral'){ sub+=P.hook+P.tali+P.instal; details.push({n:"Hook & Tali", v:P.hook+P.tali},{n:"Instalasi", v:P.instal}); }
-                    else { sub+=P.instal; details.push({n:"Instalasi", v:P.instal}); }
-                    item.desc = `${nk.toUpperCase()} (${l}x${t}) (${m.toUpperCase()}) (${p} Pnl)`;
+                    if(m!=='Spiral'){
+                        sub += P.hook + P.tali + P.instal;
+                        details.push({ n: "Hook", v: P.hook }, { n: "Tali Tasel", v: P.tali }, { n: "Jasa Instalasi", v: P.instal });
+                    } else { sub += P.instal; details.push({ n: "Jasa Instalasi", v: P.instal }); }
+                    item.desc = `${mode==='lo'?'LOKAL':'IMPOR'} (${l}x${t}) (${m.toUpperCase()})`;
                 }
                 el.querySelector('.sub-total').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
                 item.total = sub; item.details = details; finalData.push(item); grand += sub;
@@ -260,26 +265,32 @@
             const sName = localStorage.getItem('y_name') || "YENY GORDEN";
             const sWa = localStorage.getItem('y_wa') || "";
             const sLogo = localStorage.getItem('y_logo') || "";
-            const now = new Date();
-            const tgl = now.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
             
-            let dateHtml = `Tanggal: ${tgl}`;
-            if(mode==='estimasi'){
-                const exp = new Date(); exp.setDate(now.getDate() + 7);
-                dateHtml += `<br>Berlaku S/D: ${exp.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}`;
-            }
+            // LOGIKA TANGGAL & MASA BERLAKU
+            const now = new Date();
+            const tglSekarang = now.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            
+            const expDate = new Date();
+            expDate.setDate(now.getDate() + 7);
+            const tglExpired = expDate.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
 
             document.getElementById('rep-branding').innerHTML = `
                 <div class="rep-header-box">
                     <img src="${sLogo}" class="rep-logo" onerror="this.style.display='none'">
-                    <div class="rep-store-info">
-                        <h2>${sName}</h2>
-                        <p>WA: ${sWa}</p>
-                    </div>
+                    <div class="rep-store-info"><h2>${sName}</h2><p>WA: ${sWa}</p></div>
                 </div>
-                <h4 style="text-align:center; text-transform:uppercase; margin:5px 0;">${mode.toUpperCase()}</h4>
-            `;
-            document.getElementById('rep-date').innerHTML = dateHtml;
+                <h4 style="text-align:center; text-transform:uppercase; margin:5px 0;">${mode.toUpperCase()}</h4>`;
+            
+            document.getElementById('rep-date-now').innerHTML = `Tanggal Cetak: ${tglSekarang}`;
+            
+            // Tampilkan Masa Berlaku hanya pada ESTIMASI
+            const expEl = document.getElementById('rep-date-exp');
+            if(mode === 'estimasi'){
+                expEl.innerHTML = `Berlaku s/d: ${tglExpired}`;
+            } else {
+                expEl.innerHTML = "";
+            }
+
             const n = document.getElementById('c-name').value||"-", p = document.getElementById('c-phone').value||"-", a = document.getElementById('c-addr').value||"-";
             document.getElementById('rep-cust').innerHTML = `<b>Penerima:</b> ${n} (${p})<br><b>Alamat:</b> ${a}`;
 
@@ -287,9 +298,9 @@
             finalData.forEach(item => {
                 let html = `<div class="rep-item"><b>${item.name}</b><div>${item.desc}</div>`;
                 if(item.vitDesc) html += `<div>${item.vitDesc}</div>`;
-                if(mode==='estimasi') html += `<div style="text-align:right; font-weight:bold; margin-top:5px; border-top:1px solid #eee;">Total: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
+                if(mode==='estimasi' || mode==='rincian') html += `<div style="text-align:right; font-weight:bold; margin-top:5px; border-top:1px solid #eee;">Subtotal: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
                 if(mode==='rincian'){
-                    html += `<table style="width:100%; font-size:11px; margin-top:5px;">`;
+                    html += `<table style="width:100%; font-size:10px; margin-top:5px; color:#555;">`;
                     item.details.forEach(d => { html += `<tr><td>${d.n}</td><td style="text-align:right">Rp ${Math.round(d.v).toLocaleString('id-ID')}</td></tr>`; });
                     html += `</table>`;
                 }
