@@ -3,402 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeny Gorden Pro</title>
+    <title>Kalkulator Gorden - Yeny Gorden</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root {
-            --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
-            --text-main: #ffffff; --text-dim: #fbbf24; --accent: #3b82f6;
-            --success: #22c55e; --danger: #ef4444; --border: #475569;
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #020617;
+            --text-main: #f1f5f9;
+            --text-dim: #eab308;
+            --accent: #3b82f6;
+            --success: #22c55e;
+            --danger: #ef4444;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px; }
-        .container { max-width: 800px; margin: 0 auto; }
-
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .menu-card { background: var(--bg-card); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid var(--border); font-size: 11px; font-weight: 900; color: white; }
-        .menu-card.active { border-color: var(--accent); background: #2563eb; }
-
-        .window-item { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; }
+        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px 10px 160px 10px; }
+        .container { max-width: 1000px; margin: 0 auto; }
         
-        .extra-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
-        .extra-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .extra-title { font-size: 10px; font-weight: 900; color: var(--text-dim); text-transform: uppercase; }
-        .btn-add-small { background: var(--success); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .extra-row { display: grid; grid-template-columns: 1fr 80px 50px 30px; gap: 5px; margin-bottom: 5px; }
-        .btn-del-small { background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
-        input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff !important; padding: 8px; border-radius: 6px; font-size: 14px; font-weight: 700; text-align: center; }
-
-        .btn-add { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-bottom: 10px; }
+        .window-item { background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; border-left: 5px solid var(--accent); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        .window-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .window-title-input { background: transparent; border: none; color: var(--accent); font-weight: bold; font-size: 16px; width: 100%; outline: none; border-bottom: 1px dashed #334155; }
         
-        .header-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .item-tag { font-size: 12px; font-weight: 900; color: var(--text-dim); background: rgba(251, 191, 36, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--text-dim); }
-        .btn-del { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 15px; align-items: end; }
+        .split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        label { font-size: 10px; font-weight: bold; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; display: block; }
         
-        .footer-fixed { position: sticky; bottom: 10px; background: #020617; padding: 15px; border-radius: 12px; border: 2px solid var(--accent); z-index: 50; margin-top: 50px; }
-        .grand-total { color: var(--success); font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 10px; }
+        input, select { width: 100%; background: var(--bg-input); border: 1px solid #334155; color: white; padding: 10px; border-radius: 6px; font-size: 13px; outline: none; }
+        input[type="number"] { text-align: center; font-weight: bold; }
+
+        .section-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #334155; }
         .hidden { display: none !important; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
-        .modal-content { background: #fff; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; }
-        
-        /* Area Report Cetak */
-        #report-area { background: white; color: black; padding: 20px; border-radius: 5px; min-height: 200px; }
-        .rep-header-box { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 10px; gap: 15px; }
-        .rep-store-info h2 { margin: 0; font-size: 22px; color: black !important; }
-        .rep-store-info p { margin: 0; font-size: 14px; font-weight: bold; color: black !important; }
-        .rep-logo { width: 80px; height: 80px; object-fit: contain; display: block; }
-        
-        .rep-item { 
-            border: 1px solid #000; padding: 8px; margin-bottom: 10px; 
-            page-break-inside: avoid !important; /* Mencegah terpotong */
-            break-inside: avoid;
-        }
-        .grid { display: grid; gap: 8px; }
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .btn-add { background: var(--accent); color: white; grid-column: span 2; font-size: 15px; }
+        .btn-estimasi { background: #8b5cf6; color: white; }
+        .btn-spk { background: var(--success); color: white; }
+        .btn-del { background: var(--danger); color: white; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 1; position: absolute; top: -10px; right: -10px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; }
-        }
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; padding: 15px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
+        .grand-total { color: var(--success); font-size: 24px; font-weight: bold; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; padding: 10px; overflow-y: auto; }
+        .modal-content { background: white; color: black; max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 4px; }
+        .group-box { border: 1px solid #000; padding: 12px; margin-bottom: 15px; border-radius: 5px; page-break-inside: avoid; }
+        .flex-btwn { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 6px 0; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="container no-print">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 id="display-store-name" style="margin:0; color:var(--accent); font-weight:900;">YENY GORDEN</h2>
-            <button onclick="openSettings()" style="background:none; border:none; font-size:24px; cursor:pointer;">⚙️</button>
-        </div>
+    <div class="container">
+        <h2 style="text-align: center; color: var(--accent); letter-spacing: 2px; margin-bottom: 20px;">YENY GORDEN</h2>
+        
+        <div id="window-list"></div>
 
-        <div class="dashboard">
-            <div class="menu-card active" id="btn-lo" onclick="setMode('lo')">🏠 LOKAL</div>
-            <div class="menu-card" id="btn-im" onclick="setMode('im')">✈️ IMPORT</div>
-            <div class="menu-card" id="btn-bl" onclick="setMode('bl')">🪟 BLINDS</div>
-        </div>
-
-        <div id="window-container"></div>
-        <button class="btn-add" onclick="addWindow()">+ TAMBAH ITEM BARU</button>
-
-        <div class="footer-fixed">
-            <div id="grand-total" class="grand-total">TOTAL: Rp 0</div>
-            <div class="grid grid-3">
-                <button onclick="prepReport('estimasi')" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">ESTIMASI</button>
-                <button onclick="prepReport('spk')" style="background:var(--success); color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">SPK</button>
-                <button onclick="showReport('rincian')" style="background:#f97316; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">RINCIAN</button>
-            </div>
+        <div class="btn-group">
+            <button class="btn btn-add" onclick="addWindow()">+ TAMBAH JENDELA BARU</button>
+            <button class="btn btn-estimasi" onclick="printDoc('estimasi')">📄 CETAK ESTIMASI HARGA</button>
+            <button class="btn btn-spk" onclick="printDoc('spk')">🛠️ CETAK SPK BAHAN</button>
         </div>
     </div>
 
-    <div id="modal-cust" class="modal">
-        <div class="modal-content" style="max-width:350px;">
-            <h3 style="text-align:center">Data Konsumen</h3>
-            <label style="color:#666">Nama Pelanggan</label><input type="text" id="c-name" style="background:#f1f5f9; color:#000 !important;"><br>
-            <label style="color:#666">No. HP / WhatsApp</label><input type="number" id="c-phone" style="background:#f1f5f9; color:#000 !important;"><br>
-            <label style="color:#666">Alamat</label><textarea id="c-addr" style="background:#f1f5f9; color:#000 !important;"></textarea><br><br>
-            <button id="btn-go" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:900; border-radius:8px;">LANJUT</button>
+    <div class="footer">
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <label style="margin:0;">Disc:</label>
+            <select id="d-type" style="width: 60px;" onchange="calculateAll()"><option value="p">%</option><option value="n">Rp</option></select>
+            <input type="number" id="d-val" style="width: 80px;" value="0" oninput="calculateAll()">
         </div>
+        <div id="grand-total" class="grand-total">Rp 0</div>
     </div>
 
-    <div id="modal-settings" class="modal">
-        <div class="modal-content" style="max-width:350px; background:var(--bg-card); color:#fff;">
-            <h3 style="text-align:center">PENGATURAN TOKO</h3>
-            <label>Nama Toko</label><input type="text" id="set-name"><br>
-            <label>WhatsApp Toko</label><input type="number" id="set-wa"><br>
-            <label>Logo Toko</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><br>
-            <button onclick="saveSettings()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; font-weight:bold; border-radius:5px;">SIMPAN</button>
+    <div id="modal-cetak" class="modal">
+        <div class="modal-content" id="print-area">
+            <div style="text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                <h2 id="print-title" style="margin:0; text-transform: uppercase;"></h2>
+                <p id="p-date" style="font-size:12px; margin:5px;"></p>
+            </div>
+            <div id="print-list"></div>
+            <div id="total-area-print" style="margin-top:20px; text-align:right; border-top:2px solid black; padding-top:10px;">
+                <h2 id="p-grand" style="margin:0;"></h2>
+            </div>
         </div>
-    </div>
-
-    <div id="modal-report" class="modal">
-        <div class="modal-content">
-            <div id="report-area">
-                <div id="rep-branding"></div>
-                <div id="rep-info" style="font-size:12px; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:5px; color: black !important;"></div>
-                <div id="rep-list"></div>
-                <div id="rep-footer"></div>
-            </div>
-            <div class="no-print" style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button onclick="downloadPDF()" style="padding:15px; background:#000; color:#fff; border:none; font-weight:900; border-radius:8px;">DOWNLOAD PDF</button>
-                <button onclick="document.getElementById('modal-report').style.display='none'" style="padding:15px; background:var(--danger); color:#fff; border:none; font-weight:900; border-radius:8px;">TUTUP</button>
-            </div>
+        <div style="text-align:center; margin: 25px 0;">
+            <button onclick="closeModal()" style="padding:12px 30px; background:#64748b; color:white; border:none; border-radius:5px; cursor:pointer;">KEMBALI</button>
+            <button id="download-btn" style="padding:12px 30px; background:var(--success); color:white; border:none; border-radius:5px; cursor:pointer; margin-left:10px;">SIMPAN PDF</button>
         </div>
     </div>
 
     <template id="tmp-win">
         <div class="window-item">
-            <div class="header-item">
-                <input type="text" class="win-name" style="background:transparent; border:none; color:var(--text-dim); text-align:left; font-weight:900; font-size:16px; width:60%;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="item-tag">LOKAL</div>
-                    <button class="btn-del" onclick="removeItem(this)">×</button>
+            <button class="btn-del" onclick="this.parentElement.remove(); calculateAll();">×</button>
+            
+            <div class="window-header">
+                <input type="text" class="window-title-input" placeholder="Nama Jendela" >
+            </div>
+
+            <div class="grid-row">
+                <div><label>Lebar (m)</label><input type="number" placeholder="1.5" step="0.01" class="w-l" oninput="calculateAll()"></div>
+                <div><label>Tinggi (m)</label><input type="number" placeholder="2.5" step="0.01" class="w-t" oninput="calculateAll()"></div>
+                <div><label>Jenis Kain</label>
+                    <select class="w-jn" onchange="toggleMetode(this)">
+                        <option value="import">IMPORT</option>
+                        <option value="lokal">LOKAL</option>
+                        <option value="blinds">BLINDS</option>
+                    </select>
+                </div>
+                <div class="col-model"><label>Model Gorden</label>
+                    <select class="w-m" onchange="toggleModel(this)">
+                        <option value="Smokring">Smokring</option>
+                        <option value="Plisket">Plisket</option>
+                        <option value="Spiral">Spiral</option>
+                    </select>
                 </div>
             </div>
-            <div class="f-gorden">
-                <div class="grid grid-2">
-                    <div><label>Nama Kain</label><input type="text" class="in-nk" oninput="calculateAll()"></div>
-                    <div><label>Harga/m</label><input type="number" class="in-hk" oninput="calculateAll()"></div>
+
+            <div class="section-box f-kain-vit">
+                <div class="grid-row">
+                    <div><label>Nama Kain Utama</label><input type="text" class="w-nk" placeholder="Nama Bahan" oninput="calculateAll()"></div>
+                    <div><label>Harga Kain (Rp/m)</label><input type="number" class="w-hk" placeholder="150000" oninput="calculateAll()"></div>
                 </div>
-                <div class="grid grid-3">
-                    <div><label>Lebar</label><input type="number" step="0.01" class="in-l" oninput="calculateAll()"></div>
-                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-t" oninput="calculateAll()"></div>
-                    <div><label>Panel</label><input type="number" class="in-p" value="1" oninput="calculateAll()"></div>
-                </div>
-                <div class="grid grid-2">
-                    <div><label>Model Gorden</label><select class="sel-m" onchange="calculateAll()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select></div>
-                    <div><label>Pakai Vitrase?</label><select class="sel-v" onchange="toggleVit(this)"><option value="tidak">TIDAK</option><option value="Plisket">YA - PLISKET</option><option value="Spiral">YA - SPIRAL</option></select></div>
-                </div>
-                <div class="vit-box hidden" style="border:1px dashed var(--border); padding:8px; border-radius:8px; margin-top:8px;">
-                    <div class="grid grid-2">
-                        <div><label>Nama Vitrase</label><input type="text" class="in-nv" oninput="calculateAll()"></div>
-                        <div><label>Harga Vit/m</label><input type="number" class="in-hv" oninput="calculateAll()"></div>
+
+                <div class="split-row">
+                    <div class="col-panel">
+                        <label>Jml Panel (Lembar)</label>
+                        <input type="number" class="w-panel" value="1" min="1" oninput="calculateAll()">
                     </div>
-                    <div class="vit-spiral-input hidden">
-                        <div class="grid grid-3">
-                            <div><label>Lebar Vit</label><input type="number" step="0.01" class="in-vl" oninput="calculateAll()"></div>
-                            <div><label>Tinggi Vit</label><input type="number" step="0.01" class="in-vt" oninput="calculateAll()"></div>
-                            <div><label>Qty Vit</label><input type="number" class="in-vq" value="1" oninput="calculateAll()"></div>
+                    
+                    <div class="col-vit-toggle">
+                        <label>Tambahan Vitrase</label>
+                        <select class="w-v" onchange="toggleVit(this)">
+                            <option value="none">Tanpa Vitrase</option>
+                            <option value="Plisket">Vit. Plisket</option>
+                            <option value="Spiral">Vit. Spiral</option>
+                        </select>
+                    </div>
+
+                    <div class="col-qty-spiral hidden" style="grid-column: span 2;">
+                        <label>Qty Set (Stick Spiral Utama)</label>
+                        <input type="number" class="w-qs" value="1" min="1" oninput="calculateAll()">
+                    </div>
+                </div>
+                
+                <div class="grid-row v-extra hidden" style="margin-top:15px; border-top:1px dashed #555; padding-top:15px;">
+                    <div style="grid-column: 1 / -1;"><label style="color:white; background:var(--accent); display:inline-block; padding:2px 8px; border-radius:3px;">Detail Vitrase</label></div>
+                    <div><label>Nama Vitrase</label><input type="text" class="w-nv" placeholder="Nama Vitras" oninput="calculateAll()"></div>
+                    <div><label>Harga Vitras (Rp/m)</label><input type="number" class="w-hv" placeholder="100000" oninput="calculateAll()"></div>
+                    
+                    <div class="v-spiral-input-group hidden" style="grid-column: span 2;">
+                        <div class="grid-row" style="margin-bottom:0;">
+                            <div><label>Lebar Kaca (m)</label><input type="number" step="0.01" class="v-sl" placeholder="L" oninput="calculateAll()"></div>
+                            <div><label>Tinggi Kaca (m)</label><input type="number" step="0.01" class="v-st" placeholder="T" oninput="calculateAll()"></div>
+                            <div><label>Qty (Stick)</label><input type="number" class="v-sq" value="1" oninput="calculateAll()"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="f-blinds hidden">
-                <div class="grid grid-2">
-                    <div><label>Nama Blinds</label><input type="text" class="in-bl-n" oninput="calculateAll()"></div>
-                    <div><label>Harga/m</label><input type="number" class="in-bl-h" oninput="calculateAll()"></div>
-                </div>
-                <div class="grid grid-2">
-                    <div><label>Lebar</label><input type="number" step="0.01" class="in-bl-l" oninput="calculateAll()"></div>
-                    <div><label>Tinggi</label><input type="number" step="0.01" class="in-bl-t" oninput="calculateAll()"></div>
+
+            <div class="section-box f-blinds hidden">
+                <div class="grid-row" style="margin-bottom:0;">
+                    <div style="grid-column: span 2;"><label>Nama Blinds</label><input type="text" class="w-bn" placeholder="Nama Blinds" oninput="calculateAll()"></div>
+                    <div><label>Harga per m2</label><input type="number" class="w-bp" value="0" oninput="calculateAll()"></div>
                 </div>
             </div>
-            <div class="extra-box">
-                <div class="extra-header"><span class="extra-title">+ AKSESORIS / ITEM TAMBAHAN</span><button class="btn-add-small" onclick="addExtraRow(this)">+ TAMBAH</button></div>
-                <div class="extra-list"></div>
+
+            <div style="text-align:right; margin-top:10px;">
+                <span style="font-size: 11px; color: #94a3b8;">Subtotal:</span>
+                <span class="w-sub" style="color:var(--success); font-weight:bold; font-size:18px; margin-left:10px;">Rp 0</span>
             </div>
-            <div style="text-align:right; margin-top:10px; color:var(--success); font-weight:900;" class="sub-total">Rp 0</div>
         </div>
     </template>
 
     <script>
-        let currentMode = 'lo';
-        let currentReportType = '';
-        let itemCount = 0;
-        const P = { smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, stick: 50000, jahit: 20000, instal: 50000 };
-
-        window.onload = () => { loadSettings(); };
-
-        function setMode(m) {
-            currentMode = m;
-            document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('btn-'+m).classList.add('active');
-        }
-
-        function toggleVit(sel) {
-            const win = sel.closest('.window-item');
-            const box = win.querySelector('.vit-box');
-            const spiralIn = win.querySelector('.vit-spiral-input');
-            box.classList.toggle('hidden', sel.value==='tidak');
-            spiralIn.classList.toggle('hidden', sel.value!=='Spiral');
-            calculateAll();
-        }
+        const HARGA = { smokring: 4500, rollet: 65000, rell: 50000, stick: 50000, hook: 40000, tali: 38000, jahit: 20000, instal: 50000 };
+        let dataWindows = [];
 
         function addWindow() {
-            itemCount++;
-            let nameInput = prompt("Nama Jendela:", "Jendela #" + itemCount);
-            if (nameInput === null) { itemCount--; return; }
-            const container = document.getElementById('window-container');
+            const list = document.getElementById('window-list');
             const clone = document.getElementById('tmp-win').content.cloneNode(true);
-            const el = clone.querySelector('.window-item');
-            el.dataset.mode = currentMode;
-            el.querySelector('.win-name').value = nameInput || "Jendela #" + itemCount;
-            const tag = el.querySelector('.item-tag');
-            tag.innerText = (currentMode==='lo'?'LOKAL':currentMode==='im'?'IMPOR':'BLINDS');
-            if(currentMode==='bl'){ 
-                el.querySelector('.f-gorden').classList.add('hidden'); 
-                el.querySelector('.f-blinds').classList.remove('hidden'); 
-            }
-            container.appendChild(el);
+            list.appendChild(clone);
             calculateAll();
         }
 
-        function addExtraRow(btn) {
-            const list = btn.closest('.extra-box').querySelector('.extra-list');
-            const div = document.createElement('div');
-            div.className = 'extra-row';
-            div.innerHTML = `<input type="text" placeholder="Item" class="ex-n" oninput="calculateAll()"><input type="number" placeholder="Harga" class="ex-h" oninput="calculateAll()"><input type="number" placeholder="Qty" class="ex-q" value="1" oninput="calculateAll()"><button class="btn-del-small" onclick="this.parentElement.remove(); calculateAll();">×</button>`;
-            list.appendChild(div);
+        function toggleMetode(el) {
+            const win = el.closest('.window-item');
+            const mode = el.value;
+            win.querySelector('.f-kain-vit').classList.toggle('hidden', mode === 'blinds');
+            win.querySelector('.col-model').classList.toggle('hidden', mode === 'blinds');
+            win.querySelector('.f-blinds').classList.toggle('hidden', mode !== 'blinds');
+            calculateAll();
         }
 
-        function removeItem(btn) {
-            btn.closest('.window-item').remove();
+        function toggleModel(el) {
+            const win = el.closest('.window-item');
+            const model = el.value;
+            const isSpiral = (model === 'Spiral');
+            
+            win.querySelector('.col-vit-toggle').classList.toggle('hidden', isSpiral);
+            win.querySelector('.col-panel').classList.toggle('hidden', isSpiral);
+            win.querySelector('.col-qty-spiral').classList.toggle('hidden', !isSpiral);
+            
+            if(isSpiral) {
+                win.querySelector('.w-v').value = 'none';
+                win.querySelector('.v-extra').classList.add('hidden');
+            }
+            calculateAll();
+        }
+
+        function toggleVit(el) {
+            const win = el.closest('.window-item');
+            const vMode = el.value;
+            win.querySelector('.v-extra').classList.toggle('hidden', vMode === 'none');
+            win.querySelector('.v-spiral-input-group').classList.toggle('hidden', vMode !== 'Spiral');
             calculateAll();
         }
 
         function calculateAll() {
-            let grand = 0; window.finalData = [];
-            document.querySelectorAll('.window-item').forEach(el => {
-                const mode = el.dataset.mode;
-                let sub = 0, details = [], extras = [], item = { name: el.querySelector('.win-name').value, mode: mode };
+            const rows = document.querySelectorAll('.window-item');
+            let totalSemua = 0;
+            dataWindows = [];
 
-                if(mode==='bl'){
-                    const l = parseFloat(el.querySelector('.in-bl-l').value)||0, t = parseFloat(el.querySelector('.in-bl-t').value)||0, h = parseFloat(el.querySelector('.in-bl-h').value)||0, name = el.querySelector('.in-bl-n').value;
-                    let val = Math.max(l,1) * Math.max(t,1) * h;
-                    sub = val + P.instal;
-                    item.kain = `${name} (${l}x${t})`; item.modelK = "Blinds"; item.panel = "-";
-                    details.push({ n: `Blinds (${l}x${t})`, v: val }, { n: "Instalasi", v: P.instal });
+            rows.forEach((win, index) => {
+                const title = win.querySelector('.window-title-input').value || `Jendela ${index+1}`;
+                const l = parseFloat(win.querySelector('.w-l').value) || 0;
+                const t = parseFloat(win.querySelector('.w-t').value) || 0;
+                const jn = win.querySelector('.w-jn').value;
+                const m = win.querySelector('.w-m').value;
+                
+                let rincian = [];
+                let mtrJahit = 0;
+
+                if (jn === 'blinds') {
+                    const bp = parseFloat(win.querySelector('.w-bp').value) || 0;
+                    let m2 = Math.max(l, 1) * Math.max(t, 1);
+                    rincian.push({n: win.querySelector('.w-bn').value || "Blinds", q: `${m2.toFixed(2)} m2`, s: bp, v: m2 * bp, isProd: true});
+                    rincian.push({n: "Jasa Instalasi", q: "1 titik", s: HARGA.instal, v: HARGA.instal, isProd: false});
                 } else {
-                    const nk = el.querySelector('.in-nk').value, hk = parseFloat(el.querySelector('.in-hk').value)||0, l = parseFloat(el.querySelector('.in-l').value)||0, t = parseFloat(el.querySelector('.in-t').value)||0, p = el.querySelector('.in-p').value, m = el.querySelector('.sel-m').value;
-                    let mtr = (mode==='lo') ? Math.ceil((l+0.2)/0.4)*(t+0.3) : (l+0.2)*3;
-                    sub = (mtr*hk) + (mtr*P.jahit);
-                    item.kain = nk; item.ukuranK = `${l}x${t}`; item.modelK = m; item.panel = p;
-                    details.push({ n: `Bahan (${mtr.toFixed(1)}m)`, v: mtr*hk }, { n: "Jahit", v: mtr*P.jahit });
-                    if(m==='Smokring'){ 
-                        let s = Math.ceil(l*24); if(s%2!==0) s++; sub += (s*P.smokring) + (Math.max(l,1)*P.rollet);
-                        details.push({n:`Smokring (${s}pcs)`, v:s*P.smokring}, {n:"Rollet", v:Math.max(l,1)*P.rollet});
-                    } else { sub += Math.max(l,1)*P.rell; details.push({n:"Rell", v:Math.max(l,1)*P.rell}); }
+                    const nk = win.querySelector('.w-nk').value || "Kain";
+                    const hk = parseFloat(win.querySelector('.w-hk').value) || 0;
                     
-                    const vMod = el.querySelector('.sel-v').value;
-                    if(vMod !== 'tidak'){
-                        const nv = el.querySelector('.in-nv').value, hv = parseFloat(el.querySelector('.in-hv').value)||0;
-                        if(vMod === 'Plisket'){
-                            let mtrV = (l+0.2)*3; sub += (mtrV*hv) + (mtrV*P.jahit) + (Math.max(l,1)*P.rell);
-                            item.vit = nv; item.ukuranV = `${l}x${t}`; item.modelV = "Plisket"; item.qtyV = 1;
-                            details.push({n:`Vitrase Plisket`, v:mtrV*hv}, {n:"Jahit Vit", v:mtrV*P.jahit}, {n:"Rell Vit", v:Math.max(l,1)*P.rell});
+                    if(m === 'Spiral') {
+                        const qs = parseInt(win.querySelector('.w-qs').value) || 1;
+                        let pk = (l + 0.2) * 3 * qs;
+                        rincian.push({n: `${nk} (Spiral)`, q: `${pk.toFixed(2)} m`, s: hk, v: pk * hk, isProd: true});
+                        rincian.push({n: "Stick Spiral", q: `${qs} set`, s: HARGA.stick, v: HARGA.stick * qs, isProd: true});
+                        mtrJahit += pk;
+                    } else {
+                        let pk = (jn === 'lokal') ? Math.ceil((l + 0.2) / 0.4) * (t + 0.3) : (l + 0.2) * 3;
+                        rincian.push({n: `${nk} (${jn.toUpperCase()})`, q: `${pk.toFixed(2)} m`, s: hk, v: pk * hk, isProd: true});
+                        mtrJahit += pk;
+
+                        if(m === 'Smokring') {
+                            let ring = Math.ceil(l * 24); if(ring % 2 !== 0) ring++;
+                            rincian.push({n: "Smokring", q: `${ring} pcs`, s: HARGA.smokring, v: ring * HARGA.smokring, isProd: true});
+                            rincian.push({n: "Rollet/Batang", q: `${Math.max(l, 1)} m`, s: HARGA.rollet, v: Math.max(l, 1) * HARGA.rollet, isProd: true});
                         } else {
-                            const vl = parseFloat(el.querySelector('.in-vl').value)||0, vt = parseFloat(el.querySelector('.in-vt').value)||0, vq = parseFloat(el.querySelector('.in-vq').value)||1;
-                            let mtrV = (vl+0.1)*3; sub += ((mtrV*hv) + (mtrV*P.jahit) + (mtrV*P.stick))*vq;
-                            item.vit = nv; item.ukuranV = `${vl}x${vt}`; item.modelV = "Spiral"; item.qtyV = vq;
-                            details.push({n:`Vitrase Spiral`, v:((mtrV*hv)+(mtrV*P.jahit)+(mtrV*P.stick))*vq});
+                            rincian.push({n: "Rell Alumunium", q: `${Math.max(l, 1)} m`, s: HARGA.rell, v: Math.max(l, 1) * HARGA.rell, isProd: true});
                         }
+                        rincian.push({n: "Hook & Tali", q: "1 set", s: HARGA.hook + HARGA.tali, v: HARGA.hook + HARGA.tali, isProd: true});
                     }
-                    sub += P.hook + P.tali + P.instal;
-                    details.push({n:"Hook", v:P.hook}, {n:"Tali", v:P.tali}, {n:"Instalasi", v:P.instal});
+
+                    const vMode = win.querySelector('.w-v').value;
+                    if(vMode !== 'none') {
+                        const hv = parseFloat(win.querySelector('.w-hv').value) || 0;
+                        const v_l = parseFloat(win.querySelector('.v-sl').value) || l;
+                        const v_t = parseFloat(win.querySelector('.v-st').value) || t;
+                        const vsq = parseInt(win.querySelector('.v-sq').value) || 1;
+                        
+                        let pv = (v_l + 0.2) * 3 * vsq;
+                        rincian.push({n: `Vitrase ${win.querySelector('.w-nv').value}`, q: `${pv.toFixed(2)} m`, s: hv, v: pv * hv, isProd: true});
+                        
+                        if(vMode === 'Spiral') {
+                            rincian.push({n: "Stick Vitrase (Spiral)", q: `${vsq} set`, s: HARGA.stick, v: HARGA.stick * vsq, isProd: true});
+                        } else {
+                            rincian.push({n: "Rell Vitrase", q: `${Math.max(l, 1)} m`, s: HARGA.rell, v: Math.max(l, 1) * HARGA.rell, isProd: true});
+                        }
+                        mtrJahit += pv;
+                    }
+                    rincian.push({n: "Jasa Jahit", q: `${mtrJahit.toFixed(2)} m`, s: HARGA.jahit, v: mtrJahit * HARGA.jahit, isProd: false});
+                    rincian.push({n: "Jasa Instalasi", q: "1 titik", s: HARGA.instal, v: HARGA.instal, isProd: false});
                 }
-                el.querySelectorAll('.extra-row').forEach(row => {
-                    const nEx = row.querySelector('.ex-n').value || "Tambahan";
-                    const pEx = parseFloat(row.querySelector('.ex-h').value) || 0, qEx = parseFloat(row.querySelector('.ex-q').value) || 1;
-                    if(pEx > 0) { 
-                        sub += (pEx*qEx); 
-                        details.push({ n: nEx, v: pEx*qEx });
-                        extras.push({ n: nEx, q: qEx, v: pEx*qEx });
+
+                let sub = rincian.reduce((acc, c) => acc + c.v, 0);
+                win.querySelector('.w-sub').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
+                totalSemua += sub;
+                dataWindows.push({ title, l, t, jn, m, subtotal: sub, rincian });
+            });
+
+            const dType = document.getElementById('d-type').value;
+            const dVal = parseFloat(document.getElementById('d-val').value) || 0;
+            const grandTotal = totalSemua - (dType === 'p' ? (totalSemua * dVal / 100) : dVal);
+
+            document.getElementById('grand-total').innerText = "Rp " + Math.round(grandTotal).toLocaleString('id-ID');
+            document.getElementById('p-grand').innerText = "TOTAL AKHIR: Rp " + Math.round(grandTotal).toLocaleString('id-ID');
+        }
+
+        function printDoc(type) {
+            calculateAll();
+            const list = document.getElementById('print-list');
+            list.innerHTML = "";
+            document.getElementById('print-title').innerText = type === 'estimasi' ? "ESTIMASI PENAWARAN GORDEN" : "SURAT PERINTAH KERJA (BAHAN)";
+            document.getElementById('p-date').innerText = "Tanggal: " + new Date().toLocaleDateString('id-ID');
+            document.getElementById('total-area-print').style.display = (type === 'spk' || type === 'jahit') ? 'none' : 'block';
+
+            dataWindows.forEach(g => {
+                let h = `<div class="group-box">
+                    <div style="font-weight:bold; font-size:14px; border-bottom:1px solid #000; padding-bottom:5px; margin-bottom:10px; color:#2563eb;">${g.title.toUpperCase()}</div>
+                    <div style="font-size:11px; margin-bottom:10px; background:#f1f5f9; padding:5px;">
+                        Ukuran: L ${g.l}m x T ${g.t}m | Model: ${g.m}
+                    </div>`;
+                g.rincian.forEach(row => {
+                    if(type === 'estimasi') {
+                        h += `<div class="flex-btwn"><span>${row.n} <small>(${row.q} x ${row.s.toLocaleString('id-ID')})</small></span><span>Rp ${Math.round(row.v).toLocaleString('id-ID')}</span></div>`;
+                    } else if(row.isProd) {
+                        h += `<div class="flex-btwn"><span>${row.n}</span><strong>${row.q}</strong></div>`;
                     }
                 });
-                el.querySelector('.sub-total').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
-                item.total = sub; item.details = details; item.extras = extras; finalData.push(item); grand += sub;
+                if(type === 'estimasi') h += `<div style="text-align:right; font-weight:bold; margin-top:8px; border-top:1px solid #eee; padding-top:5px;">Subtotal: Rp ${Math.round(g.subtotal).toLocaleString('id-ID')}</div>`;
+                h += `</div>`;
+                list.innerHTML += h;
             });
-            document.getElementById('grand-total').innerText = "TOTAL: Rp " + Math.round(grand).toLocaleString('id-ID');
-        }
-
-        function prepReport(m) { document.getElementById('modal-cust').style.display='flex'; document.getElementById('btn-go').onclick = () => showReport(m); }
-
-        function showReport(mode) {
-            currentReportType = mode;
-            document.getElementById('modal-cust').style.display='none';
-            const sName = localStorage.getItem('y_name') || "Yeny Gorden", sWa = localStorage.getItem('y_wa') || "", sLogo = localStorage.getItem('y_logo') || "";
-            const n = document.getElementById('c-name').value||"-", p = document.getElementById('c-phone').value||"-", a = document.getElementById('c-addr').value||"-";
-            const tgl = new Date().toLocaleDateString('id-ID');
-
-            document.getElementById('rep-branding').innerHTML = `
-                <div class="rep-header-box">
-                    ${sLogo ? `<img src="${sLogo}" class="rep-logo">` : ''}
-                    <div class="rep-store-info">
-                        <h2>${sName}</h2>
-                        <p>WA: ${sWa}</p>
-                    </div>
-                </div>
-                <h3 style="text-align:center; margin:5px 0; border-bottom:1px solid #000; padding-bottom:5px; color: black;">${mode.toUpperCase()}</h3>`;
-            
-            if(mode === 'estimasi'){
-                document.getElementById('rep-info').innerHTML = `<b>Nama:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl Cetak:</b> ${tgl}<br><b>Masa Berlaku:</b> 7 Hari`;
-            } else if(mode === 'spk'){
-                document.getElementById('rep-info').innerHTML = `<b>Pesanan:</b> ${n} (${p})<br><b>Alamat:</b> ${a}<br><b>Tgl SPK:</b> ${tgl}`;
-            } else {
-                document.getElementById('rep-info').innerHTML = `<b>Pelanggan:</b> ${n}<br><b>Tanggal:</b> ${tgl}`;
-            }
-
-            const list = document.getElementById('rep-list'); list.innerHTML = "";
-            finalData.forEach(item => {
-                let html = `<div class="rep-item" style="font-size:12px; color: black;"><b>${item.name}</b><br>`;
-                html += `Kain: ${item.kain||'-'} | Uk: ${item.ukuranK||'-'} | Mod: ${item.modelK||'-'} | Pan: ${item.panel||'-'}<br>`;
-                if(item.vit) html += `Vit: ${item.vit} | Uk: ${item.ukuranV} | Mod: ${item.modelV} | Qty: ${item.qtyV}<br>`;
-                if(item.extras.length > 0) {
-                    item.extras.forEach(ex => { html += `+ ${ex.n} (Qty: ${ex.q})${mode!=='spk' ? ' - Rp '+Math.round(ex.v).toLocaleString('id-ID') : ''}<br>`; });
-                }
-                if(mode==='rincian'){
-                    html += `<div style="margin-top:5px; border-top:0.5px solid #ccc; padding-top:2px;">`;
-                    item.details.forEach(d => { html += `<div style="display:flex; justify-content:space-between; font-size:10px;"><span>- ${d.n}</span><span>Rp ${Math.round(d.v).toLocaleString('id-ID')}</span></div>`; });
-                    html += `</div>`;
-                }
-                if(mode !== 'spk') html += `<div style="text-align:right; font-weight:bold; border-top:1px solid #000; margin-top:5px;">Sub: Rp ${Math.round(item.total).toLocaleString('id-ID')}</div>`;
-                html += `</div>`;
-                list.innerHTML += html;
-            });
-            
-            if(mode !== 'spk') {
-                document.getElementById('rep-footer').innerHTML = `<h3 style="text-align:right; border-top:2px solid #000; color: black;">Grand Total: ${document.getElementById('grand-total').innerText}</h3>`;
-            } else {
-                document.getElementById('rep-footer').innerHTML = ""; 
-            }
-            document.getElementById('modal-report').style.display='block';
-        }
-
-        // --- FUNGSI DOWNLOAD PDF FIXED ---
-        async function downloadPDF() {
-            const n = document.getElementById('c-name').value || "PELANGGAN";
-            const p = document.getElementById('c-phone').value || "";
-            let prefix = currentReportType === 'spk' ? "SPK" : (currentReportType === 'estimasi' ? "EST" : "RINCIAN");
-            
-            const fileName = `${prefix} ${n.toUpperCase()} ${p}.pdf`.trim();
-            const element = document.getElementById('report-area');
-            
-            const opt = { 
-                margin: [0.5, 0.4], 
-                filename: fileName, 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { 
-                    scale: 2, 
-                    backgroundColor: '#ffffff', 
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollY: 0
-                }, 
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.rep-item' }
+            document.getElementById('modal-cetak').style.display = "block";
+            document.getElementById('download-btn').onclick = () => {
+                const opt = { margin: 0.3, filename: `${type.toUpperCase()}_GORDEN.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+                html2pdf().set(opt).from(document.getElementById('print-area')).save();
             };
-
-            // Tunggu 500ms agar gambar logo benar-benar ter-render oleh browser
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save();
-            }, 500);
         }
 
-        function openSettings() { document.getElementById('modal-settings').style.display='flex'; }
-        function saveSettings() {
-            localStorage.setItem('y_name', document.getElementById('set-name').value);
-            localStorage.setItem('y_wa', document.getElementById('set-wa').value);
-            document.getElementById('display-store-name').innerText = document.getElementById('set-name').value;
-            document.getElementById('modal-settings').style.display='none';
-            alert("Pengaturan Berhasil Disimpan!");
-        }
-        function uploadLogo(input) { 
-            if (input.files && input.files[0]) { 
-                const reader = new FileReader(); 
-                reader.onload = e => {
-                    localStorage.setItem('y_logo', e.target.result);
-                    alert("Logo Berhasil Diupload!");
-                };
-                reader.readAsDataURL(input.files[0]); 
-            } 
-        }
-        function loadSettings() {
-            document.getElementById('display-store-name').innerText = localStorage.getItem('y_name') || "YENY GORDEN";
-            document.getElementById('set-name').value = localStorage.getItem('y_name') || "";
-            document.getElementById('set-wa').value = localStorage.getItem('y_wa') || "";
-        }
+        function closeModal() { document.getElementById('modal-cetak').style.display = "none"; }
+        addWindow();
     </script>
 </body>
 </html>
