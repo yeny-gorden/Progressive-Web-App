@@ -3,357 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Gorden Pro - Yeny Gorden</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
+    <title>Kalkulator Yeny Gorden - Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
     <style>
-        :root {
-            --bg-body: #0f172a;
-            --bg-card: #1e293b;
-            --bg-input: #020617;
-            --text-main: #f1f5f9;
-            --text-dim: #eab308;
-            --accent: #3b82f6;
-            --success: #22c55e;
-            --danger: #ef4444;
-        }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 10px 10px 160px 10px; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        :root { --primary: #2563eb; --secondary: #64748b; --success: #059669; --bg: #f1f5f9; --danger: #ef4444; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); padding: 10px; color: #1e293b; margin-bottom: 80px; }
+        .container { max-width: 550px; margin: auto; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 15px; }
         
-        .config-box { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
-        .logo-preview-dash { width: 60px; height: 60px; border: 1px dashed var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-input); }
-        .logo-preview-dash img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-brand { cursor: pointer; text-align: center; }
+        #display-logo { max-height: 60px; margin-bottom: 5px; margin: auto; }
 
-        .window-item { background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; border-left: 5px solid var(--accent); }
-        .window-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .window-title-input { background: transparent; border: none; color: var(--accent); font-weight: bold; font-size: 16px; width: 100%; outline: none; border-bottom: 1px dashed #334155; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .tab-btn { flex: 1; padding: 8px; cursor: pointer; border: none; background: #e2e8f0; border-radius: 6px; font-weight: 600; font-size: 0.85rem; color: var(--secondary); transition: 0.3s; }
+        .tab-btn.active { background: var(--primary); color: white; }
         
-        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 15px; align-items: end; }
-        label { font-size: 10px; font-weight: bold; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .full-width { grid-column: span 2; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 8px; }
+        label { font-size: 0.75rem; font-weight: 700; margin-bottom: 2px; color: var(--secondary); }
+        input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
         
-        input, select { width: 100%; background: var(--bg-input); border: 1px solid #334155; color: white; padding: 10px; border-radius: 6px; font-size: 13px; outline: none; }
-        input[type="number"] { text-align: center; font-weight: bold; }
-
-        .section-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #334155; }
+        .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
+        .btn-reset { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+        
         .hidden { display: none !important; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .btn { padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s; }
-        .btn-add { background: var(--accent); color: white; grid-column: span 2; font-size: 15px; }
-        .btn-estimasi { background: #8b5cf6; color: white; }
-        .btn-spk { background: var(--success); color: white; }
-        .btn-del { background: var(--danger); color: white; border-radius: 50%; width: 28px; height: 28px; position: absolute; top: -10px; right: -10px; cursor: pointer; border: none; }
-
-        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; padding: 15px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .grand-total { color: var(--success); font-size: 24px; font-weight: bold; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; overflow-y: auto; }
-        #print-area { background: #fff; color: #000; padding: 40px; width: 100%; max-width: 800px; margin: 0 auto; min-height: 100%; border-radius: 4px; }
-        .pdf-row { border-bottom: 1px solid #eee; padding: 10px 0; color: #000; }
+        #fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center; }
+        .fab-menu { position: absolute; bottom: 70px; right: 0; display: none; flex-direction: column; gap: 10px; width: 160px; }
+        .fab-menu button { background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #1e293b; text-align: left; }
         
-        /* PDF Header Styles */
-        .pdf-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
-        .shop-info h1 { margin: 0; color: #000; font-size: 24px; font-weight: 800; letter-spacing: 1px; }
-        .shop-info p { margin: 2px 0; font-size: 14px; font-weight: 600; color: #334155; }
-        .doc-info { text-align: right; }
-        .doc-info h2 { margin: 0; text-transform: uppercase; font-size: 18px; color: #3b82f6; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; position: relative; }
+        
+        .tutorial-step { margin-bottom: 12px; padding-left: 10px; border-left: 3px solid var(--primary); }
+        .tutorial-step h4 { margin: 0 0 4px 0; color: var(--primary); font-size: 1.0rem; }
+        .tutorial-step p { margin: 0; font-size: 0.9rem; color: #000; line-height: 1.4; }
+
+        .window-item { background: #fff; border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .summary-box { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
+        .total-price { font-size: 1.3rem; color: #10b981; font-weight: 800; }
+
+        #print-area { display: none; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; font-size: 10pt; }
+            .container, #fab-container, .modal { display: none !important; }
+            #print-area { display: block !important; padding: 10mm; color: black; }
+            .print-header { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
+            .print-header img { max-height: 60px; margin-right: 15px; }
+            .print-header-text h1 { margin: 0; font-size: 1.4rem; }
+            .flex-between { display: flex; justify-content: space-between; }
+            .print-item { border-bottom: 1px solid #eee; padding: 8px 0; page-break-inside: avoid; }
+            .red-note { color: red !important; font-weight: bold; font-size: 0.85rem; }
+            .doc-label { font-weight: 900; font-size: 1.2rem; text-decoration: underline; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2 style="text-align: center; color: var(--accent); letter-spacing: 2px; margin-bottom: 20px;">YENY GORDEN</h2>
-        
-        <div class="config-box">
-            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
-                <div class="logo-preview-dash" id="dash-logo-container">
-                    <span style="font-size: 8px; color: #64748b;">NO LOGO</span>
-                </div>
-                <div style="flex: 1;">
-                    <label>Upload Logo (Tampil di PDF)</label>
-                    <input type="file" id="logo-input" accept="image/*" onchange="loadLogo(event)">
-                </div>
-            </div>
-
-            <div class="grid-row">
-                <div><label>Nama Pembeli</label><input type="text" id="cust-nama" placeholder="Nama" oninput="saveCustomer()"></div>
-                <div><label>Alamat</label><input type="text" id="cust-alamat" placeholder="Alamat" oninput="saveCustomer()"></div>
-                <div><label>Telepon</label><input type="number" id="cust-telp" placeholder="Nomor WA" oninput="saveCustomer()"></div>
-            </div>
-        </div>
-
-        <div id="window-list"></div>
-
-        <div class="btn-group">
-            <button class="btn btn-add" onclick="addWindow()">+ TAMBAH JENDELA BARU</button>
-            <button class="btn btn-estimasi" onclick="openPreview('estimasi')">📄 CETAK ESTIMASI</button>
-            <button class="btn btn-spk" onclick="openPreview('spk')">🛠️ CETAK SPK BAHAN</button>
-        </div>
+<div class="container">
+    <div class="card header-brand" onclick="openCustModal()">
+        <img id="display-logo" src="" alt="" style="display: none;">
+        <h2 style="margin: 0; color: var(--primary);" id="display-nama-toko">YENY GORDEN</h2>
+        <small id="display-tagline">Tlp. 089504215020</small>
+        <div style="font-size: 0.6rem; color: var(--secondary); margin-top: 5px;">Jl. Jend. Sudirman Purwokerto </div>
     </div>
 
-    <div class="footer">
-        <div>
-            <label style="margin:0;">Diskon (Rp):</label>
-            <input type="number" id="d-val" style="width: 100px;" value="0" oninput="calculateAll()">
+    <div class="card">
+        <div class="tabs">
+            <button id="btn-import" class="tab-btn active" onclick="switchTab('import')">Gorden Impor</button>
+            <button id="btn-lokal" class="tab-btn" onclick="switchTab('lokal')">Gorden Lokal</button>
+            <button id="btn-blinds" class="tab-btn" onclick="switchTab('blinds')">Blinds</button>
         </div>
-        <div id="grand-total" class="grand-total">Rp 0</div>
+
+        <div class="grid">
+            <div class="input-group full-width">
+                <label>📍 Nama Jendela / Lokasi</label>
+                <input type="text" id="nama_jendela" placeholder="Contoh: Kamar Depan">
+            </div>
+            <div class="input-group">
+                <label>Lebar (m)</label>
+                <input type="number" id="lebar" step="0.01" placeholder="1.5">
+            </div>
+            <div class="input-group">
+                <label>Tinggi (m)</label>
+                <input type="number" id="tinggi" step="0.01" placeholder="2.5">
+            </div>
+            <div class="input-group" id="grp-model">
+                <label>Model Gorden</label>
+                <select id="model" onchange="toggleVitraseOption()">
+                    <option value="smokring">Smokring</option>
+                    <option value="plisket">Plisket</option>
+                    <option value="spiral">Spiral</option>
+                </select>
+            </div>
+            <div class="input-group" id="grp-panel">
+                <label>Jumlah Belahan (Panel)</label>
+                <input type="number" id="jml_panel" value="2" min="1">
+            </div>
+            
+            <div class="input-group full-width" id="container-vitrase">
+                <label>Tambah Vitrase</label>
+                <select id="pakai_vitrase" onchange="toggleVitraseSpiralFields()">
+                    <option value="no">Tanpa Vitrase</option>
+                    <option value="plisket">Vitrase Plisket</option>
+                    <option value="spiral">Vitrase Spiral</option>
+                </select>
+            </div>
+
+            <div id="spiral-vitrase-fields" class="full-width grid hidden" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                <div class="input-group"><label>L Vitrase (m)</label><input type="number" placeholder="Lebar Vit" id="v_lebar" step="0.01"></div>
+                <div class="input-group"><label>T Vitrase (m)</label><input type="number" placeholder="Tinggi Vit" id="v_tinggi" step="0.01"></div>
+                <div class="input-group full-width"><label>Qty (Set)</label><input type="number" id="v_qty" value="1"></div>
+            </div>
+        </div>
+        <button class="btn-add" onclick="tambahJendela()">TAMBAH KE DAFTAR</button>
     </div>
 
-    <div id="modal-cetak" class="modal">
-        <div style="text-align:center; margin-bottom: 15px;">
-            <button onclick="closeModal()" style="padding:10px 20px; background:var(--danger); color:white; border:none; border-radius:5px; cursor:pointer;">KEMBALI</button>
-            <button id="download-btn" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold; margin-left:10px;">💾 DOWNLOAD PDF</button>
+    <div id="daftar-jendela"></div>
+
+    <div class="summary-box" id="summary" style="display:none;">
+        <div class="flex-between">
+            <h4 style="margin:0;">Total Estimasi</h4>
+            <button class="btn-reset" onclick="resetSemua()">Hapus Semua</button>
         </div>
-        <div id="print-area">
-            <div class="pdf-header-grid">
-                <div class="shop-info">
-                    <div id="pdf-logo-wrap" style="margin-bottom: 8px;"></div>
-                    <h1>YENY GORDEN</h1>
-                    <p>📞 089504215020</p>
-                </div>
-                <div class="doc-info">
-                    <h2 id="pdf-title"></h2>
-                    <p id="pdf-date" style="font-size:13px; margin:5px 0; font-weight: bold;"></p>
-                    <p id="pdf-exp" style="font-size: 12px; font-weight: bold; color: #dc2626; margin: 0;"></p>
-                </div>
-            </div>
-            
-            <div id="pdf-buyer" style="font-size:14px; margin-bottom:20px; line-height:1.4; color: #000; background: #f1f5f9; padding: 12px; border-radius: 5px; border: 1px solid #cbd5e1;"></div>
-            
-            <div id="pdf-content"></div>
-            
-            <div id="pdf-total" style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-top:20px; font-size:20px; font-weight:bold; color: #000;"></div>
-        </div>
+        <div class="total-price" id="grand-total">Rp 0</div>
     </div>
+</div>
 
-    <template id="tmp-win">
-        <div class="window-item">
-            <button class="btn-del" onclick="this.parentElement.remove(); calculateAll();">×</button>
-            <div class="window-header"><input type="text" class="window-title-input" placeholder="Nama Ruangan/Jendela" ></div>
-            
-            <div class="grid-row">
-                <div><label>LEBAR (m)</label><input type="number" placeholder="1.5" step="0.01" class="w-l" oninput="calculateAll()"></div>
-                <div><label>TINGGI (m)</label><input type="number" placeholder="2.5" step="0.01" class="w-t" oninput="calculateAll()"></div>
-                <div><label>Bahan</label>
-                    <select class="w-jn" onchange="calculateAll()">
-                        <option value="import">IMPORT</option>
-                        <option value="lokal">LOKAL</option>
-                    </select>
-                </div>
-                <div><label>Model</label>
-                    <select class="w-m" onchange="toggleModel(this)">
-                        <option value="Smokring">Smokring</option>
-                        <option value="Plisket">Plisket</option>
-                        <option value="Spiral">Spiral</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="section-box">
-                <div class="grid-row">
-                    <div><label>Nama Kain</label><input type="text" class="w-nk" placeholder="Nama Kain" oninput="calculateAll()"></div>
-                    <div><label>Harga Kain</label><input type="number" placeholder="150000" class="w-hk" oninput="calculateAll()"></div>
-                    <div class="panel-field"><label>Panel</label><input type="number" class="w-panel" value="1" oninput="calculateAll()"></div>
-                </div>
-
-                <div class="vit-field" style="margin-top:10px; border-top: 1px solid #334155; padding-top:10px;">
-                    <label>Tambahan Vitrase</label>
-                    <select class="w-v" onchange="toggleVit(this)">
-                        <option value="none">Tanpa Vitrase</option>
-                        <option value="Plisket">Vitrase Plisket</option>
-                        <option value="Spiral">Vitrase Spiral</option>
-                    </select>
-
-                    <div class="v-spiral-box hidden" style="margin-top:10px; background: rgba(59, 130, 246, 0.1); padding: 10px; border-radius: 5px;">
-                        <div class="grid-row" style="margin-bottom:0;">
-                            <div><label>Nama Vitras</label><input type="text" placeholder="Warna" class="w-nv" oninput="calculateAll()"></div>
-                            <div><label>Harga Vitras</label><input type="number" placeholder="100000" class="w-hv" oninput="calculateAll()"></div>
-                            <div><label>L Kaca</label><input type="number" placeholder="0.5" step="0.01" class="v-sl" oninput="calculateAll()"></div>
-                            <div><label>T Kaca</label><input type="number" placeholder="1.6" step="0.01" class="v-st" oninput="calculateAll()"></div>
-                            <div><label>Qty Stick</label><input type="number" class="v-sq" value="1" oninput="calculateAll()"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="v-plisket-box hidden" style="margin-top:10px;">
-                        <div class="grid-row">
-                            <div><label>Nama Vitras</label><input type="text" placeholder="Warna" class="w-nv-p" oninput="calculateAll()"></div>
-                            <div><label>Harga Vitras</label><input type="number" placeholder="100000" class="w-hv-p" oninput="calculateAll()"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="text-align:right; margin-top:10px;"><span class="w-sub" style="color:var(--success); font-weight:bold; font-size:18px;">Rp 0</span></div>
+<div id="modalPrice" class="modal">
+    <div class="modal-content">
+        <h3>Setting Harga <span id="title-tab" style="text-transform: capitalize;"></span></h3>
+        <div class="input-group"><label>Nama Kain/Produk</label><input type="text" id="m_nama_kain"></div>
+        <div class="input-group"><label>Harga Per m (atau m²)</label><input type="number" id="m_harga_kain"></div>
+        <div id="v-extra">
+            <hr>
+            <div class="input-group"><label>Nama Vitrase</label><input type="text" id="m_nama_vit"></div>
+            <div class="input-group"><label>Harga Vit/m</label><input type="number" id="m_harga_vit"></div>
         </div>
-    </template>
+        <button class="btn-add" onclick="simpanHarga()">TERAPKAN</button>
+        <button class="btn-reset" style="width:100%; margin-top:10px" onclick="closeModals()">Batal</button>
+    </div>
+</div>
 
-    <script>
-        // Data Harga Default
-        const HARGA = { smokring: 4500, rollet: 65000, rell: 50000, stick: 50000, hook: 40000, tali: 38000, jahit: 20000, instal: 50000 };
-        let allData = [];
-        let logoDataURL = "";
+<div id="modalCust" class="modal">
+    <div class="modal-content">
+        <h3>Profil & Pelanggan</h3>
+        <div class="input-group"><label>Logo Toko</label><input type="file" id="input-logo" accept="image/*" onchange="previewLogo(this)"></div>
+        <div class="input-group"><label>Nama Pelanggan</label><input type="text" id="c_nama" placeholder="Bpk. Budi"></div>
+        <div class="input-group"><label>No. Telp</label><input type="tel" id="c_telp"></div>
+        <div class="input-group"><label>Alamat</label><textarea id="c_alamat" rows="2"></textarea></div>
+        <hr>
+        <div class="input-group"><label>Nama Toko</label><input type="text" id="t_nama" value="YENY GORDEN"></div>
+        <button class="btn-add" onclick="simpanPelanggan()">SIMPAN</button>
+    </div>
+</div>
 
-        window.onload = () => {
-            document.getElementById('cust-nama').value = localStorage.getItem('yeny_nama') || '';
-            document.getElementById('cust-alamat').value = localStorage.getItem('yeny_alamat') || '';
-            document.getElementById('cust-telp').value = localStorage.getItem('yeny_telp') || '';
-            addWindow();
-        };
+<div id="modalTutorial" class="modal">
+    <div class="modal-content">
+        <h2 style="color: var(--primary); margin-top: 0; font-size: 1.2rem;">👋 PANDUAN SINGKAT</h2>
+         <div class="tutorial-step">
+            <h4>1. Data Pembeli</h4>
+            <p>Klik <b>LOGO</b> pada bagian atas.</p>
+        </div>
+        <div class="tutorial-step">
+            <h4>2. Atur Harga</h4>
+            <p>Klik tab <b>IMPORT/LOKAL/BLINDS</b> di atas untuk ubah nama/kode warna dan harga kain/m.</p>
+        </div>
+        <div class="tutorial-step">
+            <h4>3. Masukan Ukuran</h4>
+            <p>Isi data <b>LEBAR</b>, <b>TINGGI</b> dan <b>JUMLAH PANEL</b> gorden yang akan di buat.</p>
+         </div>
+         <div class="tutorial-step">
+          <h4>4. Bagian Vitrase</h4>
+          <p>Klik <b>TAMBAH VITRASE</b> dan pilih modelnya jika menggunakan vitrase.</p>
+        </div>   
+         <div class="tutorial-step">
+            <h4>5. Tambah Ke Daftar</h4>
+            <p>Klik <b>TAMBAH KE DAFTAR</b> untuk menyimpan hasil perhitungan tiap jendela.</p>
+        </div>
+         <div class="tutorial-step">
+            <h4>6. Cetak Estimasi & Spk</h4>
+            <p>Untuk menyimpan sebagai pdf, Klik <b>TOMBOL BIRU</b> di pojok kanan bawah.</p>
+        </div>
+         <div class="tutorial-step">
+            <h4><b>Gunakan dengan teliti agar tidak terjadi salah input.</b></h4>
+        </div>
+        <button class="btn-add" onclick="closeTutorial()">MENGERTI</button>
+    </div>
+</div>
 
-        function loadLogo(event) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                logoDataURL = reader.result;
-                document.getElementById('dash-logo-container').innerHTML = `<img src="${logoDataURL}">`;
+<div id="print-area"></div>
+
+<div id="fab-container">
+    <div class="fab-menu" id="fab-menu">
+        <button onclick="prosesCetak('Estimasi')">📄 Estimasi</button>
+        <button onclick="prosesCetak('SPK')">📝 SPK Penjahit</button>
+        <button onclick="prosesCetak('Rincian')">🔍 Rincian Biaya</button>
+    </div>
+    <button class="fab-main" onclick="toggleFab()">☰</button>
+</div>
+
+<script>
+    let keranjang = [];
+    let currentTab = 'import';
+    let dataLogo = localStorage.getItem('yeny_logo') || '';
+    let customer = { nama: '', telp: '', alamat: '', toko: 'YENY GORDEN' };
+
+    let settings = {
+        import: { nama: 'Blackout Premium', harga: 150000, n_vit: 'Vitrase Polos', h_vit: 100000 },
+        lokal: { nama: 'Kain Lokal Standar', harga: 70000, n_vit: 'Vitrase Lokal', h_vit: 100000 },
+        blinds: { nama: 'Roller Blind', harga: 350000, n_vit: '-', h_vit: 0 }
+    };
+
+    const CONST = {
+        H_SMOKRING: 4500, H_JAHIT: 20000, H_ROLLET: 65000, 
+        H_RELL: 50000, H_HOOK: 40000, H_TALI: 38000, 
+        H_INSTALASI: 50000, H_STICK: 50000
+    };
+
+    window.onload = () => {
+        if (dataLogo) {
+            document.getElementById('display-logo').src = dataLogo;
+            document.getElementById('display-logo').style.display = 'block';
+        }
+        if (!sessionStorage.getItem('tutorial_seen')) document.getElementById('modalTutorial').style.display = 'block';
+        updateUIForTab();
+    };
+
+    function previewLogo(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                dataLogo = e.target.result;
+                localStorage.setItem('yeny_logo', dataLogo);
+                document.getElementById('display-logo').src = dataLogo;
+                document.getElementById('display-logo').style.display = 'block';
             };
-            reader.readAsDataURL(event.target.files[0]);
+            reader.readAsDataURL(input.files[0]);
         }
+    }
 
-        function saveCustomer() {
-            localStorage.setItem('yeny_nama', document.getElementById('cust-nama').value);
-            localStorage.setItem('yeny_alamat', document.getElementById('cust-alamat').value);
-            localStorage.setItem('yeny_telp', document.getElementById('cust-telp').value);
+    function switchTab(tab) {
+        if (currentTab === tab) {
+            openPriceModal(tab);
+        } else {
+            currentTab = tab;
+            updateUIForTab();
         }
+    }
 
-        function addWindow() {
-            const list = document.getElementById('window-list');
-            const clone = document.getElementById('tmp-win').content.cloneNode(true);
-            list.appendChild(clone);
-            calculateAll();
-        }
+    function updateUIForTab() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + currentTab).classList.add('active');
+        const isBlinds = (currentTab === 'blinds');
+        document.getElementById('grp-model').classList.toggle('hidden', isBlinds);
+        document.getElementById('grp-panel').classList.toggle('hidden', isBlinds);
+        document.getElementById('container-vitrase').classList.toggle('hidden', isBlinds);
+        document.getElementById('spiral-vitrase-fields').classList.add('hidden');
+    }
 
-        function toggleModel(el) {
-            const win = el.closest('.window-item');
-            win.querySelector('.panel-field').classList.toggle('hidden', el.value === 'Spiral');
-            win.querySelector('.vit-field').classList.toggle('hidden', el.value === 'Spiral');
-            calculateAll();
-        }
+    function openPriceModal(tab) {
+        document.getElementById('modalPrice').style.display = 'block';
+        document.getElementById('title-tab').innerText = tab;
+        document.getElementById('m_nama_kain').value = settings[tab].nama;
+        document.getElementById('m_harga_kain').value = settings[tab].harga;
+        document.getElementById('m_nama_vit').value = settings[tab].n_vit;
+        document.getElementById('m_harga_vit').value = settings[tab].h_vit;
+        document.getElementById('v-extra').style.display = (tab === 'blinds') ? 'none' : 'block';
+    }
 
-        function toggleVit(el) {
-            const win = el.closest('.window-item');
-            win.querySelector('.v-spiral-box').classList.toggle('hidden', el.value !== 'Spiral');
-            win.querySelector('.v-plisket-box').classList.toggle('hidden', el.value !== 'Plisket');
-            calculateAll();
-        }
+    function simpanHarga() {
+        settings[currentTab].nama = document.getElementById('m_nama_kain').value;
+        settings[currentTab].harga = parseFloat(document.getElementById('m_harga_kain').value) || 0;
+        settings[currentTab].n_vit = document.getElementById('m_nama_vit').value;
+        settings[currentTab].h_vit = parseFloat(document.getElementById('m_harga_vit').value) || 0;
+        closeModals();
+    }
 
-        function calculateAll() {
-            const items = document.querySelectorAll('.window-item');
-            let grandTotal = 0;
-            allData = [];
+    function tambahJendela() {
+        const L = parseFloat(document.getElementById('lebar').value) || 0;
+        const T = parseFloat(document.getElementById('tinggi').value) || 0;
+        const nama = document.getElementById('nama_jendela').value || "Jendela";
+        const model = document.getElementById('model').value;
+        const panel = parseInt(document.getElementById('jml_panel').value) || 1;
+        const vMode = document.getElementById('pakai_vitrase').value;
+        const s = settings[currentTab];
 
-            items.forEach((win, i) => {
-                const l = parseFloat(win.querySelector('.w-l').value) || 0;
-                const t = parseFloat(win.querySelector('.w-t').value) || 0;
-                const jn = win.querySelector('.w-jn').value;
-                const m = win.querySelector('.w-m').value;
-                const panel = win.querySelector('.w-panel').value || 1;
-                const title = win.querySelector('.window-title-input').value || `Jendela ${i+1}`;
-                
-                let sub = 0;
-                let data = { title, l, t, m, panel, nk:"", hk:0, nv:"", hv:0, sub:0, isSpiralVit: false, vsq: 0 };
-                const hk = parseFloat(win.querySelector('.w-hk').value) || 0;
-                data.nk = win.querySelector('.w-nk').value || "Kain";
+        if (L <= 0 || T <= 0) return alert("Cek Lebar/Tinggi!");
 
-                let pk = (jn === 'import') ? (l + 0.2) * 3 : Math.ceil((l + 0.2) / 0.4) * (t + 0.3);
-                sub += (pk * hk) + (pk * HARGA.jahit);
+        let item = { nama, L, T, model, panel, kat: currentTab, kain: s.nama, vInfo: null, komponen: [], total: 0 };
 
-                if(m === 'Smokring') {
-                    let ring = Math.ceil(l * 24); if(ring % 2 !== 0) ring++;
-                    sub += (ring * HARGA.smokring) + (Math.max(l,1) * HARGA.rollet) + (HARGA.hook + HARGA.tali);
-                } else if(m === 'Spiral') {
-                    sub += (1 * HARGA.stick);
+        if (currentTab === 'blinds') {
+            let fixL = L < 1 ? 1 : L;
+            let fixT = T < 1 ? 1 : T;
+            let luas = fixL * fixT;
+            item.komponen.push({ n: s.nama, q: luas, h: s.harga, t: luas * s.harga });
+        } else {
+            let mKain = (currentTab === 'import') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
+            item.komponen.push({ n: 'Kain ' + s.nama, q: mKain, h: s.harga, t: mKain * s.harga });
+            item.komponen.push({ n: 'Jahit Kain', q: mKain, h: CONST.H_JAHIT, t: mKain * CONST.H_JAHIT });
+
+            let LAks = L < 1 ? 1 : L;
+            if (model === 'smokring') {
+                let jmlSmok = Math.ceil(L * 24); if(jmlSmok % 2 !== 0) jmlSmok++;
+                item.komponen.push({ n: 'Smokring', q: jmlSmok, h: CONST.H_SMOKRING, t: jmlSmok * CONST.H_SMOKRING });
+                item.komponen.push({ n: 'Rollet', q: LAks, h: CONST.H_ROLLET, t: LAks * CONST.H_ROLLET });
+            } else if (model === 'spiral') {
+                item.komponen.push({ n: 'Stick Gorden (1 Set)', q: 1, h: CONST.H_STICK, t: CONST.H_STICK });
+            } else {
+                item.komponen.push({ n: 'Rell Plisket', q: LAks, h: CONST.H_RELL, t: LAks * CONST.H_RELL });
+            }
+
+            if (model !== 'spiral') {
+                item.komponen.push({ n: 'Hook', q: 1, h: CONST.H_HOOK, t: CONST.H_HOOK });
+                item.komponen.push({ n: 'Tali Kain', q: 1, h: CONST.H_TALI, t: CONST.H_TALI });
+            }
+
+            if (vMode !== 'no') {
+                let vL, vT, vQty, mVit;
+                if (vMode === 'spiral') {
+                    vL = parseFloat(document.getElementById('v_lebar').value) || L;
+                    vT = parseFloat(document.getElementById('v_tinggi').value) || T;
+                    vQty = parseFloat(document.getElementById('v_qty').value) || 1;
+                    mVit = (vL + 0.2) * 3 * vQty;
+                    item.vInfo = { nama: 'Vitrase Spiral', L: vL, T: vT, model: 'Spiral', qty: vQty };
+                    item.komponen.push({ n: 'Vitrase Spiral', q: mVit, h: s.h_vit, t: mVit * s.h_vit });
+                    item.komponen.push({ n: 'Jahit Vitrase', q: mVit, h: CONST.H_JAHIT, t: mVit * CONST.H_JAHIT });
+                    item.komponen.push({ n: 'Stick Vitrase (Set)', q: vQty, h: CONST.H_STICK, t: vQty * CONST.H_STICK });
                 } else {
-                    sub += (Math.max(l,1) * HARGA.rell) + (HARGA.hook + HARGA.tali);
+                    mVit = (L + 0.2) * 3;
+                    item.vInfo = { nama: 'Vitrase Plisket', L: L, T: T, model: 'Plisket', qty: 1 };
+                    item.komponen.push({ n: 'Vitrase Plisket', q: mVit, h: s.h_vit, t: mVit * s.h_vit });
+                    item.komponen.push({ n: 'Jahit Vitrase', q: mVit, h: CONST.H_JAHIT, t: mVit * CONST.H_JAHIT });
+                    item.komponen.push({ n: 'Rell Vitrase', q: LAks, h: CONST.H_RELL, t: LAks * CONST.H_RELL });
                 }
-                sub += HARGA.instal;
+            }
+        }
+        item.komponen.push({ n: 'Instalasi', q: 1, h: CONST.H_INSTALASI, t: CONST.H_INSTALASI });
+        item.total = item.komponen.reduce((a, b) => a + b.t, 0);
+        keranjang.push(item);
+        renderList();
+        document.getElementById('nama_jendela').value = '';
+    }
 
-                const vMode = win.querySelector('.w-v').value;
-                if(m !== 'Spiral' && vMode !== 'none') {
-                    if(vMode === 'Spiral') {
-                        const vl = parseFloat(win.querySelector('.v-sl').value) || l;
-                        const vsq = parseInt(win.querySelector('.v-sq').value) || 1;
-                        const hv = parseFloat(win.querySelector('.w-hv').value) || 0;
-                        let pv = (vl + 0.2) * 3 * vsq;
-                        sub += (pv * hv) + (pv * HARGA.jahit) + (vsq * HARGA.stick);
-                        data.nv = win.querySelector('.w-nv').value || "Vitras Spiral";
-                        data.isSpiralVit = true; data.vsq = vsq;
-                    } else {
-                        const hv = parseFloat(win.querySelector('.w-hv-p').value) || 0;
-                        let pv = (l + 0.2) * 3;
-                        sub += (pv * hv) + (pv * HARGA.jahit) + (Math.max(l,1) * HARGA.rell);
-                        data.nv = win.querySelector('.w-nv-p').value || "Vitras Plisket";
+    function renderList() {
+        const div = document.getElementById('daftar-jendela');
+        div.innerHTML = ''; let gt = 0;
+        keranjang.forEach((it, i) => {
+            gt += it.total;
+            div.innerHTML += `<div class="window-item">
+                <div><b>${it.nama}</b><br><small>${it.kat === 'blinds' ? 'Blinds' : it.model} | ${it.L}x${it.T}m</small></div>
+                <div>Rp ${it.total.toLocaleString()} <button onclick="hapus(${i})" class="btn-reset">X</button></div>
+            </div>`;
+        });
+        document.getElementById('summary').style.display = keranjang.length ? 'block' : 'none';
+        document.getElementById('grand-total').innerText = "Rp " + gt.toLocaleString();
+    }
+
+    function hapus(i) { keranjang.splice(i, 1); renderList(); }
+    function resetSemua() { if(confirm("Hapus semua?")) { keranjang = []; renderList(); } }
+    function toggleFab() { const m = document.getElementById('fab-menu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+    function closeModals() { document.getElementById('modalCust').style.display = 'none'; document.getElementById('modalPrice').style.display = 'none'; }
+    function openCustModal() { document.getElementById('modalCust').style.display = 'block'; }
+    function closeTutorial() { document.getElementById('modalTutorial').style.display = 'none'; sessionStorage.setItem('tutorial_seen', 'true'); }
+    function toggleVitraseOption() { document.getElementById('container-vitrase').classList.toggle('hidden', document.getElementById('model').value === 'spiral'); }
+    function toggleVitraseSpiralFields() { document.getElementById('spiral-vitrase-fields').classList.toggle('hidden', document.getElementById('pakai_vitrase').value !== 'spiral'); }
+    
+    function simpanPelanggan() { 
+        customer.toko = document.getElementById('t_nama').value; 
+        customer.nama = document.getElementById('c_nama').value; 
+        customer.telp = document.getElementById('c_telp').value; 
+        customer.alamat = document.getElementById('c_alamat').value; 
+        document.getElementById('display-nama-toko').innerText = customer.toko; 
+        closeModals(); 
+    }
+
+    function prosesCetak(jenis) {
+        if (!keranjang.length) return;
+        const printArea = document.getElementById('print-area');
+        let gt = 0;
+        let tgl = new Date();
+        let tglStr = tgl.toLocaleDateString('id-ID');
+        let tglExp = new Date(tgl.getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('id-ID');
+        
+        let headerHtml = `
+            <div class="print-header">
+                ${dataLogo ? `<img src="${dataLogo}">` : ''}
+                <div class="print-header-text">
+                    <h1>${customer.toko}</h1>
+                    <div style="font-size:0.9rem;">Tlp. 089504215020</div>
+                </div>
+            </div>
+            <div style="margin-bottom:15px;">
+                <div class="doc-label">${jenis.toUpperCase()}</div>
+                <div>Tanggal Cetak: ${tglStr}</div>
+                <hr>
+                <div><strong>Pelanggan:</strong> ${customer.nama || '-'}</div>
+                <div><strong>Alamat:</strong> ${customer.alamat || '-'}</div>
+                <div><strong>Tlp:</strong> ${customer.telp || '-'}</div>
+            </div>`;
+
+        let contentHtml = '';
+        keranjang.forEach(it => {
+            gt += it.total;
+            contentHtml += `<div class="print-item"><strong>📍 Lokasi: ${it.nama}</strong><br>`;
+            
+            if (jenis === 'Estimasi' || jenis === 'SPK') {
+                if (it.kat === 'blinds') {
+                    contentHtml += `<div>Blinds: ${it.kain} / Uk: ${it.L}x${it.T}m</div>`;
+                } else {
+                    contentHtml += `<div>Gorden: ${it.kain} / Uk: ${it.L}x${it.T}m / Model: ${it.model} / Panel: ${it.panel}</div>`;
+                    if (it.vInfo) {
+                        contentHtml += `<div>Vitrase: ${it.vInfo.nama} / Uk: ${it.vInfo.L}x${it.vInfo.T}m / Model: ${it.vInfo.model} / Qty: ${it.vInfo.qty}</div>`;
                     }
                 }
-                win.querySelector('.w-sub').innerText = "Rp " + Math.round(sub).toLocaleString('id-ID');
-                data.sub = sub; grandTotal += sub; allData.push(data);
-            });
-
-            const dVal = parseFloat(document.getElementById('d-val').value) || 0;
-            const final = grandTotal - dVal;
-            document.getElementById('grand-total').innerText = "Rp " + Math.round(final).toLocaleString('id-ID');
-        }
-
-        function openPreview(type) {
-            calculateAll();
-            const modal = document.getElementById('modal-cetak');
-            const today = new Date();
-            
-            // Tampilkan Logo di PDF jika ada
-            const logoWrap = document.getElementById('pdf-logo-wrap');
-            logoWrap.innerHTML = logoDataURL ? `<img src="${logoDataURL}" style="max-height:60px;">` : "";
-
-            document.getElementById('pdf-title').innerText = type === 'estimasi' ? "ESTIMASI PENAWARAN" : "SPK (PERINTAH KERJA)";
-            document.getElementById('pdf-date').innerText = "Tanggal: " + today.toLocaleDateString('id-ID');
-            
-            const expEl = document.getElementById('pdf-exp');
-            if (type === 'estimasi') {
-                const expDate = new Date(); expDate.setDate(today.getDate() + 7);
-                expEl.innerText = "Berlaku s/d: " + expDate.toLocaleDateString('id-ID');
-                expEl.style.display = "block";
-            } else {
-                expEl.style.display = "none";
+                if (jenis === 'Estimasi') contentHtml += `<div style="text-align:right">Total: Rp ${it.total.toLocaleString()}</div>`;
+            } else if (jenis === 'Rincian') {
+                it.komponen.forEach(k => {
+                    contentHtml += `<div class="flex-between" style="font-size:0.85rem;"><span>${k.n} (${k.q.toFixed(2)}) @ Rp ${k.h.toLocaleString()}</span><span>Rp ${k.t.toLocaleString()}</span></div>`;
+                });
+                contentHtml += `<div style="text-align:right; font-weight:bold; margin-top:5px;">Subtotal: Rp ${it.total.toLocaleString()}</div>`;
             }
-            
-            document.getElementById('pdf-buyer').innerHTML = `
-                Nama: <strong>${document.getElementById('cust-nama').value || '-'}</strong><br>
-                Alamat: ${document.getElementById('cust-alamat').value || '-'}<br>
-                Telp: ${document.getElementById('cust-telp').value || '-'}
-            `;
+            contentHtml += `</div>`;
+        });
 
-            let content = "";
-            allData.forEach(d => {
-                content += `
-                <div class="pdf-row">
-                    <div style="font-weight:bold; color: #000; font-size: 14px; margin-bottom: 4px;">${d.title.toUpperCase()}</div>
-                    <div style="font-size:13px; color: #334155; line-height: 1.5;">
-                        Gorden: ${d.nk} (${d.l}x${d.t}m) - Model: ${d.m} ${d.m !== 'Spiral' ? '['+d.panel+' Panel]' : ''}
-                        ${d.nv ? `<br>Vitras: ${d.nv} ${d.isSpiralVit ? '(Spiral '+d.vsq+' set)' : '[Plisket]'}` : ''}
-                    </div>
-                    ${type === 'estimasi' ? `<div style="text-align:right; font-weight:bold; color: #000; font-size: 14px; margin-top:5px;">Subtotal: Rp ${Math.round(d.sub).toLocaleString('id-ID')}</div>` : ''}
-                </div>`;
-            });
-            document.getElementById('pdf-content').innerHTML = content;
-            document.getElementById('pdf-total').innerText = type === 'estimasi' ? "GRAND TOTAL: " + document.getElementById('grand-total').innerText : "";
-            
-            modal.style.display = "block";
-
-            document.getElementById('download-btn').onclick = () => {
-                const element = document.getElementById('print-area');
-                const namaCust = document.getElementById('cust-nama').value.toUpperCase().replace(/\s+/g, '_') || 'PELANGGAN';
-                const kode = type === 'estimasi' ? 'EST' : 'SPK';
-                
-                window.scrollTo(0,0);
-                html2pdf().set({
-                    margin: [0.5, 0.5],
-                    filename: `${kode}_${namaCust}.pdf`,
-                    html2canvas: { scale: 2, scrollY: 0, useCORS: true },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                }).from(element).save();
-            };
+        let footerHtml = '';
+        if (jenis === 'Estimasi') {
+            footerHtml = `
+                <h2 style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-bottom:5px;">TOTAL: Rp ${gt.toLocaleString()}</h2>
+                <div class="red-note">*Estimasi berlaku sd ${tglExp} dan sudah termasuk biaya jahit dan pasang.</div>`;
+        } else if (jenis === 'Rincian') {
+            footerHtml = `<h2 style="text-align:right; border-top:2px solid #000; padding-top:10px;">TOTAL: Rp ${gt.toLocaleString()}</h2>`;
         }
-
-        function closeModal() { document.getElementById('modal-cetak').style.display = "none"; }
-    </script>
+        
+        printArea.innerHTML = headerHtml + contentHtml + footerHtml;
+        toggleFab(); 
+        setTimeout(() => { window.print(); }, 500);
+    }
+</script>
 </body>
 </html>
