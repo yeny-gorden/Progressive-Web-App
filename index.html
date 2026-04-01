@@ -116,7 +116,7 @@
 
             <div id="spiral-vitrase-fields" class="full-width grid hidden" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
                 <div class="input-group"><label>L Vitrase (m)</label><input type="number" placeholder="Lebar Vit" id="v_lebar" step="0.01"></div>
-                <div class="input-group"><label>T Vitrase (m)</label><input type="number" placeholder="Tinggi Vit" id="v_tinggi" step="0.01"></div>
+                <div class="input-group"><label>T Tinggi Vitrase (m)</label><input type="number" placeholder="Tinggi Vit" id="v_tinggi" step="0.01"></div>
                 <div class="input-group full-width"><label>Qty (Set)</label><input type="number" id="v_qty" value="1"></div>
             </div>
         </div>
@@ -171,7 +171,7 @@
         </div>
         <div class="tutorial-step">
             <h4>2. Atur Harga</h4>
-            <p>Pilih lebar kain <b>2.8m -3m/1.2m - 1.4m/BLINDS</b> di atas untuk ubah nama/kode warna dan harga kain/m.</p>
+            <p>Pilih lebar kain <b>2.8m -3m/1.2m - 1.4m/BLINDS</b> di atas, ketuk 2x untuk ubah nama/kode warna dan harga kain/m.</p>
         </div>
         <div class="tutorial-step">
             <h4>3. Masukan Ukuran</h4>
@@ -268,7 +268,11 @@
 
     function openPriceModal(tab) {
         document.getElementById('modalPrice').style.display = 'block';
-        document.getElementById('title-tab').innerText = tab;
+        // Perubahan Label di sini: Jika tab import/lokal, tampilkan "Kain"
+        let displayTitle = tab;
+        if(tab === 'import' || tab === 'lokal') displayTitle = 'Kain';
+        
+        document.getElementById('title-tab').innerText = displayTitle;
         document.getElementById('m_nama_kain').value = settings[tab].nama;
         document.getElementById('m_harga_kain').value = settings[tab].harga;
         document.getElementById('m_nama_vit').value = settings[tab].n_vit;
