@@ -11,43 +11,29 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); padding: 10px; color: #1e293b; margin-bottom: 80px; }
         .container { max-width: 550px; margin: auto; }
         .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        
         .header-brand { cursor: pointer; text-align: center; }
         #display-logo { max-height: 60px; margin-bottom: 5px; margin: auto; }
-
         .tabs { display: flex; gap: 5px; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
         .tab-btn { flex: 1; padding: 8px; cursor: pointer; border: none; background: #e2e8f0; border-radius: 6px; font-weight: 600; font-size: 0.85rem; color: var(--secondary); transition: 0.3s; }
         .tab-btn.active { background: var(--primary); color: white; }
-        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .full-width { grid-column: span 2; }
         .input-group { display: flex; flex-direction: column; margin-bottom: 8px; }
         label { font-size: 0.75rem; font-weight: 700; margin-bottom: 2px; color: var(--secondary); }
         input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
-        
         .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
         .btn-reset { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
-        
         .hidden { display: none !important; }
-
         #fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center; }
         .fab-menu { position: absolute; bottom: 70px; right: 0; display: none; flex-direction: column; gap: 10px; width: 160px; }
         .fab-menu button { background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #1e293b; text-align: left; }
-        
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; }
         .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; position: relative; }
-        
-        .tutorial-step { margin-bottom: 12px; padding-left: 10px; border-left: 3px solid var(--primary); }
-        .tutorial-step h4 { margin: 0 0 4px 0; color: var(--primary); font-size: 1.0rem; }
-        .tutorial-step p { margin: 0; font-size: 0.9rem; color: #000; line-height: 1.4; }
-
         .window-item { background: #fff; border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .summary-box { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
         .total-price { font-size: 1.3rem; color: #10b981; font-weight: 800; }
-
         #print-area { display: none; }
-
         @media print {
             body { background: white; padding: 0; margin: 0; font-size: 10pt; }
             .container, #fab-container, .modal { display: none !important; }
@@ -58,8 +44,12 @@
             .flex-between { display: flex; justify-content: space-between; }
             .print-item { border-bottom: 1px solid #eee; padding: 8px 0; page-break-inside: avoid; }
             .red-note { color: red !important; font-weight: bold; font-size: 0.85rem; }
+            .payment-info { margin-top: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #fafafa; }
             .doc-label { font-weight: 900; font-size: 1.2rem; text-decoration: underline; margin-bottom: 5px; }
         }
+        /* Tutorial Style */
+        .tutorial-step { text-align: left; line-height: 1.5; font-size: 0.9rem; }
+        .tutorial-step b { color: var(--primary); }
     </style>
 </head>
 <body>
@@ -104,7 +94,6 @@
                 <label>Jumlah Belahan (Panel)</label>
                 <input type="number" id="jml_panel" value="2" min="1">
             </div>
-            
             <div class="input-group full-width" id="container-vitrase">
                 <label>Tambah Vitrase</label>
                 <select id="pakai_vitrase" onchange="toggleVitraseSpiralFields()">
@@ -113,10 +102,9 @@
                     <option value="spiral">Vitrase Spiral</option>
                 </select>
             </div>
-
             <div id="spiral-vitrase-fields" class="full-width grid hidden" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
-                <div class="input-group"><label>L Vitrase (m)</label><input type="number" placeholder="Lebar Vit" id="v_lebar" step="0.01"></div>
-                <div class="input-group"><label>T Tinggi Vitrase (m)</label><input type="number" placeholder="Tinggi Vit" id="v_tinggi" step="0.01"></div>
+                <div class="input-group"><label>L Vitrase (m)</label><input type="number" id="v_lebar" step="0.01"></div>
+                <div class="input-group"><label>T Tinggi Vitrase (m)</label><input type="number" id="v_tinggi" step="0.01"></div>
                 <div class="input-group full-width"><label>Qty (Set)</label><input type="number" id="v_qty" value="1"></div>
             </div>
         </div>
@@ -138,7 +126,7 @@
     <div class="modal-content">
         <h3>Setting Harga <span id="title-tab" style="text-transform: capitalize;"></span></h3>
         <div class="input-group"><label>Nama Kain/Produk</label><input type="text" id="m_nama_kain"></div>
-        <div class="input-group"><label>Harga Per m (atau m²)</label><input type="number" id="m_harga_kain"></div>
+        <div class="input-group"><label>Harga Per m</label><input type="number" id="m_harga_kain"></div>
         <div id="v-extra">
             <hr>
             <div class="input-group"><label>Nama Vitrase</label><input type="text" id="m_nama_vit"></div>
@@ -162,41 +150,18 @@
     </div>
 </div>
 
-<div id="modalTutorial" class="modal">
+<div id="modalTutorial" class="modal" style="display: block;">
     <div class="modal-content">
-        <h2 style="color: var(--primary); margin-top: 0; font-size: 1.2rem;">👋 PANDUAN SINGKAT</h2>
-         <div class="tutorial-step">
-            <h4>1. Data Pembeli</h4>
-            <p>Klik <b>LOGO</b> pada bagian atas.</p>
-        </div>
+        <h3 style="color: var(--primary); text-align: center;">🚀 Tutorial Singkat</h3>
         <div class="tutorial-step">
-            <h4>2. Atur Harga</h4>
-            <p>Pilih lebar kain <b>2.8m -3m/1.2m - 1.4m/BLINDS</b> di atas, ketuk 2x untuk ubah nama/kode warna dan harga kain/m.</p>
+            <p>1. <b>Atur Identitas:</b> Klik header (nama toko) untuk setel logo & profil pelanggan.</p>
+            <p>2. <b>Atur Harga:</b> Klik tab yang sedang aktif (misal: "Lebar Kain 2.8m") untuk merubah harga satuan kain/vitrase.</p>
+            <p>3. <b>Input Data:</b> Isi lebar, tinggi, & model gorden, lalu klik <b>Tambah ke Daftar</b>.</p>
+            <p>4. <b>Cetak:</b> Klik tombol <b>☰</b> di kanan bawah untuk memilih jenis cetakan (Estimasi/SPK/Rincian).</p>
         </div>
-        <div class="tutorial-step">
-            <h4>3. Masukan Ukuran</h4>
-            <p>Isi data <b>LEBAR</b>, <b>TINGGI</b> dan <b>JUMLAH PANEL</b> gorden yang akan di buat.</p>
-         </div>
-         <div class="tutorial-step">
-          <h4>4. Bagian Vitrase</h4>
-          <p>Klik <b>TAMBAH VITRASE</b> dan pilih modelnya jika menggunakan vitrase.</p>
-        </div>   
-         <div class="tutorial-step">
-            <h4>5. Tambah Ke Daftar</h4>
-            <p>Klik <b>TAMBAH KE DAFTAR</b> untuk menyimpan hasil perhitungan tiap jendela.</p>
-        </div>
-         <div class="tutorial-step">
-            <h4>6. Cetak Estimasi & Spk</h4>
-            <p>Untuk menyimpan sebagai pdf, Klik <b>TOMBOL BIRU</b> di pojok kanan bawah.</p>
-        </div>
-         <div class="tutorial-step">
-            <h4><b>Gunakan dengan teliti agar tidak terjadi salah input.</b></h4>
-        </div>
-        <button class="btn-add" onclick="closeTutorial()">MENGERTI</button>
+        <button class="btn-add" onclick="closeTutorial()">SAYA MENGERTI</button>
     </div>
 </div>
-
-<div id="print-area"></div>
 
 <div id="fab-container">
     <div class="fab-menu" id="fab-menu">
@@ -207,7 +172,11 @@
     <button class="fab-main" onclick="toggleFab()">☰</button>
 </div>
 
+<div id="print-area"></div>
+
 <script>
+    const URL_GAS = "https://script.google.com/macros/s/AKfycbzdtG8mJ7eu6-8edL8_FM9DPcviSPCyAmIxux1dD-fprl8e2pEK3XQoAEFtYedcQ92a/exec"; 
+
     let keranjang = [];
     let currentTab = 'import';
     let dataLogo = localStorage.getItem('yeny_logo') || '';
@@ -230,9 +199,11 @@
             document.getElementById('display-logo').src = dataLogo;
             document.getElementById('display-logo').style.display = 'block';
         }
-        if (!sessionStorage.getItem('tutorial_seen')) document.getElementById('modalTutorial').style.display = 'block';
         updateUIForTab();
+        document.getElementById('modalTutorial').style.display = 'block';
     };
+
+    function closeTutorial() { document.getElementById('modalTutorial').style.display = 'none'; }
 
     function previewLogo(input) {
         if (input.files && input.files[0]) {
@@ -248,12 +219,8 @@
     }
 
     function switchTab(tab) {
-        if (currentTab === tab) {
-            openPriceModal(tab);
-        } else {
-            currentTab = tab;
-            updateUIForTab();
-        }
+        if (currentTab === tab) openPriceModal(tab);
+        else { currentTab = tab; updateUIForTab(); }
     }
 
     function updateUIForTab() {
@@ -268,10 +235,7 @@
 
     function openPriceModal(tab) {
         document.getElementById('modalPrice').style.display = 'block';
-        // Perubahan Label di sini: Jika tab import/lokal, tampilkan "Kain"
-        let displayTitle = tab;
-        if(tab === 'import' || tab === 'lokal') displayTitle = 'Kain';
-        
+        let displayTitle = (tab === 'import' || tab === 'lokal') ? 'Kain' : tab;
         document.getElementById('title-tab').innerText = displayTitle;
         document.getElementById('m_nama_kain').value = settings[tab].nama;
         document.getElementById('m_harga_kain').value = settings[tab].harga;
@@ -302,16 +266,14 @@
         let item = { nama, L, T, model, panel, kat: currentTab, kain: s.nama, vInfo: null, komponen: [], total: 0 };
 
         if (currentTab === 'blinds') {
-            let fixL = L < 1 ? 1 : L;
-            let fixT = T < 1 ? 1 : T;
-            let luas = fixL * fixT;
+            let luas = Math.max(L, 1) * Math.max(T, 1);
             item.komponen.push({ n: s.nama, q: luas, h: s.harga, t: luas * s.harga });
         } else {
             let mKain = (currentTab === 'import') ? (L + 0.2) * 3 : Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
             item.komponen.push({ n: 'Kain ' + s.nama, q: mKain, h: s.harga, t: mKain * s.harga });
             item.komponen.push({ n: 'Jahit Kain', q: mKain, h: CONST.H_JAHIT, t: mKain * CONST.H_JAHIT });
 
-            let LAks = L < 1 ? 1 : L;
+            let LAks = Math.max(L, 1);
             if (model === 'smokring') {
                 let jmlSmok = Math.ceil(L * 24); if(jmlSmok % 2 !== 0) jmlSmok++;
                 item.komponen.push({ n: 'Smokring', q: jmlSmok, h: CONST.H_SMOKRING, t: jmlSmok * CONST.H_SMOKRING });
@@ -328,23 +290,21 @@
             }
 
             if (vMode !== 'no') {
-                let vL, vT, vQty, mVit;
+                let vL = L, vT = T, vQty = 1, mVit;
                 if (vMode === 'spiral') {
                     vL = parseFloat(document.getElementById('v_lebar').value) || L;
                     vT = parseFloat(document.getElementById('v_tinggi').value) || T;
                     vQty = parseFloat(document.getElementById('v_qty').value) || 1;
                     mVit = (vL + 0.2) * 3 * vQty;
-                    item.vInfo = { nama: 'Vitrase Spiral', L: vL, T: vT, model: 'Spiral', qty: vQty };
-                    item.komponen.push({ n: 'Vitrase Spiral', q: mVit, h: s.h_vit, t: mVit * s.h_vit });
-                    item.komponen.push({ n: 'Jahit Vitrase', q: mVit, h: CONST.H_JAHIT, t: mVit * CONST.H_JAHIT });
+                    item.vInfo = { nama: s.n_vit + ' (Spiral)', L: vL, T: vT, model: 'Spiral', qty: vQty };
                     item.komponen.push({ n: 'Stick Vitrase (Set)', q: vQty, h: CONST.H_STICK, t: vQty * CONST.H_STICK });
                 } else {
                     mVit = (L + 0.2) * 3;
-                    item.vInfo = { nama: 'Vitrase Plisket', L: L, T: T, model: 'Plisket', qty: 1 };
-                    item.komponen.push({ n: 'Vitrase Plisket', q: mVit, h: s.h_vit, t: mVit * s.h_vit });
-                    item.komponen.push({ n: 'Jahit Vitrase', q: mVit, h: CONST.H_JAHIT, t: mVit * CONST.H_JAHIT });
+                    item.vInfo = { nama: s.n_vit + ' (Plisket)', L: L, T: T, model: 'Plisket', qty: 1 };
                     item.komponen.push({ n: 'Rell Vitrase', q: LAks, h: CONST.H_RELL, t: LAks * CONST.H_RELL });
                 }
+                item.komponen.push({ n: 'Kain Vitrase', q: mVit, h: s.h_vit, t: mVit * s.h_vit });
+                item.komponen.push({ n: 'Jahit Vitrase', q: mVit, h: CONST.H_JAHIT, t: mVit * CONST.H_JAHIT });
             }
         }
         item.komponen.push({ n: 'Instalasi', q: 1, h: CONST.H_INSTALASI, t: CONST.H_INSTALASI });
@@ -373,7 +333,6 @@
     function toggleFab() { const m = document.getElementById('fab-menu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
     function closeModals() { document.getElementById('modalCust').style.display = 'none'; document.getElementById('modalPrice').style.display = 'none'; }
     function openCustModal() { document.getElementById('modalCust').style.display = 'block'; }
-    function closeTutorial() { document.getElementById('modalTutorial').style.display = 'none'; sessionStorage.setItem('tutorial_seen', 'true'); }
     function toggleVitraseOption() { document.getElementById('container-vitrase').classList.toggle('hidden', document.getElementById('model').value === 'spiral'); }
     function toggleVitraseSpiralFields() { document.getElementById('spiral-vitrase-fields').classList.toggle('hidden', document.getElementById('pakai_vitrase').value !== 'spiral'); }
     
@@ -386,67 +345,66 @@
         closeModals(); 
     }
 
+    async function kirimKeGAS(jenis, totalGT) {
+        try {
+            fetch(URL_GAS, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jenis, customer, keranjang, grandTotal: totalGT })
+            });
+        } catch (e) { console.error(e); }
+    }
+
     function prosesCetak(jenis) {
         if (!keranjang.length) return;
+        if (!customer.nama || !customer.telp || !customer.alamat) {
+            alert("Harap lengkapi Profil & Data Pelanggan sebelum mencetak.");
+            openCustModal(); return;
+        }
+
         const printArea = document.getElementById('print-area');
-        let gt = 0;
-        let tgl = new Date();
-        let tglStr = tgl.toLocaleDateString('id-ID');
-        let tglExp = new Date(tgl.getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('id-ID');
+        let gt = 0, tglStr = new Date().toLocaleDateString('id-ID');
+        let tglExp = new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString('id-ID');
         
-        let headerHtml = `
-            <div class="print-header">
-                ${dataLogo ? `<img src="${dataLogo}">` : ''}
-                <div class="print-header-text">
-                    <h1>${customer.toko}</h1>
-                    <div style="font-size:0.9rem;">Tlp. 089504215020</div>
-                </div>
-            </div>
-            <div style="margin-bottom:15px;">
-                <div class="doc-label">${jenis.toUpperCase()}</div>
-                <div>Tanggal Cetak: ${tglStr}</div>
-                <hr>
-                <div><strong>Pelanggan:</strong> ${customer.nama || '-'}</div>
-                <div><strong>Alamat:</strong> ${customer.alamat || '-'}</div>
-                <div><strong>Tlp:</strong> ${customer.telp || '-'}</div>
-            </div>`;
+        let headerHtml = `<div class="print-header">${dataLogo ? `<img src="${dataLogo}">` : ''}<div class="print-header-text"><h1>${customer.toko}</h1><div style="font-size:0.9rem;">Tlp. 089504215020</div></div></div><div style="margin-bottom:15px;"><div class="doc-label">${jenis.toUpperCase()}</div><div>Tanggal: ${tglStr}</div><hr><div><strong>Pelanggan:</strong> ${customer.nama}</div><div><strong>Alamat:</strong> ${customer.alamat}</div><div><strong>Tlp:</strong> ${customer.telp}</div></div>`;
 
         let contentHtml = '';
         keranjang.forEach(it => {
             gt += it.total;
             contentHtml += `<div class="print-item"><strong>📍 Lokasi: ${it.nama}</strong><br>`;
-            
-            if (jenis === 'Estimasi' || jenis === 'SPK') {
-                if (it.kat === 'blinds') {
-                    contentHtml += `<div>Blinds: ${it.kain} / Uk: ${it.L}x${it.T}m</div>`;
-                } else {
-                    contentHtml += `<div>Gorden: ${it.kain} / Uk: ${it.L}x${it.T}m / Model: ${it.model} / Panel: ${it.panel}</div>`;
-                    if (it.vInfo) {
-                        contentHtml += `<div>Vitrase: ${it.vInfo.nama} / Uk: ${it.vInfo.L}x${it.vInfo.T}m / Model: ${it.vInfo.model} / Qty: ${it.vInfo.qty}</div>`;
-                    }
-                }
-                if (jenis === 'Estimasi') contentHtml += `<div style="text-align:right">Total: Rp ${it.total.toLocaleString()}</div>`;
-            } else if (jenis === 'Rincian') {
+            if (jenis === 'Rincian') {
                 it.komponen.forEach(k => {
-                    contentHtml += `<div class="flex-between" style="font-size:0.85rem;"><span>${k.n} (${k.q.toFixed(2)}) @ Rp ${k.h.toLocaleString()}</span><span>Rp ${k.t.toLocaleString()}</span></div>`;
+                    contentHtml += `<div class="flex-between" style="font-size:0.85rem;"><span>${k.n} (${k.q.toFixed(2)})</span><span>Rp ${k.t.toLocaleString()}</span></div>`;
                 });
+            } else {
+                contentHtml += `<div>Gorden: ${it.kain} / Uk: ${it.L}x${it.T}m / Model: ${it.model}</div>`;
+                if (it.vInfo) {
+                    let vQtyTxt = (it.vInfo.model === 'Spiral') ? ` / Qty: ${it.vInfo.qty} Set` : '';
+                    contentHtml += `<div style="padding-left:10px; border-left:2px solid #ccc; font-style:italic; font-size:0.85rem;">Vitrase: ${it.vInfo.nama} / Uk: ${it.vInfo.L}x${it.vInfo.T}m / Model: ${it.vInfo.model}${vQtyTxt}</div>`;
+                }
+            }
+            if (jenis !== 'SPK') {
                 contentHtml += `<div style="text-align:right; font-weight:bold; margin-top:5px;">Subtotal: Rp ${it.total.toLocaleString()}</div>`;
             }
             contentHtml += `</div>`;
         });
 
-        let footerHtml = '';
         if (jenis === 'Estimasi') {
-            footerHtml = `
+            contentHtml += `
                 <h2 style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-bottom:5px;">TOTAL: Rp ${gt.toLocaleString()}</h2>
-                <div class="red-note">*Estimasi berlaku sd ${tglExp} dan sudah termasuk biaya jahit dan pasang.</div>`;
-        } else if (jenis === 'Rincian') {
-            footerHtml = `<h2 style="text-align:right; border-top:2px solid #000; padding-top:10px;">TOTAL: Rp ${gt.toLocaleString()}</h2>`;
+                <div class="red-note">*Estimasi sudah termasuk biaya jahit dan pasang.</div>
+                <div class="red-note">*Estimasi berlaku sd ${tglExp}</div>
+                <div class="payment-info">
+                    <strong>Instruksi Pembayaran:</strong><br>
+                    Bank BCA<br>
+                    AN: EKO TRIONO<br>
+                    0463191163
+                </div>`;
+            kirimKeGAS(jenis, gt);
         }
         
-        printArea.innerHTML = headerHtml + contentHtml + footerHtml;
-        toggleFab(); 
-        setTimeout(() => { window.print(); }, 500);
+        printArea.innerHTML = headerHtml + contentHtml;
+        toggleFab(); setTimeout(() => { window.print(); }, 500);
     }
 </script>
 </body>
