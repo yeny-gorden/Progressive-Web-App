@@ -24,30 +24,31 @@
         .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
         .btn-reset { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
         .hidden { display: none !important; }
+
+        /* FAB & Menu */
         #fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center; }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; }
         .fab-menu { position: absolute; bottom: 70px; right: 0; display: none; flex-direction: column; gap: 10px; width: 160px; }
         .fab-menu button { background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #1e293b; text-align: left; }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; }
         .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; position: relative; }
         .window-item { background: #fff; border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .summary-box { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
         .total-price { font-size: 1.3rem; color: #10b981; font-weight: 800; }
-        #print-area { display: none; }
+
         @media print {
             body { background: white; padding: 0; margin: 0; font-size: 10pt; }
             .container, #fab-container, .modal { display: none !important; }
             #print-area { display: block !important; padding: 10mm; color: black; }
             .print-header { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
             .print-header img { max-height: 60px; margin-right: 15px; }
-            .print-header-text h1 { margin: 0; font-size: 1.4rem; }
             .flex-between { display: flex; justify-content: space-between; }
             .print-item { border-bottom: 1px solid #eee; padding: 8px 0; page-break-inside: avoid; }
             .red-note { color: red !important; font-weight: bold; font-size: 0.85rem; }
             .payment-info { margin-top: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #fafafa; }
             .doc-label { font-weight: 900; font-size: 1.2rem; text-decoration: underline; margin-bottom: 5px; }
         }
-        /* Tutorial Style */
         .tutorial-step { text-align: left; line-height: 1.5; font-size: 0.9rem; }
         .tutorial-step b { color: var(--primary); }
     </style>
@@ -64,8 +65,8 @@
 
     <div class="card">
         <div class="tabs">
-            <button id="btn-import" class="tab-btn active" onclick="switchTab('import')">Lebar Kain 2.8m - 3m</button>
-            <button id="btn-lokal" class="tab-btn" onclick="switchTab('lokal')">Lebar Kain 1.2m - 1.4m</button>
+            <button id="btn-import" class="tab-btn active" onclick="switchTab('import')">Kain 2.8m - 3m</button>
+            <button id="btn-lokal" class="tab-btn" onclick="switchTab('lokal')">Kain 1.2m - 1.4m</button>
             <button id="btn-blinds" class="tab-btn" onclick="switchTab('blinds')">Blinds</button>
         </div>
 
@@ -103,8 +104,8 @@
                 </select>
             </div>
             <div id="spiral-vitrase-fields" class="full-width grid hidden" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
-                <div class="input-group"><label>L Vitrase (m)</label><input type="number" id="v_lebar" step="0.01"></div>
-                <div class="input-group"><label>T Tinggi Vitrase (m)</label><input type="number" id="v_tinggi" step="0.01"></div>
+                <div class="input-group"><label>L Vit (m)</label><input type="number" id="v_lebar" step="0.01"></div>
+                <div class="input-group"><label>T Vit (m)</label><input type="number" id="v_tinggi" step="0.01"></div>
                 <div class="input-group full-width"><label>Qty (Set)</label><input type="number" id="v_qty" value="1"></div>
             </div>
         </div>
@@ -155,9 +156,9 @@
         <h3 style="color: var(--primary); text-align: center;">🚀 Tutorial Singkat</h3>
         <div class="tutorial-step">
             <p>1. <b>Atur Identitas:</b> Klik header (nama toko) untuk setel logo & profil pelanggan.</p>
-            <p>2. <b>Atur Harga:</b> Klik tab yang sedang aktif (misal: "Lebar Kain 2.8m") untuk merubah harga satuan kain/vitrase.</p>
+            <p>2. <b>Atur Harga:</b> Klik tab yang aktif untuk merubah harga satuan kain/vitrase.</p>
             <p>3. <b>Input Data:</b> Isi lebar, tinggi, & model gorden, lalu klik <b>Tambah ke Daftar</b>.</p>
-            <p>4. <b>Cetak:</b> Klik tombol <b>☰</b> di kanan bawah untuk memilih jenis cetakan (Estimasi/SPK/Rincian).</p>
+            <p>4. <b>Cetak:</b> Klik tombol <b>Ikon Printer (🖨️)</b> di kanan bawah untuk memilih jenis cetakan.</p>
         </div>
         <button class="btn-add" onclick="closeTutorial()">SAYA MENGERTI</button>
     </div>
@@ -169,7 +170,7 @@
         <button onclick="prosesCetak('SPK')">📝 SPK Penjahit</button>
         <button onclick="prosesCetak('Rincian')">🔍 Rincian Biaya</button>
     </div>
-    <button class="fab-main" onclick="toggleFab()">☰</button>
+    <button class="fab-main" onclick="toggleFab()">🖨️</button>
 </div>
 
 <div id="print-area"></div>
@@ -200,11 +201,9 @@
             document.getElementById('display-logo').style.display = 'block';
         }
         updateUIForTab();
-        document.getElementById('modalTutorial').style.display = 'block';
     };
 
     function closeTutorial() { document.getElementById('modalTutorial').style.display = 'none'; }
-
     function previewLogo(input) {
         if (input.files && input.files[0]) {
             let reader = new FileReader();
@@ -257,13 +256,12 @@
         const T = parseFloat(document.getElementById('tinggi').value) || 0;
         const nama = document.getElementById('nama_jendela').value || "Jendela";
         const model = document.getElementById('model').value;
-        const panel = parseInt(document.getElementById('jml_panel').value) || 1;
         const vMode = document.getElementById('pakai_vitrase').value;
         const s = settings[currentTab];
 
         if (L <= 0 || T <= 0) return alert("Cek Lebar/Tinggi!");
 
-        let item = { nama, L, T, model, panel, kat: currentTab, kain: s.nama, vInfo: null, komponen: [], total: 0 };
+        let item = { nama, L, T, model, kat: currentTab, kain: s.nama, vInfo: null, komponen: [], total: 0 };
 
         if (currentTab === 'blinds') {
             let luas = Math.max(L, 1) * Math.max(T, 1);
@@ -357,8 +355,8 @@
 
     function prosesCetak(jenis) {
         if (!keranjang.length) return;
-        if (!customer.nama || !customer.telp || !customer.alamat) {
-            alert("Harap lengkapi Profil & Data Pelanggan sebelum mencetak.");
+        if (!customer.nama || !customer.telp) {
+            alert("Harap lengkapi Profil Pelanggan.");
             openCustModal(); return;
         }
 
@@ -393,13 +391,7 @@
             contentHtml += `
                 <h2 style="text-align:right; border-top:2px solid #000; padding-top:10px; margin-bottom:5px;">TOTAL: Rp ${gt.toLocaleString()}</h2>
                 <div class="red-note">*Estimasi sudah termasuk biaya jahit dan pasang.</div>
-                <div class="red-note">*Estimasi berlaku sd ${tglExp}</div>
-                <div class="payment-info">
-                    <strong>Instruksi Pembayaran:</strong><br>
-                    Bank BCA<br>
-                    AN: EKO TRIONO<br>
-                    0463191163
-                </div>`;
+                <div class="payment-info">Bank BCA - AN: EKO TRIONO - 0463191163</div>`;
             kirimKeGAS(jenis, gt);
         }
         
