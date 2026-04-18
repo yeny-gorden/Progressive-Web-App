@@ -358,7 +358,8 @@
                 const model = document.getElementById(`model-g-${id}`).value;
                 const L = parseFloat(document.getElementById(`L-${id}`).value) || 0;
                 const T = parseFloat(document.getElementById(`T-${id}`).value) || 0;
-                const prod = KATALOG.kain[document.getElementById(`produk-${id}`).value];
+                const prodIndex = document.getElementById(`produk-${id}`).value;
+                const prod = KATALOG.kain[prodIndex];
                 const colG = document.getElementById(`color-g-${id}`).value || "-";
                 const pan = document.getElementById(`panel-g-${id}`).value || 2;
 
@@ -374,22 +375,27 @@
 
                 const biayaKain = mK * prod.harga;
                 const biayaJahit = mK * (aks.jahit || 20000);
-                const biayaAlat = (Math.max(1, Math.ceil(L)) * (aks.rollet || 65000)) + (aks.hook || 0) + (aks.tali || 0);
+                const jmlRollet = Math.max(1, Math.ceil(L));
+                const biayaRollet = jmlRollet * (aks.rollet || 65000);
+                const biayaHook = aks.hook || 0;
+                const biayaTali = aks.tali || 0;
                 
-                let sub = biayaKain + biayaJahit + biayaAlat;
+                let sub = biayaKain + biayaJahit + biayaRollet + biayaHook + biayaTali;
                 
-                // Rincian Baris Gorden
+                // Rincian Baris Gorden (Per Item)
                 let rincianArr = [];
-                rincianArr.push(`${prod.nama} / ${mK.toFixed(2)}m / ${formatRp(biayaKain)}`);
-                rincianArr.push(`Jahit Gorden / ${mK.toFixed(2)}m / ${formatRp(biayaJahit)}`);
-                rincianArr.push(`Aksesoris (Rollet/Hook/Tali) / 1 set / ${formatRp(biayaAlat)}`);
+                rincianArr.push(`Kain Gorden (${prod.nama}) | ${mK.toFixed(2)}m : ${formatRp(biayaKain)}`);
+                rincianArr.push(`Jasa Jahit Gorden | ${mK.toFixed(2)}m : ${formatRp(biayaJahit)}`);
+                rincianArr.push(`Rollet/Rel Gorden | ${jmlRollet}m : ${formatRp(biayaRollet)}`);
+                rincianArr.push(`Hook Gorden | 1 set : ${formatRp(biayaHook)}`);
+                rincianArr.push(`Tali Gorden | 1 set : ${formatRp(biayaTali)}`);
 
                 if(model === 'Grommet') {
                     const hargaGrommet = aks.smokring || 4500;
                     const jmlGrommet = Math.ceil(L * 24);
                     const biayaGrom = jmlGrommet * hargaGrommet;
                     sub += biayaGrom;
-                    rincianArr.push(`Grommet / ${jmlGrommet}pcs / ${formatRp(biayaGrom)}`);
+                    rincianArr.push(`Grommet/Smokring | ${jmlGrommet}pcs : ${formatRp(biayaGrom)}`);
                 }
                 
                 let detail = `${rNama}<br>${prod.nama} / ${colG} / ${L}x${T} / ${model} / ${pan} Panel`;
@@ -405,16 +411,30 @@
                     let mV = (vL + 0.2) * 3 * vQ;
                     let biayaVit = mV * (aks.harga_vitrase_default || 100000);
                     let jahitVit = mV * 20000;
-                    let alatVit = (vM === 'Spiral') ? (aks.stick * vQ) : (Math.max(1, Math.ceil(vL)) * aks.rell);
+                    
+                    let alatVit = 0;
+                    let namaAlatVit = "";
+                    let qtyAlatVit = 0;
+
+                    if(vM === 'Spiral') {
+                        qtyAlatVit = vQ;
+                        alatVit = aks.stick * qtyAlatVit;
+                        namaAlatVit = "Stick Spiral";
+                    } else {
+                        qtyAlatVit = Math.max(1, Math.ceil(vL));
+                        alatVit = qtyAlatVit * aks.rell;
+                        namaAlatVit = "Rel Vitrase";
+                    }
                     
                     let subV = biayaVit + jahitVit + alatVit;
                     sub += subV;
                     vitLine = `<br>Vitrase: ${vM} / ${vCol} / ${vL}x${vT} / Qty: ${vQ}`;
                     
-                    // Rincian Baris Vitrase
-                    rincianArr.push(`Kain Vitrase / ${mV.toFixed(2)}m / ${formatRp(biayaVit)}`);
-                    rincianArr.push(`Jahit Vitrase / ${mV.toFixed(2)}m / ${formatRp(jahitVit)}`);
-                    rincianArr.push(`Aksesoris Vitrase (${vM === 'Spiral' ? 'Stick' : 'Rell'}) / 1 set / ${formatRp(alatVit)}`);
+                    // Rincian Baris Vitrase (Per Item)
+                    rincianArr.push(`---`); // Pembatas visual
+                    rincianArr.push(`Kain Vitrase | ${mV.toFixed(2)}m : ${formatRp(biayaVit)}`);
+                    rincianArr.push(`Jasa Jahit Vitrase | ${mV.toFixed(2)}m : ${formatRp(jahitVit)}`);
+                    rincianArr.push(`${namaAlatVit} | ${qtyAlatVit}${vM==='Spiral'?'set':'m'} : ${formatRp(alatVit)}`);
                 }
 
                 document.getElementById(`rincian-${id}`).innerHTML = rincianArr.join('<br>');
