@@ -178,58 +178,31 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2FWZ2hTFieLk9lM_h8Rw2ZqpGJ25ShNgUKpmGfrEZg4Ilw0vzR5-L3SMCAw-k4XmL/exec";
+    // URL Web App Google Script Anda (Pusat Sinkronisasi)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuqjJ9jamyjp1gFjxc43KvzQHD2bLUMi5rE7Gcyx9kohTq6rKRmFo0PXk6a3l1HMk/exec";
+    const JSON_URL = WEB_APP_URL; // Mengambil katalog langsung dari Sheet
 
-    let KATALOG = {
-        "kain": [
-            { "nama": "Resort", "harga": 512000, "tipe": "Bidang Besar" },
-            { "nama": "Design", "harga": 456000, "tipe": "Bidang Besar" },
-            { "nama": "Opera", "harga": 451000, "tipe": "Bidang Kecil" },
-            { "nama": "Sandy", "harga": 336000, "tipe": "Bidang Kecil" },
-            { "nama": "Saga Bonded", "harga": 336000, "tipe": "Bidang Kecil" },
-            { "nama": "Glory", "harga": 379000, "tipe": "Bidang Kecil" },
-            { "nama": "Lumiere", "harga": 439000, "tipe": "Bidang Besar" },
-            { "nama": "New Shade", "harga": 391000, "tipe": "Bidang Kecil" },
-            { "nama": "Solene", "harga": 360000, "tipe": "Bidang Kecil" },
-            { "nama": "Stellar", "harga": 252000, "tipe": "Bidang Kecil" },
-            { "nama": "Night Night", "harga": 300000, "tipe": "Bidang Besar" },
-            { "nama": "Vanilla", "harga": 403000, "tipe": "Bidang Kecil" },
-            { "nama": "Urban", "harga": 343000, "tipe": "Bidang Kecil" },
-            { "nama": "New Urban", "harga": 259000, "tipe": "Bidang Kecil" },
-            { "nama": "Alaska", "harga": 175000, "tipe": "Bidang Besar" },
-            { "nama": "Camillo", "harga": 175000, "tipe": "Bidang Besar" },
-            { "nama": "Gisella", "harga": 175000, "tipe": "Bidang Besar" },
-            { "nama": "Kesyaa", "harga": 160000, "tipe": "Bidang Besar" },
-            { "nama": "Dilan", "harga": 160000, "tipe": "Bidang Besar" },
-            { "nama": "Delanna", "harga": 160000, "tipe": "Bidang Besar" },
-            { "nama": "Newsenza", "harga": 175000, "tipe": "Bidang Besar" },
-            { "nama": "Crawford", "harga": 175000, "tipe": "Bidang Besar" },
-            { "nama": "Megan", "harga": 160000, "tipe": "Bidang Besar" }
-        ],
-        "aksesoris_default": {
-            "jahit": 20000,
-            "smokring": 4500,
-            "rollet": 65000,
-            "rell": 50000,
-            "hook": 40000,
-            "tali": 38000,
-            "stick": 50000,
-            "pasang": 50000,
-            "harga_vitrase_default": 100000
-        }
-    };
-
+    let KATALOG = null;
     let winIdx = 0;
-    const JSON_URL = "https://yeny-gorden.github.io/Progressive-Web-App/harga.json";
     const LOGO_URL = "https://yeny-gorden.github.io/Progressive-Web-App/logo.png";
 
     window.onload = async () => {
         try {
+            // Mengambil data real-time dari Google Sheets
             const response = await fetch(JSON_URL);
-            if(response.ok) KATALOG = await response.json();
-            onKatalogLoaded("✅ Online", "var(--success)");
+            if(response.ok) {
+                KATALOG = await response.json();
+                onKatalogLoaded("✅ Online (Sheets)", "var(--success)");
+            } else {
+                throw new Error("Gagal load");
+            }
         } catch (err) {
-            onKatalogLoaded("⚠️ Default Load", "var(--text-dim)");
+            // Jika gagal, gunakan data default agar aplikasi tetap bisa jalan
+            KATALOG = {
+                "kain": [{ "nama": "Sample Kain", "harga": 150000, "tipe": "Bidang Besar" }],
+                "aksesoris_default": { "jahit": 20000, "smokring": 4500, "rollet": 65000, "rell": 50000, "hook": 40000, "tali": 38000, "stick": 50000, "pasang": 50000, "harga_vitrase_default": 100000 }
+            };
+            onKatalogLoaded("⚠️ Mode Offline", "var(--text-dim)");
         }
     };
 
@@ -247,8 +220,16 @@
         reader.onload = (event) => {
             KATALOG = JSON.parse(event.target.result);
             onKatalogLoaded("✅ Manual", "var(--primary)");
+            updateSemuaProdukDropdown();
         };
         reader.readAsText(e.target.files[0]);
+    }
+
+    // Fungsi untuk mengupdate dropdown jika katalog berubah
+    function updateSemuaProdukDropdown() {
+        document.querySelectorAll('[id^="produk-"]').forEach(select => {
+            select.innerHTML = KATALOG.kain.map((k, i) => `<option value="${i}">${k.nama} - Rp ${k.harga.toLocaleString()}</option>`).join('');
+        });
     }
 
     function filterKatalog(idx, key) {
@@ -338,7 +319,7 @@
                 <img src="${LOGO_URL}" style="width:70px; height:70px; margin-right:15px; object-fit:contain;">
                 <div>
                     <strong style="font-size:22px; display:block;">YENY GORDEN</strong>
-                    <span style="font-size:12px; font-weight:bold;">Tlp: 089504215020 | Email: yenygorden@gmail.com</span><br>
+                    <span style="font-size:12px; font-weight:bold;">Tlp: 089504215020 <br> Email: yenygorden@gmail.com</span><br>
                     <span style="font-size:12px; font-weight:bold;">Tgl: ${new Date().toLocaleDateString('id-ID')}</span>
                 </div>
             </div>
@@ -362,7 +343,6 @@
         document.querySelectorAll('.window-item').forEach(win => {
             const id = win.id.split('-')[2];
             const kat = document.getElementById(`kategori-${id}`).value;
-            // PERBAIKAN: Selalu ambil nama ruangan terbaru dari innerText
             const rNama = document.getElementById(`title-text-${id}`).innerText.trim().toUpperCase();
 
             if(kat === 'Gorden') {
@@ -454,7 +434,6 @@
                 bodyE += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #eee;">${htmlDetail}<div style="text-align:right;">${formatRp(sub)}</div></div>`;
                 bodyS += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #000; padding-bottom:5px;">${htmlDetail}</div>`;
             } 
-            // PENAMBAHAN LOGIKA BLINDS
             else if (kat === 'Blind') {
                 const nB = document.getElementById(`nama-blind-${id}`).value || "Blind";
                 const LB = parseFloat(document.getElementById(`LB-${id}`).value) || 0;
@@ -575,11 +554,12 @@
     }
 
     function initModalFields() {
+        if(!KATALOG) return;
         const aks = KATALOG.aksesoris_default;
         const container = document.getElementById('modalForm');
         container.innerHTML = "";
         for (let key in aks) {
-            let labelText = key.toUpperCase();
+            let labelText = key.toUpperCase().replace(/_/g, " ");
             if(labelText === 'SMOKRING') labelText = 'GROMMET';
             container.innerHTML += `<label>${labelText}</label><input type="number" value="${aks[key]}" oninput="KATALOG.aksesoris_default['${key}']=parseFloat(this.value); hitungFinal();">`;
         }
