@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    	<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3b82f6">
-<link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon" href="logo.png">
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW Registered!', reg))
-        .catch(err => console.log('SW Registration Failed', err));
-    });
-  }
-</script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW Registered!', reg))
+            .catch(err => console.log('SW Registration Failed', err));
+        });
+      }
+    </script>
 
     <title>Kalkulator Gorden Pro v4.1 - Yeny Gorden</title>
     <style>
@@ -178,6 +178,9 @@
 </div>
 
 <script>
+    // URL Web App GAS
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2FWZ2hTFieLk9lM_h8Rw2ZqpGJ25ShNgUKpmGfrEZg4Ilw0vzR5-L3SMCAw-k4XmL/exec";
+
     let KATALOG = {
         "kain": [
             { "nama": "Resort", "harga": 512000, "tipe": "Bidang Besar" },
@@ -344,10 +347,14 @@
         `;
     }
 
+    // Variabel global untuk menyimpan data akhir yang akan dikirim
+    let lastCalculationData = {};
+
     function hitungFinal() {
         if(!KATALOG) return;
         const aks = KATALOG.aksesoris_default;
         let total = 0, bodyE = "", bodyS = "";
+        let rincianFullText = "";
 
         document.querySelectorAll('.window-item').forEach(win => {
             const id = win.id.split('-')[2];
@@ -382,7 +389,6 @@
                 
                 let sub = biayaKain + biayaJahit + biayaRollet + biayaHook + biayaTali;
                 
-                // Rincian Baris Gorden (Per Item)
                 let rincianArr = [];
                 rincianArr.push(`Kain Gorden (${prod.nama}) | ${mK.toFixed(2)}m : ${formatRp(biayaKain)}`);
                 rincianArr.push(`Jasa Jahit Gorden | ${mK.toFixed(2)}m : ${formatRp(biayaJahit)}`);
@@ -398,7 +404,7 @@
                     rincianArr.push(`Grommet/Smokring | ${jmlGrommet}pcs : ${formatRp(biayaGrom)}`);
                 }
                 
-                let detail = `${rNama}<br>${prod.nama} / ${colG} / ${L}x${T} / ${model} / ${pan} Panel`;
+                let detail = `${rNama}\n${prod.nama} / ${colG} / ${L}x${T} / ${model} / ${pan} Panel`;
                 let vitLine = "";
 
                 if(!document.getElementById(`vit-sec-${id}`).classList.contains('hidden')) {
@@ -428,20 +434,21 @@
                     
                     let subV = biayaVit + jahitVit + alatVit;
                     sub += subV;
-                    vitLine = `<br>Vitrase: ${vM} / ${vCol} / ${vL}x${vT} / Qty: ${vQ}`;
+                    vitLine = `\nVitrase: ${vM} / ${vCol} / ${vL}x${vT} / Qty: ${vQ}`;
                     
-                    // Rincian Baris Vitrase (Per Item)
-                    rincianArr.push(`---`); // Pembatas visual
+                    rincianArr.push(`---`);
                     rincianArr.push(`Kain Vitrase | ${mV.toFixed(2)}m : ${formatRp(biayaVit)}`);
                     rincianArr.push(`Jasa Jahit Vitrase | ${mV.toFixed(2)}m : ${formatRp(jahitVit)}`);
                     rincianArr.push(`${namaAlatVit} | ${qtyAlatVit}${vM==='Spiral'?'set':'m'} : ${formatRp(alatVit)}`);
                 }
 
                 document.getElementById(`rincian-${id}`).innerHTML = rincianArr.join('<br>');
+                rincianFullText += `\n[ ${rNama} ]\n${detail}${vitLine}\nSubtotal: ${formatRp(sub)}\n`;
 
                 total += sub;
-                bodyE += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #eee;">${detail}${vitLine}<div style="text-align:right;">${formatRp(sub)}</div></div>`;
-                bodyS += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #000; padding-bottom:5px;">${detail}${vitLine}</div>`;
+                let htmlDetail = detail.replace(/\n/g, "<br>") + vitLine.replace(/\n/g, "<br>");
+                bodyE += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #eee;">${htmlDetail}<div style="text-align:right;">${formatRp(sub)}</div></div>`;
+                bodyS += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #000; padding-bottom:5px;">${htmlDetail}</div>`;
             }
         });
 
@@ -450,6 +457,17 @@
         const dp = parseFloat(document.getElementById('extraDP').value) || 0;
         const grandTotal = total + pas - dis;
         const sisa = grandTotal - dp;
+
+        // Simpan data untuk dikirim ke server nanti
+        lastCalculationData = {
+            nama: document.getElementById('custNama').value,
+            telp: document.getElementById('custTelp').value,
+            alamat: document.getElementById('custAlamat').value,
+            rincianText: rincianFullText,
+            grandTotal: grandTotal,
+            dp: dp,
+            sisa: sisa
+        };
 
         const titleDoc = (dp > 0) ? 'INVOICE PEMBAYARAN' : 'ESTIMASI BIAYA GORDEN';
         const expDate = new Date();
@@ -493,7 +511,33 @@
         document.getElementById('printArea').innerHTML = document.body.dataset.estimasi;
     }
 
+    async function kirimKeServer(type) {
+        if(!lastCalculationData.nama) return;
+        
+        const data = {
+            tipe: type,
+            ...lastCalculationData
+        };
+
+        try {
+            // Menggunakan fetch dengan mode no-cors untuk pengiriman background "diam-diam" ke GAS
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            console.log("Data dikirim ke server...");
+        } catch (e) {
+            console.error("Gagal mengirim data", e);
+        }
+    }
+
     function printDoc(type) {
+        // Kirim data secara background sebelum proses cetak
+        kirimKeServer(type);
+
         const content = (type === 'Estimasi') ? document.body.dataset.estimasi : document.body.dataset.spk;
         let printFrame = document.getElementById('printFrame');
         if (!printFrame) {
