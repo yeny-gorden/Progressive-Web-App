@@ -272,7 +272,7 @@
         div.id = `win-block-${winIdx}`;
         div.innerHTML = `
             <div class="win-header">
-                <span class="win-title" id="title-text-${winIdx}" onclick="this.innerText=prompt('Nama Ruangan:', this.innerText)">ITEM #${winIdx}</span>
+                <span class="win-title" id="title-text-${winIdx}" onclick="this.innerText=prompt('Nama Ruangan:', this.innerText); hitungFinal();">ITEM #${winIdx}</span>
                 <button class="btn-mini btn-remove" onclick="document.getElementById('win-block-${winIdx}').remove(); hitungFinal();">HAPUS</button>
             </div>
             <div class="category-toggle">
@@ -308,8 +308,13 @@
                 <div id="rincian-${winIdx}" class="rincian-box"></div>
             </div>
             <div id="form-blind-${winIdx}" class="hidden">
-                <input type="text" id="nama-blind-${winIdx}" placeholder="Nama Blind">
-                <div class="form-grid"><input type="number" id="LB-${winIdx}" placeholder="Lebar"><input type="number" id="TB-${winIdx}" placeholder="Tinggi"><input type="number" id="harga-blind-${winIdx}" placeholder="Harga/m2"></div>
+                <div class="form-grid">
+                    <div class="full-width"><label>Nama Blind</label><input type="text" id="nama-blind-${winIdx}" placeholder="Contoh: Roller Blind Blackout"></div>
+                    <div><label>Lebar (m)</label><input type="number" id="LB-${winIdx}" placeholder="1.0" step="0.01"></div>
+                    <div><label>Tinggi (m)</label><input type="number" id="TB-${winIdx}" placeholder="1.0" step="0.01"></div>
+                    <div class="full-width"><label>Harga/m2 (Rp)</label><input type="number" id="harga-blind-${winIdx}" placeholder="350000"></div>
+                </div>
+                <div id="rincian-blind-${winIdx}" class="rincian-box"></div>
             </div>
         `;
         document.getElementById('windowContainer').appendChild(div);
@@ -357,7 +362,8 @@
         document.querySelectorAll('.window-item').forEach(win => {
             const id = win.id.split('-')[2];
             const kat = document.getElementById(`kategori-${id}`).value;
-            const rNama = document.getElementById(`title-text-${id}`).innerText.toUpperCase();
+            // PERBAIKAN: Selalu ambil nama ruangan terbaru dari innerText
+            const rNama = document.getElementById(`title-text-${id}`).innerText.trim().toUpperCase();
 
             if(kat === 'Gorden') {
                 const model = document.getElementById(`model-g-${id}`).value;
@@ -447,6 +453,26 @@
                 let htmlDetail = detail.replace(/\n/g, "<br>") + vitLine.replace(/\n/g, "<br>");
                 bodyE += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #eee;">${htmlDetail}<div style="text-align:right;">${formatRp(sub)}</div></div>`;
                 bodyS += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #000; padding-bottom:5px;">${htmlDetail}</div>`;
+            } 
+            // PENAMBAHAN LOGIKA BLINDS
+            else if (kat === 'Blind') {
+                const nB = document.getElementById(`nama-blind-${id}`).value || "Blind";
+                const LB = parseFloat(document.getElementById(`LB-${id}`).value) || 0;
+                const TB = parseFloat(document.getElementById(`TB-${id}`).value) || 0;
+                const hB = parseFloat(document.getElementById(`harga-blind-${id}`).value) || 0;
+
+                let luas = Math.max(1, (LB * TB));
+                let subB = luas * hB;
+
+                let detailB = `${rNama}\n${nB} | ${LB}m x ${TB}m | Luas: ${luas.toFixed(2)}m2`;
+                
+                document.getElementById(`rincian-blind-${id}`).innerHTML = `<b>${nB}</b><br>Luas: ${luas.toFixed(2)}m2 x ${formatRp(hB)}<br>Subtotal: ${formatRp(subB)}`;
+                rincianFullText += `\n[ ${rNama} ]\n${detailB}\nSubtotal: ${formatRp(subB)}\n`;
+
+                total += subB;
+                let htmlDetailB = detailB.replace(/\n/g, "<br>");
+                bodyE += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #eee;">${htmlDetailB}<div style="text-align:right;">${formatRp(subB)}</div></div>`;
+                bodyS += `<div style="margin-bottom:10px; font-family:Arial; font-weight:bold; color:#000; border-bottom:1px solid #000; padding-bottom:5px;">${htmlDetailB}</div>`;
             }
         });
 
@@ -454,13 +480,11 @@
         const disPersen = parseFloat(document.getElementById('extraDiskon').value) || 0;
         const dp = parseFloat(document.getElementById('extraDP').value) || 0;
         
-        // Rumus Diskon Persentase
         const totalSebelumDiskon = total + pas;
         const disNominal = totalSebelumDiskon * (disPersen / 100);
         const grandTotal = totalSebelumDiskon - disNominal;
         const sisa = grandTotal - dp;
 
-        // Penyesuaian Teks Dinamis Berdasarkan DP
         const isInvoice = dp > 0;
         const titleDoc = isInvoice ? 'INVOICE PEMBAYARAN' : 'ESTIMASI BIAYA GORDEN';
         const labelCatatan = isInvoice ? 'Batas waktu pelunasan' : 'Estimasi berlaku hingga';
