@@ -156,7 +156,7 @@
         <h2>🛠️ Biaya Tambahan & Pembayaran</h2>
         <div class="form-grid">
             <div><label>Jasa Pasang (Rp)</label><input type="number" id="extraPasang" value="0"></div>
-            <div><label>Diskon (Rp)</label><input type="number" id="extraDiskon" value="0"></div>
+            <div><label>Diskon (%)</label><input type="number" id="extraDiskon" value="0" placeholder="Contoh: 10"></div>
             <div class="full-width"><label>Uang Muka / DP (Rp)</label><input type="number" id="extraDP" value="0" style="border: 2px solid var(--success);"></div>
         </div>
     </div>
@@ -178,7 +178,6 @@
 </div>
 
 <script>
-    // URL Web App GAS
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2FWZ2hTFieLk9lM_h8Rw2ZqpGJ25ShNgUKpmGfrEZg4Ilw0vzR5-L3SMCAw-k4XmL/exec";
 
     let KATALOG = {
@@ -347,7 +346,6 @@
         `;
     }
 
-    // Variabel global untuk menyimpan data akhir yang akan dikirim
     let lastCalculationData = {};
 
     function hitungFinal() {
@@ -453,12 +451,24 @@
         });
 
         const pas = parseFloat(document.getElementById('extraPasang').value) || 0;
-        const dis = parseFloat(document.getElementById('extraDiskon').value) || 0;
+        const disPersen = parseFloat(document.getElementById('extraDiskon').value) || 0;
         const dp = parseFloat(document.getElementById('extraDP').value) || 0;
-        const grandTotal = total + pas - dis;
+        
+        // Rumus Diskon Persentase
+        const totalSebelumDiskon = total + pas;
+        const disNominal = totalSebelumDiskon * (disPersen / 100);
+        const grandTotal = totalSebelumDiskon - disNominal;
         const sisa = grandTotal - dp;
 
-        // Simpan data untuk dikirim ke server nanti
+        // Penyesuaian Teks Dinamis Berdasarkan DP
+        const isInvoice = dp > 0;
+        const titleDoc = isInvoice ? 'INVOICE PEMBAYARAN' : 'ESTIMASI BIAYA GORDEN';
+        const labelCatatan = isInvoice ? 'Batas waktu pelunasan' : 'Estimasi berlaku hingga';
+        
+        const expDate = new Date();
+        expDate.setDate(expDate.getDate() + 7);
+        const expString = expDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
         lastCalculationData = {
             nama: document.getElementById('custNama').value,
             telp: document.getElementById('custTelp').value,
@@ -469,17 +479,12 @@
             sisa: sisa
         };
 
-        const titleDoc = (dp > 0) ? 'INVOICE PEMBAYARAN' : 'ESTIMASI BIAYA GORDEN';
-        const expDate = new Date();
-        expDate.setDate(expDate.getDate() + 7);
-        const expString = expDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
         document.body.dataset.estimasi = `
             <div style="background:#fff; padding:10px;">
                 ${generatePrintHeader(titleDoc)}
                 ${bodyE}
                 <div style="border-top:2px solid #000; font-family:Arial; font-weight:bold; color:#000; padding-top:5px;">
-                    ${dis > 0 ? `<div style="display:flex; justify-content:space-between; color:red"><span>Diskon:</span><span>- ${formatRp(dis)}</span></div>` : ''}
+                    ${disPersen > 0 ? `<div style="display:flex; justify-content:space-between; color:red"><span>Diskon (${disPersen}%):</span><span>- ${formatRp(disNominal)}</span></div>` : ''}
                     <div style="display:flex; justify-content:space-between; font-size:16px; margin-top:5px; border-top:1px solid #000;"><span>TOTAL:</span><span>${formatRp(grandTotal)}</span></div>
                     ${dp > 0 ? `
                     <div style="display:flex; justify-content:space-between; color:green; margin-top:5px;"><span>DP / Uang Muka:</span><span>- ${formatRp(dp)}</span></div>
@@ -491,8 +496,8 @@
                     Bank BCA <br> No. Rek: 0463191163 <br> A/n: Eko Triono
                 </div>
                 <div style="margin-top:20px; color:red; font-family:Arial; font-weight:bold; font-size:11px;">
-                    * Estimasi berlaku hingga ${expString}.<br>
-                    ${pas > 0 ? '* Estimasi sudah termasuk biaya aksesoris, jahit dan pasang.' : '* Estimasi sudah termasuk biaya aksesoris dan jahit.'}
+                    * ${labelCatatan} ${expString}.<br>
+                    * Harga sudah ${pas > 0 ? 'termasuk biaya aksesoris, jahit dan pasang.' : 'termasuk biaya aksesoris dan jahit.'}
                 </div>
             </div>
         `;
@@ -513,14 +518,8 @@
 
     async function kirimKeServer(type) {
         if(!lastCalculationData.nama) return;
-        
-        const data = {
-            tipe: type,
-            ...lastCalculationData
-        };
-
+        const data = { tipe: type, ...lastCalculationData };
         try {
-            // Menggunakan fetch dengan mode no-cors untuk pengiriman background "diam-diam" ke GAS
             fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -528,16 +527,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            console.log("Data dikirim ke server...");
-        } catch (e) {
-            console.error("Gagal mengirim data", e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function printDoc(type) {
-        // Kirim data secara background sebelum proses cetak
         kirimKeServer(type);
-
         const content = (type === 'Estimasi') ? document.body.dataset.estimasi : document.body.dataset.spk;
         let printFrame = document.getElementById('printFrame');
         if (!printFrame) {
