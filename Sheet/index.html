@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Gorden Pro - Cloud Sync</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+        }
+
+        .tabs {
+            display: flex; background: #252525; position: sticky;
+            top: 0; z-index: 100; border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-link {
+            flex: 1; padding: 15px; text-align: center; cursor: pointer;
+            font-weight: bold; color: #888; transition: 0.3s; font-size: 0.9em;
+        }
+
+        .tab-link.active {
+            color: var(--secondary); border-bottom: 3px solid var(--secondary); background: #2c2c2c;
+        }
+
+        .tab-content { display: none; padding: 15px; max-width: 600px; margin: auto; }
+        .tab-content.active { display: block; }
+
+        .window-card {
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            margin-bottom: 15px; border: 1px solid var(--border-color); position: relative;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.85em; color: var(--secondary); }
+        
+        input, select {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: #2c2c2c; color: white; box-sizing: border-box; font-size: 16px;
+        }
+
+        input[type="number"] { text-align: center; }
+
+        .btn {
+            padding: 14px; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: bold; width: 100%; margin-top: 10px;
+        }
+
+        .btn-add { background-color: var(--primary); color: #000; }
+        .btn-pdf { background-color: #f44336; color: white; margin-top: 20px; }
+        .btn-invoice { background-color: #4caf50; color: white; margin-top: 10px; }
+        
+        .btn-edit { 
+            background-color: #333; color: var(--secondary); border: 1px solid var(--secondary);
+            font-size: 0.8em; padding: 8px; width: auto;
+        }
+
+        .result-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #252525; padding: 12px 15px; border-radius: 8px;
+            margin-bottom: 10px; border-left: 4px solid var(--primary);
+        }
+
+        .summary-box {
+            background: var(--card-bg); padding: 20px; border-radius: 12px;
+            border: 2px solid var(--primary); text-align: right; margin-top: 15px;
+            font-size: 1.2em; font-weight: bold;
+        }
+
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 2000;
+        }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); display: none; align-items: center;
+            justify-content: center; z-index: 1000; padding: 20px;
+        }
+        
+        .modal-content {
+            background: var(--card-bg); width: 100%; max-width: 500px;
+            max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader" class="loading-overlay">
+    <div style="color:var(--primary); font-size:1.5em; margin-bottom:10px;">Sinkronisasi Data...</div>
+    <div style="font-size:0.8em;">Mengambil Katalog dari Google Sheets</div>
+</div>
+
+<div class="tabs">
+    <div class="tab-link active" onclick="openTab(event, 'tab-ukuran')">UKURAN</div>
+    <div class="tab-link" onclick="openTab(event, 'tab-global')">SETTING</div>
+    <div class="tab-link" onclick="openTab(event, 'tab-hasil')">HASIL</div>
+</div>
+
+<div id="tab-ukuran" class="tab-content active">
+    <div id="window-list"></div>
+    <button class="btn btn-add" onclick="addWindow()">+ Tambah Jendela</button>
+</div>
+
+<div id="tab-global" class="tab-content">
+    <div class="window-card" style="border: 1px solid var(--secondary);">
+        <div id="global-form-container"></div>
+    </div>
+</div>
+
+<div id="tab-hasil" class="tab-content">
+    <div id="results-area">
+        <p style="text-align: center; color: #666;">Isi ukuran L (Lebar) untuk melihat rincian.</p>
+    </div>
+    <div id="btn-group-results" style="display: none;">
+        <button class="btn btn-pdf" onclick="openPdfModal('SPK')">💾 SIMPAN PDF SPK</button>
+        <button class="btn btn-invoice" onclick="openPdfModal('INVOICE')">📑 CETAK INVOICE</button>
+    </div>
+</div>
+
+<div id="modal-pdf" class="modal-overlay">
+    <div class="modal-content">
+        <h4 id="pdf-modal-title" style="color:var(--secondary); margin-top:0;">Data Pelanggan</h4>
+        <div class="form-group"><label>Nama Pelanggan</label><input type="text" id="cust-name"></div>
+        <div class="form-group"><label>Alamat</label><input type="text" id="cust-address"></div>
+        <div class="form-group"><label>Telepon</label><input type="tel" id="cust-phone"></div>
+        <div id="extra-payment-fields" style="display:none; border-top:1px solid #444; padding-top:15px; margin-top:10px;">
+            <div class="form-group"><label>DP Pembayaran</label><input type="number" id="cust-dp" placeholder="Rp 0"></div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-add" style="flex:1" onclick="generateDocument()">Download PDF</button>
+            <button class="btn" style="background:#444; color:white; flex:1" onclick="closePdfModal()">Batal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR9Y2HncykGJHcoQ_n3wFZzIT67AvGhmQhsQiqrCdkhHd0_jV-GWn9R6wbAYQn_4wfR63F_ym-ma6Ho/pub?gid=489185316&single=true&output=csv';
+
+    let fabricData = [];
+    let vitraseData = [];
+    const accessories = { jahit: 20000, smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 38000, instalasi: 50000 };
+
+    let globalConfig = { model: 'GROMMET', fabric: '', panels: 1, addVitrase: 'NONE', vFabric: '' };
+    let windowData = [];
+    let currentDocType = 'SPK';
+
+    async function fetchKatalog() {
+        try {
+            const response = await fetch(SHEET_CSV_URL);
+            const data = await response.text();
+            const rows = data.split('\n').slice(1);
+            
+            fabricData = []; vitraseData = [];
+            rows.forEach(row => {
+                const cols = row.split(',');
+                if (cols.length >= 3) {
+                    const item = { name: cols[0].trim(), price: parseInt(cols[1].replace(/[^0-9]/g, '')) || 0 };
+                    const kategori = cols[2].trim().toLowerCase();
+                    if (kategori.includes('vitras')) { vitraseData.push(item); }
+                    else { item.type = kategori.includes('besar') ? 'Besar' : 'Kecil'; fabricData.push(item); }
+                }
+            });
+            globalConfig.fabric = fabricData[0]?.name;
+            globalConfig.vFabric = vitraseData[0]?.name;
+            document.getElementById('loader').style.display = 'none';
+            renderForm('global-form-container', globalConfig, true);
+        } catch (e) { alert("Gagal mengambil data dari Sheet!"); }
+    }
+
+    function openTab(evt, tabName) {
+        document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+        document.querySelectorAll(".tab-link").forEach(tl => tl.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function addWindow() {
+        windowData.push({ id: Date.now(), name: '', w: '', h: '', isCustom: false, customConfig: null });
+        renderSizeUI();
+    }
+
+    function renderSizeUI() {
+        const container = document.getElementById('window-list');
+        container.innerHTML = windowData.map((win, index) => `
+            <div class="window-card">
+                <div style="display:flex; justify-content:space-between;">
+                    <h4 style="color:var(--primary); margin:0;">Jendela #${index+1}</h4>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div class="form-group" style="flex:2;"><label>Lokasi</label><input type="text" oninput="updateWin(${win.id}, 'name', this.value)" value="${win.name}"></div>
+                    <div class="form-group" style="flex:1;"><label>L</label><input type="number" oninput="updateWin(${win.id}, 'w', this.value)" value="${win.w}"></div>
+                    <div class="form-group" style="flex:1;"><label>T</label><input type="number" oninput="updateWin(${win.id}, 'h', this.value)" value="${win.h}"></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderForm(containerId, config, isGlobal) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `
+            <div class="form-group">
+                <label>Pilih Gorden</label>
+                <select onchange="updateConfigVal('fabric', this.value)">
+                    ${fabricData.map(f => `<option value="${f.name}" ${config.fabric === f.name ? 'selected':''}>${f.name} (Rp ${f.price.toLocaleString()})</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Model</label>
+                <select onchange="updateConfigVal('model', this.value)">
+                    <option value="GROMMET">SMOKRING</option>
+                    <option value="PINCH PLEAT">PLISKET</option>
+                </select>
+            </div>
+        `;
+    }
+
+    function updateWin(id, key, val) {
+        windowData.find(w => w.id === id)[key] = val;
+        calculateAll();
+    }
+
+    function updateConfigVal(key, val) {
+        globalConfig[key] = val;
+        calculateAll();
+    }
+
+    function calculateAll() {
+        let total = 0; let html = ''; let valid = 0;
+        windowData.forEach((win, index) => {
+            const w = parseFloat(win.w) || 0; const h = parseFloat(win.h) || 0;
+            if (w <= 0) return; valid++;
+            const f = fabricData.find(x => x.name === globalConfig.fabric) || fabricData[0];
+            
+            let meterKain = (w + 0.2) * 3;
+            let costKain = (f.type === 'Besar') ? meterKain * f.price : Math.ceil((w+0.2)/0.4) * (h+0.3) * f.price;
+            
+            let ring = globalConfig.model === 'GROMMET' ? Math.ceil(w * 24) : 0;
+            if(ring % 2 !== 0) ring++;
+            
+            let subtotal = costKain + (ring * accessories.smokring) + (Math.max(1, Math.ceil(w)) * accessories.rollet) + accessories.instalasi + accessories.hook + accessories.tali + (meterKain * accessories.jahit);
+            
+            total += subtotal;
+            html += `<div class="result-item"><div><b>${win.name || 'Jendela '+(index+1)}</b><br><small>${f.name}</small></div><b>Rp ${subtotal.toLocaleString()}</b></div>`;
+        });
+        if(valid > 0) {
+            document.getElementById('results-area').innerHTML = html + `<div class="summary-box">TOTAL: Rp ${total.toLocaleString()}</div>`;
+            document.getElementById('btn-group-results').style.display = 'block';
+        }
+    }
+
+    function openPdfModal(type) { 
+        currentDocType = type; 
+        document.getElementById('extra-payment-fields').style.display = type === 'INVOICE' ? 'block' : 'none';
+        document.getElementById('modal-pdf').style.display = 'flex'; 
+    }
+    function closePdfModal() { document.getElementById('modal-pdf').style.display = 'none'; }
+
+    function generateDocument() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        doc.text(`LAPORAN ${currentDocType}`, 105, 20, { align: 'center' });
+        doc.save(`${currentDocType}.pdf`);
+        closePdfModal();
+    }
+
+    fetchKatalog(); addWindow();
+</script>
+</body>
+</html>
