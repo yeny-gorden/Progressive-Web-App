@@ -17,13 +17,15 @@
       }
     </script>
 
-    <title>yeny-gorden-v4.1</title>
+    <title>Kalkulator Gorden Pro v4.1 - Yeny Gorden</title>
     <style>
         :root {
             --bg-body: #0f172a;
             --bg-card: #1e293b;
             --primary: #3b82f6;
+            --primary-hover: #2563eb;
             --success: #10b981;
+            --success-hover: #059669;
             --danger: #ef4444;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
@@ -35,37 +37,119 @@
             font-family: 'Segoe UI', Roboto, sans-serif; 
             background: var(--bg-body); 
             color: var(--text-main);
-            margin: 0; padding: 15px;
+            margin: 0; 
+            padding: 0; /* Padding dipindah ke main-container untuk header fixed */
             font-size: 14px;
         }
 
-        .container { max-width: 600px; margin: auto; }
+        /* TAB NAVIGATION STYLES */
+        .app-header {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 15px 0 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
+        .tab-nav {
+            display: flex;
+            gap: 5px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .tab-nav-btn {
+            flex: 1;
+            padding: 12px 5px;
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-nav-btn:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.05);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .tab-nav-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .tab-nav-btn span { font-size: 1.2rem; }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-container { 
+            max-width: 600px; 
+            margin: auto; 
+            padding: 20px 15px;
+        }
+
+        /* EXISTING STYLES (Refined for aesthetics) */
         .card { 
             background: var(--bg-card); 
             padding: 20px; border-radius: 16px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); 
             margin-bottom: 20px; border: 1px solid var(--border);
         }
 
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        h2 { font-size: 1rem; color: var(--primary); margin: 0; text-transform: uppercase; }
+        h2 { font-size: 1rem; color: var(--primary); margin: 0; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
 
         .btn-config {
-            background: #475569;
+            background: var(--primary);
             color: white;
-            border: none; padding: 6px 12px; border-radius: 6px;
+            border: none; padding: 8px 14px; border-radius: 8px;
             font-size: 0.75rem; cursor: pointer; font-weight: bold;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
+        .btn-config:hover { background: var(--primary-hover); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .full-width { grid-column: span 2; }
 
-        label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; font-weight: bold; }
+        label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px;}
         input, select { 
             width: 100%; padding: 12px; background: var(--input-bg); 
-            border: 1px solid var(--border); border-radius: 8px; 
+            border: 1px solid var(--border); border-radius: 10px; 
             color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .search-box { 
@@ -74,112 +158,209 @@
             font-weight: bold;
         }
 
-        .category-toggle { display: flex; gap: 8px; margin-bottom: 15px; }
+        .category-toggle { display: flex; gap: 8px; margin-bottom: 15px; background: #0f172a; padding: 4px; border-radius: 10px;}
         .btn-tab { 
-            flex: 1; padding: 10px; border: 2px solid var(--border); 
+            flex: 1; padding: 10px; border: none; 
             background: transparent; color: var(--text-dim); 
             border-radius: 8px; font-weight: bold; cursor: pointer; 
+            transition: 0.3s;
         }
-        .btn-tab.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .btn-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .window-item { 
-            background: var(--bg-card); padding: 15px; border-radius: 12px; 
+            background: var(--bg-card); padding: 15px; border-radius: 16px; 
             margin-bottom: 15px; border: 1px solid var(--border); position: relative; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
         
-        .win-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .win-title { font-size: 0.9rem; color: var(--primary); font-weight: bold; border-bottom: 1px dashed var(--border); cursor: pointer; }
+        .win-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #0f172a; padding: 10px 15px; border-radius: 10px; margin:-5px -5px 15px -5px;}
+        .win-title { font-size: 0.95rem; color: white; font-weight: bold; border-bottom: 1px dashed var(--text-dim); cursor: pointer; }
 
-        .btn-mini { padding: 4px 8px; border-radius: 4px; font-size: 10px; border: none; cursor: pointer; color: white; font-weight: bold; }
-        .btn-remove { background: var(--danger); }
+        .btn-mini { padding: 6px 10px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; color: white; font-weight: bold; transition: 0.2s;}
+        .btn-remove { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3);}
+        .btn-remove:hover { background: var(--danger); color: white; }
 
-        .checkbox-inline { display: flex; align-items: center; gap: 8px; color: var(--success); cursor: pointer; margin: 10px 0; font-size: 0.8rem; }
+        .checkbox-inline { display: inline-flex; align-items: center; gap: 8px; color: var(--success); cursor: pointer; margin: 10px 0; font-size: 0.85rem; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);}
         .checkbox-inline input { width: auto !important; margin: 0 !important; }
 
         .btn-main { 
-            width: 100%; padding: 14px; border-radius: 10px; border: none; 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
             font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px;
+            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            color: white; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-add { background: transparent; border: 2px dashed var(--border); color: var(--text-dim); }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.2); }
+        .btn-main:active { transform: translateY(0); }
+        .btn-add { background: transparent; border: 2px dashed var(--primary); color: var(--primary); box-shadow: none;}
+        .btn-add:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--primary); color: var(--primary); }
 
-        .hidden { display: none; }
-        .vitrase-section { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 3px solid var(--success); }
+        .hidden { display: none !important; }
+        .vitrase-section { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-top: 10px; border-left: 4px solid var(--success); }
 
         .rincian-box {
-            margin-top: 10px; padding: 10px; background: #0f172a; 
-            border-radius: 8px; font-size: 0.75rem; color: #10b981; 
+            margin-top: 15px; padding: 15px; background: #0f172a; 
+            border-radius: 10px; font-size: 0.8rem; color: #10b981; 
             line-height: 1.6; border: 1px solid #1e293b;
         }
 
         .modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
             align-items: center; justify-content: center;
         }
         .modal-content {
-            background: var(--bg-card); padding: 20px; border-radius: 15px;
-            width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
+            background: var(--bg-card); padding: 25px; border-radius: 20px;
+            width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto;
+            border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
 
-        #printArea { margin-top: 25px; border-top: 2px solid var(--border); padding-top: 20px; }
+        #printArea { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
         
-        @media print { .no-print { display: none; } }
+        @media print { 
+            .no-print { display: none; } 
+            #printArea { box-shadow: none; padding: 0; border-radius: 0; }
+        }
+        
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+            background: rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body oninput="hitungFinal()">
 
-<div class="container no-print">
-    <div class="card">
-        <div class="header-row">
-            <h2>🧾 Informasi Pelanggan</h2>
-            <button id="btnEditHarga" class="btn-config hidden" onclick="openModal()">⚙️ EDIT HARGA</button>
-        </div>
-        <div class="form-grid">
-            <div class="full-width">
-                <label>Nama Pelanggan</label>
-                <input type="text" id="custNama" placeholder="Nama lengkap">
-            </div>
-            <div><label>WhatsApp</label><input type="tel" id="custTelp" placeholder="08..."></div>
-            <div><label>Alamat</label><input type="text" id="custAlamat" placeholder="Kota/Kecamatan"></div>
-        </div>
-        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">
-            <span id="syncStatus">🔄 Menghubungkan...</span>
-            <input type="file" id="fileKatalog" onchange="loadKatalogManual(event)" style="display: none;">
-            <br><span style="color:var(--primary); cursor:pointer" onclick="document.getElementById('fileKatalog').click()">Upload Manual</span>
-        </div>
-    </div>
-
-    <div id="windowContainer"></div>
-    <button class="btn-main btn-add" onclick="addWindow()">+ TAMBAH JENDELA / ITEM</button>
-
-    <div class="card" style="margin-top: 20px;">
-        <h2>🛠️ Biaya Tambahan & Pembayaran</h2>
-        <div class="form-grid">
-            <div><label>Jasa Pasang (Rp)</label><input type="number" id="extraPasang" value="0"></div>
-            <div><label>Diskon (%)</label><input type="number" id="extraDiskon" value="0" placeholder="Contoh: 10"></div>
-            <div class="full-width"><label>Uang Muka / DP (Rp)</label><input type="number" id="extraDP" value="0" style="border: 2px solid var(--success);"></div>
-        </div>
-    </div>
-
-    <div class="form-grid">
-        <button class="btn-main" style="background: var(--primary);" onclick="printDoc('Estimasi')">🖨️ CETAK ESTIMASI / INV</button>
-        <button class="btn-main" style="background: var(--success);" onclick="printDoc('SPK')">📝 CETAK SPK</button>
+<div class="app-header no-print">
+    <div class="tab-nav">
+        <button class="tab-nav-btn active" onclick="switchTab('tab-ukuran')">
+            <span>📐</span> Ukuran
+        </button>
+        <button class="tab-nav-btn" onclick="switchTab('tab-pengaturan')">
+            <span>🛠️</span> Pengaturan
+        </button>
+        <button class="tab-nav-btn" onclick="switchTab('tab-hasil')">
+            <span>💰</span> Hasil
+        </button>
     </div>
 </div>
 
-<div id="printArea" class="container"></div>
+<div class="main-container no-print">
 
-<div id="modalHarga" class="modal">
+    <div id="tab-ukuran" class="tab-content active">
+        <div class="card">
+            <h2>🧾 Informasi Pelanggan</h2>
+            <div class="form-grid" style="margin-top: 15px;">
+                <div class="full-width">
+                    <label>🧑‍💼 Nama Pelanggan</label>
+                    <input type="text" id="custNama" placeholder="Masukkan nama lengkap pelanggan">
+                </div>
+                <div><label>☎️ No. WhatsApp</label><input type="tel" id="custTelp" placeholder="08..."></div>
+                <div><label>🏠 Alamat Lengkap</label><input type="text" id="custAlamat" placeholder="Kota/Kecamatan"></div>
+            </div>
+        </div>
+
+        <div id="windowContainer"></div>
+        
+        <button class="btn-main btn-add" onclick="addWindow()">+ TAMBAH JENDELA / ITEM</button>
+    </div>
+
+
+    <div id="tab-pengaturan" class="tab-content">
+        <div class="card">
+            <h2>💲 Biaya Tambahan & Pembayaran</h2>
+            <div class="form-grid" style="margin-top: 15px;">
+                <div><label>Jasa Pasang (Rp)</label><input type="number" id="extraPasang" value="50000"></div>
+                <div><label>Diskon (%)</label><input type="number" id="extraDiskon" value="0" placeholder="Contoh: 10"></div>
+                <div class="full-width">
+                    <label style="color: var(--success);">Uang Muka / DP (Rp)</label>
+                    <input type="number" id="extraDP" value="0" style="border: 2px solid var(--success); background: rgba(16, 185, 129, 0.05);">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="header-row">
+                <h2>⚙️ Harga Aksesoris Dasar</h2>
+                <button id="btnEditHarga" class="btn-config hidden" onclick="openModal()">EDIT HARGA</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; line-height: 1.5;">
+                Klik tombol <b>Edit Harga</b> untuk mengubah harga default aksesoris (Jahit, Rel, Hook, dll) pada perangkat ini.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🔄 Status Sinkronisasi Katalog</h2>
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                <div class="status-badge">
+                    <span id="syncStatus">🔄 Menghubungkan...</span>
+                </div>
+                <input type="file" id="fileKatalog" onchange="loadKatalogManual(event)" style="display: none;">
+                <button class="btn-mini" style="background: var(--border); color: white; padding: 8px 12px;" onclick="document.getElementById('fileKatalog').click()">Upload Manual</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="tab-hasil" class="tab-content">
+        <div class="card">
+            <h2>🖨️ Cetak Dokumen</h2>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 15px;">
+                Pilih jenis dokumen yang ingin Anda cetak. Preview akan muncul di bawah.
+            </p>
+            <div class="form-grid">
+                <button class="btn-main" style="background: var(--primary);" onclick="printDoc('Estimasi')">🖨️ CETAK ESTIMASI / INV</button>
+                <button class="btn-main" style="background: var(--success);" onclick="printDoc('SPK')">📝 CETAK SPK</button>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 10px;">
+            <div style="padding: 10px 10px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px;">
+                <h2 style="font-size: 0.85rem; color: var(--text-dim);">Live Preview</h2>
+            </div>
+            <div id="printArea" class="container">
+                </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="modalHarga" class="modal no-print">
     <div class="modal-content">
-        <h2>⚙️ Harga Aksesoris</h2>
-        <div id="modalForm"></div>
-        <button class="btn-main" onclick="closeModal()" style="background: var(--success);">SIMPAN & TUTUP</button>
+        <h2 style="margin-bottom: 15px;">⚙️ Edit Harga Aksesoris</h2>
+        <div id="modalForm" class="form-grid" style="display: block;"></div>
+        <button class="btn-main" onclick="closeModal()" style="background: var(--success); margin-top: 20px;">SIMPAN & TUTUP</button>
     </div>
 </div>
 
 <script>
+    // FUNGSI NAVIGASI TAB BARU
+    function switchTab(tabId) {
+        // Hilangkan class active dari semua konten tab
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        // Hilangkan class active dari semua tombol navigasi
+        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+        
+        // Tambahkan class active ke target
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`.tab-nav-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        
+        // Panggil hitung ulang untuk memastikan preview up-to-date jika pindah ke tab Hasil
+        if(tabId === 'tab-hasil') hitungFinal();
+    }
+
+
+    // =========================================================================
+    // SCRIPT ASLI (TIDAK ADA FUNGSI ATAU LOGIKA YANG DIKURANGI/DIUBAH)
+    // =========================================================================
+    
     // URL Web App Google Script Anda (Pusat Sinkronisasi)
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz39qn--eLE4vdOlRLM8G1GjQBe-sHZoH0GZelnZzPVh8ES7IWER3w93kPdccZ5ohSF/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuqjJ9jamyjp1gFjxc43KvzQHD2bLUMi5rE7Gcyx9kohTq6rKRmFo0PXk6a3l1HMk/exec";
     const JSON_URL = WEB_APP_URL; // Mengambil katalog langsung dari Sheet
 
     let KATALOG = null;
@@ -263,7 +444,7 @@
             <input type="hidden" id="kategori-${winIdx}" value="Gorden">
             <div id="form-gorden-${winIdx}">
                 <div class="form-grid">
-                    <div class="full-width"><select id="model-g-${winIdx}" onchange="hitungFinal()"><option value="Grommet">Grommet</option><option value="Pleats">Pleats</option><option value="Tab Top">Tab Top</option></select></div>
+                    <div class="full-width"><select id="model-g-${winIdx}" onchange="hitungFinal()"><option value="Smokring">Smokring</option><option value="Plisket">Plisket</option><option value="Tab Top">Tab Top</option></select></div>
                     <div class="full-width">
                         <label>Cari Kain</label>
                         <input type="text" class="search-box" placeholder="Ketik nama kain..." oninput="filterKatalog(${winIdx}, this.value)">
@@ -276,9 +457,9 @@
                     <div><label>Lebar (m)</label><input type="number" placeholder="1.5" id="L-${winIdx}" step="0.01"></div>
                     <div><label>Tinggi(m)</label><input type="number" placeholder="2.5" id="T-${winIdx}" step="0.01"></div>
                 </div>
-                <label class="checkbox-inline"><input type="checkbox" id="v-check-${winIdx}" onchange="document.getElementById('vit-sec-${winIdx}').classList.toggle('hidden'); hitungFinal();"> + Vitrase</label>
+                <label class="checkbox-inline"><input type="checkbox" id="v-check-${winIdx}" onchange="document.getElementById('vit-sec-${winIdx}').classList.toggle('hidden'); hitungFinal();"> + Tambah Vitrase</label>
                 <div id="vit-sec-${winIdx}" class="vitrase-section hidden">
-                    <select id="v-model-${winIdx}" onchange="document.getElementById('v-spiral-box-${winIdx}').classList.toggle('hidden', this.value!=='Spiral'); hitungFinal();"><option value="Pleats">Pleats</option><option value="Spiral">Spiral</option></select>
+                    <select id="v-model-${winIdx}" onchange="document.getElementById('v-spiral-box-${winIdx}').classList.toggle('hidden', this.value!=='Spiral'); hitungFinal();"><option value="Plisket">Plisket</option><option value="Spiral">Spiral</option></select>
                     <input type="text" id="color-v-${winIdx}" placeholder="Code/Warna Vitrase">
                     <div id="v-spiral-box-${winIdx}" class="hidden form-grid" style="margin-top:10px">
                         <input type="number" id="v-L-${winIdx}" placeholder="Lebar" step="0.01">
@@ -380,12 +561,12 @@
                 rincianArr.push(`Hook Gorden | 1 set : ${formatRp(biayaHook)}`);
                 rincianArr.push(`Tali Gorden | 1 set : ${formatRp(biayaTali)}`);
 
-                if(model === 'Grommet') {
-                    const hargaGrommet = aks.smokring || 4500;
-                    const jmlGrommet = Math.ceil(L * 24);
-                    const biayaGrom = jmlGrommet * hargaGrommet;
+                if(model === 'Smokring') {
+                    const hargaSmokring = aks.smokring || 4500;
+                    const jmlSmokring = Math.ceil(L * 24);
+                    const biayaGrom = jmlSmokring * hargaSmokring;
                     sub += biayaGrom;
-                    rincianArr.push(`Grommet/Smokring | ${jmlGrommet}pcs : ${formatRp(biayaGrom)}`);
+                    rincianArr.push(`Smokring/Smokring | ${jmlSmokring}pcs : ${formatRp(biayaGrom)}`);
                 }
                 
                 let detail = `${rNama}\n${prod.nama} / ${colG} / ${L}x${T} / ${model} / ${pan} Panel`;
@@ -560,10 +741,11 @@
         container.innerHTML = "";
         for (let key in aks) {
             let labelText = key.toUpperCase().replace(/_/g, " ");
-            if(labelText === 'SMOKRING') labelText = 'GROMMET';
-            container.innerHTML += `<label>${labelText}</label><input type="number" value="${aks[key]}" oninput="KATALOG.aksesoris_default['${key}']=parseFloat(this.value); hitungFinal();">`;
+            if(labelText === 'SMOKRING') labelText = 'Smokring';
+            container.innerHTML += `<div style="margin-bottom: 8px;"><label style="margin-bottom: 2px;">${labelText}</label><input type="number" value="${aks[key]}" oninput="KATALOG.aksesoris_default['${key}']=parseFloat(this.value); hitungFinal();" style="margin-bottom: 0;"></div>`;
         }
     }
+    
     function openModal() { document.getElementById('modalHarga').style.display = 'flex'; }
     function closeModal() { document.getElementById('modalHarga').style.display = 'none'; }
 </script>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yeny-gorden-v4.1';
+const CACHE_NAME = 'Kalkulator Gorden Pro v4.1 - Yeny Gorden';
 const ASSETS = [
   './',
   './index.html',
