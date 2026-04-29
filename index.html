@@ -360,7 +360,7 @@
     // =========================================================================
     
     // URL Web App Google Script Anda (Pusat Sinkronisasi)
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuqjJ9jamyjp1gFjxc43KvzQHD2bLUMi5rE7Gcyx9kohTq6rKRmFo0PXk6a3l1HMk/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxUdKPIa-4F3CqA_BOUDWvvokx1un_x9FM81cHJ0MbPYQTBax0-LveilgPODzu4f7M/exec";
     const JSON_URL = WEB_APP_URL; // Mengambil katalog langsung dari Sheet
 
     let KATALOG = null;
@@ -701,18 +701,17 @@
     }
 
     async function kirimKeServer(type) {
-        if(!lastCalculationData.nama) return;
-        const data = { tipe: type, ...lastCalculationData };
-        try {
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-        } catch (e) { console.error(e); }
-    }
+    if(!lastCalculationData.nama) return;
+    const data = { tipe: type, ...lastCalculationData };
+    try {
+        // Gunakan URLSearchParams agar data bisa diterima Apps Script dengan mudah
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(data) 
+        });
+    } catch (e) { console.error(e); }
+}
+
 
     function printDoc(type) {
         kirimKeServer(type);
