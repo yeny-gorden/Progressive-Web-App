@@ -547,23 +547,30 @@
 
                 const biayaKain = mK * prod.harga;
                 const biayaJahit = mK * (aks.jahit || 20000);
-                const jmlRollet = Math.max(1, Math.ceil(L));
-                const biayaRollet = jmlRollet * (aks.rollet || 65000);
-                const biayaHook = aks.hook || 0;
-                const biayaTali = aks.tali || 0;
-                
-                let sub = biayaKain + biayaJahit + biayaRollet + biayaHook + biayaTali;
-                
+                const jenisBatang = (model === 'Smokring') ? 'Rollet' : 'Rell';
+const hargaBatang = (model === 'Smokring') ? (aks.rollet || 65000) : (aks.rell || 50000);
+const qtyBatang = Math.max(1, L);
+const biayaBatang = qtyBatang * hargaBatang;
+
+const biayaHook = aks.hook || 40000;
+const biayaTali = aks.tali || 38000;
+
+let sub = biayaKain + biayaJahit + biayaBatang + biayaHook + biayaTali;
+          
                 let rincianArr = [];
                 rincianArr.push(`Kain Gorden (${prod.nama}) | ${mK.toFixed(2)}m : ${formatRp(biayaKain)}`);
                 rincianArr.push(`Jasa Jahit Gorden | ${mK.toFixed(2)}m : ${formatRp(biayaJahit)}`);
-                rincianArr.push(`Rollet/Rel Gorden | ${jmlRollet}m : ${formatRp(biayaRollet)}`);
+                rincianArr.push(`${jenisBatang} Gorden | ${qtyBatang.toFixed(2)}m : ${formatRp(biayaBatang)}`);
                 rincianArr.push(`Hook Gorden | 1 set : ${formatRp(biayaHook)}`);
                 rincianArr.push(`Tali Gorden | 1 set : ${formatRp(biayaTali)}`);
 
                 if(model === 'Smokring') {
                     const hargaSmokring = aks.smokring || 4500;
-                    const jmlSmokring = Math.ceil(L * 24);
+                    let jmlSmokring = Math.ceil(L * 24);
+if (jmlSmokring % 2 !== 0) {
+    jmlSmokring += 1; // Jika ganjil, tambahkan 1 agar menjadi genap terdekat di atasnya
+}
+
                     const biayaGrom = jmlSmokring * hargaSmokring;
                     sub += biayaGrom;
                     rincianArr.push(`Smokring/Smokring | ${jmlSmokring}pcs : ${formatRp(biayaGrom)}`);
@@ -592,7 +599,8 @@
                         alatVit = aks.stick * qtyAlatVit;
                         namaAlatVit = "Stick Spiral";
                     } else {
-                        qtyAlatVit = Math.max(1, Math.ceil(vL));
+                        qtyAlatVit = Math.max(1, vL);
+
                         alatVit = qtyAlatVit * aks.rell;
                         namaAlatVit = "Rel Vitrase";
                     }
