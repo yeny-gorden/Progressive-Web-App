@@ -2,865 +2,285 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<link rel="manifest" href="manifest.json">
     <title>Kalkulator Gorden & Blinds Pro</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent-color: #bb86fc;
-            --text-color: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --border-color: #333333;
-            --input-bg: #2d2d2d;
-            --success-color: #03dac6;
-            --warning-color: #ffb74d;
-            --danger-color: #cf6679;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; font-size: 14px; line-height: 1.5; }
-        .container { max-width: 500px; margin: 0 auto; padding-bottom: 30px; }
-        header { text-align: center; margin-bottom: 16px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        header h1 { font-size: 1.25rem; color: var(--accent-color); font-weight: 600; }
-        .card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--accent-color); border-left: 3px solid var(--accent-color); padding-left: 8px; }
-        .form-group { margin-bottom: 12px; }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
-        input, select { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 6px; font-size: 0.95rem; outline: none; }
-        input:disabled, select:disabled { opacity: 0.4; background-color: #1a1a1a; }
-        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-        .checkbox-group input[type="checkbox"] { width: auto; accent-color: var(--accent-color); transform: scale(1.1); }
-        .checkbox-group label { margin-bottom: 0; color: var(--text-color); font-size: 0.9rem; }
-        
-        .product-tab { display: flex; gap: 8px; margin-bottom: 12px; }
-        .tab-btn { flex: 1; padding: 10px; background: #2d2d2d; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center; }
-        .tab-btn.active { background: var(--accent-color); color: #121212; border-color: var(--accent-color); }
+        :root { --bg: #121212; --panel: #1e1e1e; --text: #e0e0e0; --accent: #bb86fc; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .panel { background: var(--panel); padding: 20px; border-radius: 12px; flex: 1; min-width: 350px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #333; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; }
+        button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+        .switch-wrapper { position: relative; width: 100%; height: 50px; background: #2a2a2a; border-radius: 25px; display: flex; align-items: center; cursor: pointer; margin-bottom: 15px; }
+        .switch-toggle { position: absolute; left: 5px; width: 48%; height: 40px; background: var(--accent); border-radius: 20px; transition: 0.3s; }
+        .mode-blinds .switch-toggle { transform: translateX(100%); }
+        .window-card { border: 1px solid #444; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #252525; }
 
-        .dynamic-item-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
-        .dynamic-item-row input { padding: 6px; font-size: 0.85rem; }
-        
-        .result-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #333; font-size: 0.85rem; }
-        .result-item:last-child { border-bottom: none; }
-        .result-label { color: var(--text-muted); }
-        .result-value { font-weight: 500; }
-        
-        .total-box { background-color: rgba(187, 134, 252, 0.1); border: 1px solid var(--accent-color); border-radius: 8px; padding: 12px; text-align: center; margin-top: 10px; }
-        .total-box h2 { font-size: 1.4rem; color: var(--success-color); margin-top: 4px; }
-        .loading { text-align: center; color: var(--warning-color); font-weight: bold; padding: 10px; }
-        
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; text-align: center; }
-        .btn-accent { background-color: var(--accent-color); color: #121212; }
-        .btn-success { background-color: var(--success-color); color: #121212; }
-        .btn-danger { background-color: var(--danger-color); color: #fff; padding: 4px 8px; font-size: 0.75rem; width: auto; border-radius: 4px; }
-        .btn-secondary { background-color: #333; color: var(--text-color); border: 1px solid var(--border-color); }
-        .print-btn-group { display: flex; gap: 8px; margin-top: 12px; }
-        .print-btn-group .btn { flex: 1; }
-        
-        .basket-item { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        #printArea { background: white; border-radius: 8px; padding: 4px; margin-top: 10px; overflow-x: auto; }
+        /* --- STYLING CUSTOM MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease; overflow-y: auto; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--panel); border: 2px solid var(--accent); border-radius: 12px;
+            width: 100%; max-width: 450px; padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: scale(0.85);
+            transition: transform 0.25s ease; margin: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { font-size: 1.25rem; font-weight: bold; color: var(--accent); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; }
+        .modal-body { text-align: left; font-size: 0.95rem; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2d2d2d; }
+        .detail-row:last-child { border-bottom: none; }
+        .modal-footer { margin-top: 20px; }
     </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e40af">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log('Service Worker Registered'));
+      }
+    </script>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Yeny Gorden</h1>
-        <div id="loading_status" class="loading">Check Database Katalog & Harga....</div>
-    </header>
+<div class="panel">
+    <h2>Input Data</h2>
+    <div class="switch-wrapper" onclick="toggleMode()" id="switchBox">
+        <div class="switch-toggle"></div>
+        <div style="flex:1; text-align:center; font-weight:bold; z-index:1; color: #fff;">CURTAIN</div>
+        <div style="flex:1; text-align:center; font-weight:bold; z-index:1; color: #fff;">BLINDS</div>
+    </div>
 
-    <!-- INPUT DATA JENDELA SATUAN -->
-    <div class="card" style="border: 1px solid var(--accent-color);">
-        <div class="card-title" style="margin-bottom: 6px;">⚙️ INPUT DATA JENDELA</div>
+    <input type="text" id="nama" placeholder="Nama Jendela">
+
+    <div id="curtainFields">
+        <div class="grid-2">
+            <input type="number" id="lebar" placeholder="Lebar (m)">
+            <input type="number" id="tinggi" placeholder="Tinggi (m)">
+            <input type="number" id="hKain" placeholder="Harga Kain Utama/m">
+            <input type="number" id="hVitras" placeholder="Harga Vitrase/m">
+        </div>
+        <select id="model" onchange="checkModel()">
+            <option value="smokring">Smokring</option>
+            <option value="plisket">Plisket</option>
+            <option value="tabtop">Tab Top</option>
+            <option value="spiral">Spiral</option>
+        </select>
+        <select id="jenisKain">
+            <option value="import">Import</option>
+            <option value="lokal">Lokal</option>
+            <option value="vitrase">Kain Vitrase</option>
+        </select>
         
-        <div class="form-group">
-            <label for="nama_lokasi_item">Label / Posisi Jendela</label>
-            <input type="text" id="nama_lokasi_item" placeholder="Contoh: R. Tamu Utama / Jendela Kmr Depan">
+        <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
+            <label>Vitrase Tambahan:</label>
+            <button id="btnVitrase" onclick="toggleVitrase()" style="width:100px;">OFF</button>
         </div>
-
-        <div class="product-tab">
-            <div id="tab_gorden" class="tab-btn active" onclick="switchProductMode('gorden')">Gorden Kain</div>
-            <div id="tab_blinds" class="tab-btn" onclick="switchProductMode('blinds')">Blinds</div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="lebar">Lebar (m)</label>
-                <input type="number" id="lebar" step="0.01" min="0" placeholder="0.00" oninput="calculateCurrentItem()">
-            </div>
-            <div class="form-group">
-                <label for="tinggi">Tinggi (m)</label>
-                <input type="number" id="tinggi" step="0.01" min="0" placeholder="0.00" oninput="calculateCurrentItem()">
-            </div>
-            <div class="form-group" style="max-width: 80px;">
-                <label for="qty">Qty Set</label>
-                <input type="number" id="qty" min="1" value="1" oninput="calculateCurrentItem()">
-            </div>
-        </div>
-
-        <!-- FORM GORDEN -->
-        <div id="form_gorden_only">
-            <div class="form-group">
-                <label for="model_select">Model Gorden</label>
-                <select id="model_select" onchange="handleModelChange(); calculateCurrentItem();">
-                    <option value="smokring">Model Smokring</option>
-                    <option value="pinch_pleat">Model Pinch Pleat</option>
-                    <option value="spiral">Model Spiral</option>
-                    <option value="tab_top">Model Tab Top</option>
-                    <option value="ripple_fold">Model Ripple Fold</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="gorden_color">Warna / Kode Varian Kain</label>
-                <input type="text" id="gorden_color" placeholder="Contoh: Mocca No. 12" oninput="calculateCurrentItem()">
-            </div>
-
-            <div class="checkbox-group" style="margin-bottom: 8px;">
-                <input type="checkbox" id="use_kain" checked onchange="toggleBahanSection('kain'); calculateCurrentItem();">
-                <label for="use_kain">Gunakan Kain Gorden</label>
-            </div>
-            <div id="kain_section" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
-                <div class="form-group">
-                    <select id="kain_select" onchange="calculateCurrentItem()"></select>
-                </div>
-                <div class="form-row" style="font-size: 0.8rem; color: var(--text-muted);">
-                    <div>Bidang: <span id="kain_kat" style="color:#fff;">-</span></div>
-                    <div style="margin-left: auto;">Kebutuhan Kain: <span id="kain_qty_lbl" style="color:var(--success-color);">0 m</span></div>
-                </div>
-            </div>
-
-            <div class="checkbox-group" style="margin-bottom: 8px;">
-                <input type="checkbox" id="use_vitrase" onchange="handleModelChange(); calculateCurrentItem();">
-                <label for="use_vitrase">Gunakan Vitrase Tambahan</label>
-            </div>
-            <div id="vitrase_section" style="display: none; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
-                <div class="form-group">
-                    <label for="model_vitrase_select">Model Pemasangan Vitrase</label>
-                    <select id="model_vitrase_select" onchange="handleModelChange(); calculateCurrentItem();">
-                        <option value="pinch_pleat">Model Pinch Pleat</option>
-                        <option value="spiral">Model Spiral</option>
-                    </select>
-                </div>
-
-                <div id="ukuran_vitrase_spiral_section" style="display: none; background: rgba(187,134,252,0.05); padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px dashed var(--accent-color);">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="lebar_vit">L Vitrase (m)</label>
-                            <input type="number" id="lebar_vit" step="0.01" min="0" placeholder="0.00" oninput="calculateCurrentItem()">
-                        </div>
-                        <div class="form-group">
-                            <label for="tinggi_vit">T Vitrase (m)</label>
-                            <input type="number" id="tinggi_vit" step="0.01" min="0" placeholder="0.00" oninput="calculateCurrentItem()">
-                        </div>
-                        <div class="form-group" style="max-width: 60px;">
-                            <label for="qty_vit">Qty</label>
-                            <input type="number" id="qty_vit" min="1" value="1" oninput="calculateCurrentItem()">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <select id="vitrase_select" onchange="calculateCurrentItem()"></select>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="vitrase_color" placeholder="Warna Vitrase (Contoh: Putih)" oninput="calculateCurrentItem()">
-                </div>
-                <div style="font-size: 0.8rem; text-align: right; color: var(--text-muted);">
-                    Kebutuhan Vitrase: <span id="vitrase_qty_lbl" style="color:var(--success-color);">0 m</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- FORM BLINDS -->
-        <div id="form_blinds_only" style="display: none;">
-            <div class="form-group">
-                <label for="blinds_name">Nama / Jenis Blinds</label>
-                <input type="text" id="blinds_name" placeholder="Contoh: Roller Blind Sharp Point / Wooden Blind" oninput="calculateCurrentItem()">
-            </div>
-            <div class="form-group">
-                <label for="blinds_price_m2">Harga Per m² (Rp)</label>
-                <input type="number" id="blinds_price_m2" placeholder="Contoh: 350000" oninput="calculateCurrentItem()">
-            </div>
-            
-            <div class="form-group" style="margin-top: 10px;">
-                <label style="font-weight: bold; color: var(--warning-color);">➕ Item Tambahan Khusus (Dinamis)</label>
-                <div id="dynamic_items_container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addDynamicItemField()" style="padding: 6px; font-size: 0.8rem; margin-top: 4px;">+ Tambah Aksesoris/Item Lain</button>
-            </div>
-        </div>
-
-        <div id="aksesoris_status_list" style="margin-bottom: 10px;"></div>
-
-        <div class="result-item" style="border-top:1px dashed #444; font-weight: bold; padding: 10px 0;">
-            <span style="color:#fff;">Subtotal Jendela Ini:</span>
-            <span id="current_item_price" style="color:var(--warning-color);">Rp 0</span>
-        </div>
-
-        <button class="btn btn-accent" onclick="addItemToBasket()" style="margin-top: 5px;">➕ Tambahkan Jendela ke Nota</button>
-    </div>
-
-    <!-- DAFTAR KERANJANG -->
-    <div class="card">
-        <div class="card-title">📦 DAFTAR JENDELA TERGABUNG (<span id="basket_count">0</span>)</div>
-        <div id="basket_list_container">
-            <div style="color:var(--text-muted); text-align: center; padding: 10px; font-size: 0.85rem;">Belum ada jendela yang ditambahkan.</div>
-        </div>
-    </div>
-
-    <!-- DATA NOTA & PELANGGAN -->
-    <div class="card">
-        <div class="card-title">👤 DATA NOTA & PELANGGAN</div>
-        <div class="form-group">
-            <label for="custNama">Nama Pelanggan</label>
-            <input type="text" id="custNama" placeholder="Nama Pelanggan" oninput="renderFinalDocuments()">
-        </div>
-        <div class="form-group">
-            <label for="custAlamat">Alamat Rumah</label>
-            <input type="text" id="custAlamat" placeholder="Alamat Pengiriman" oninput="renderFinalDocuments()">
-        </div>
-        <div class="form-group">
-            <label for="custTelp">No. Telepon</label>
-            <input type="text" id="custTelp" placeholder="08xxxxxxxxxx" oninput="renderFinalDocuments()">
-        </div>
-        <div class="checkbox-group" style="margin-bottom: 12px;">
-            <input type="checkbox" id="chk_instalasi" checked onchange="renderFinalDocuments()">
-            <label for="chk_instalasi"><strong>Tambah Jasa Instalasi Pasang Seluruh Jendela</strong></label>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="extraDiskon">Diskon Global (%)</label>
-                <input type="number" id="extraDiskon" min="0" max="100" value="0" oninput="renderFinalDocuments()">
-            </div>
-            <div class="form-group">
-                <label for="extraDP">DP / Uang Muka (Rp)</label>
-                <input type="number" id="extraDP" min="0" placeholder="0" oninput="renderFinalDocuments()">
+        <div id="vContainer" class="hidden">
+            <select id="vModel" onchange="updateVitraseUI()">
+                <option value="plisket">Vitrase Plisket</option>
+                <option value="spiral">Vitrase Spiral</option>
+            </select>
+            <div id="vInputSpiral" class="grid-2 hidden">
+                <input type="number" id="vL" placeholder="L (m)"><input type="number" id="vT" placeholder="T (m)"><input type="number" id="vQ" placeholder="Qty">
             </div>
         </div>
     </div>
 
-    <!-- SUMMARY -->
-    <div class="card">
-        <div class="card-title">🧾 SUMMARY NOTA GABUNGAN</div>
-        <div class="total-box">
-            <span class="result-label" style="color: var(--text-color);">ESTIMASI TOTAL BIAYA AKHIR</span>
-            <h2 id="grand_total">Rp 0</h2>
-        </div>
-        <div class="print-btn-group">
-            <button class="btn btn-success" onclick="printDoc('Estimasi')">🖨️ Cetak Invoice</button>
-            <button class="btn btn-secondary" onclick="printDoc('SPK')">📝 Cetak SPK Workshop</button>
+    <div id="blindsFields" class="hidden">
+        <div class="grid-2">
+            <input type="number" id="bL" placeholder="Lebar (m)">
+            <input type="number" id="bT" placeholder="Tinggi (m)">
+            <input type="number" id="bHarga" placeholder="Harga/m²">
         </div>
     </div>
+    <button onclick="tambah()">TAMBAH JENDELA</button>
+</div>
 
-    <!-- PREVIEW AREA -->
-    <div class="card" style="background:#444;">
-        <div class="card-title" style="color:#fff; border-left-color:#fff;">Live Preview Dokumen Berwarna</div>
-        <div id="printArea"></div>
+<div class="panel">
+    <h2>Daftar Jendela</h2>
+    <div id="daftarJendela"></div>
+    <h3 id="totalSemua">Total: Rp 0</h3>
+</div>
+
+<!-- CONTAINER CUSTOM MODAL -->
+<div id="customModal" class="modal-overlay" onclick="tutupModalLuar(event)">
+    <div class="modal-content">
+        <div id="modalTitle" class="modal-header">Rincian Perhitungan</div>
+        <div id="modalBody" class="modal-body"></div>
+        <div class="modal-footer">
+            <button onclick="tutupModal()">TUTUP</button>
+        </div>
     </div>
 </div>
 
 <script>
-    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbxMroPk4f6jGUK8bOAAdY1lr7Bmo2ifE8RsuthPJ2GsT0hwVQxrVFm7PvWWAluyHNhvHg/exec";
-    const LOGO_URL = "https://yeny-gorden.github.io/Progressive-Web-App/logo.png";
+let list = []; let mode = 'curtain'; let vOn = false;
+const h = { jahit: 20000, smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 50000, stick: 50000, instalasi: 50000 };
 
-    let kainData = [];
-    let vitraseData = [];
-    let aksesorisJasa = {}; 
-    
-    let basketItems = []; 
-    let currentCalculatedObject = null;
-    let currentProductMode = 'gorden';
-
-    async function loadDatabase() {
-        try {
-            const response = await fetch(DATABASE_URL);
-            const data = await response.json();
-            
-            kainData = data.kain || [];
-            vitraseData = data.vitrase || [];
-            aksesorisJasa = data.aksesoris || {};
-
-            const kainSelect = document.getElementById('kain_select');
-            kainSelect.innerHTML = "";
-            kainData.forEach((item, idx) => {
-                let opt = document.createElement('option');
-                opt.value = idx;
-                opt.textContent = `${item.nama || item.Nama} - Rp ${(item.harga || item.Harga || 0).toLocaleString('id-ID')}`;
-                kainSelect.appendChild(opt);
-            });
-
-            const vitraseSelect = document.getElementById('vitrase_select');
-            vitraseSelect.innerHTML = "";
-            vitraseData.forEach((item, idx) => {
-                let opt = document.createElement('option');
-                opt.value = idx;
-                opt.textContent = `${item.nama || item.Nama} - Rp ${(item.harga || item.Harga || 0).toLocaleString('id-ID')}`;
-                vitraseSelect.appendChild(opt);
-            });
-
-            document.getElementById('loading_status').style.display = 'none';
-            handleModelChange();
-            calculateCurrentItem();
-            renderFinalDocuments();
-        } catch (error) {
-            document.getElementById('loading_status').textContent = "Gagal memuat database Google Sheets!";
-            console.error(error);
-        }
+// Load cache cadangan lokal jika aplikasi tidak sengaja ter-refresh saat offline
+window.addEventListener('DOMContentLoaded', () => {
+    const savedList = localStorage.getItem('temp_calc_list');
+    if(savedList) {
+        list = JSON.parse(savedList);
+        render();
     }
+});
 
-    function switchProductMode(mode) {
-        currentProductMode = mode;
-        document.getElementById('tab_gorden').classList.toggle('active', mode === 'gorden');
-        document.getElementById('tab_blinds').classList.toggle('active', mode === 'blinds');
+function checkModel() {
+    const model = document.getElementById('model').value;
+    const btnV = document.getElementById('btnVitrase');
+    if(model === 'spiral') {
+        document.getElementById('jenisKain').value = 'vitrase';
+        vOn = false; btnV.innerText = "OFF"; btnV.disabled = true;
+        document.getElementById('vContainer').classList.add('hidden');
+    } else {
+        btnV.disabled = false;
+    }
+}
+
+function toggleMode() {
+    mode = (mode === 'curtain') ? 'blinds' : 'curtain';
+    document.getElementById('switchBox').classList.toggle('mode-blinds');
+    document.getElementById('curtainFields').classList.toggle('hidden');
+    document.getElementById('blindsFields').classList.toggle('hidden');
+}
+
+function toggleVitrase() {
+    if(document.getElementById('model').value === 'spiral') return;
+    vOn = !vOn;
+    document.getElementById('btnVitrase').innerText = vOn ? "ON" : "OFF";
+    document.getElementById('vContainer').classList.toggle('hidden', !vOn);
+    updateVitraseUI();
+}
+
+function updateVitraseUI() {
+    const isSpiral = document.getElementById('vModel').value === 'spiral';
+    document.getElementById('vInputSpiral').classList.toggle('hidden', !(vOn && isSpiral));
+}
+
+function tambah() {
+    let obj = { id: Date.now(), mode, nama: document.getElementById('nama').value || (mode === 'curtain' ? "Gorden" : "Blinds") };
+    if(mode === 'curtain') {
+        Object.assign(obj, { L: +document.getElementById('lebar').value, T: +document.getElementById('tinggi').value, hKain: +document.getElementById('hKain').value, hVit: +document.getElementById('hVitras').value, model: document.getElementById('model').value, jenis: document.getElementById('jenisKain').value, vOn, vModel: document.getElementById('vModel').value, vL: +document.getElementById('vL').value, vT: +document.getElementById('vT').value, vQ: +document.getElementById('vQ').value });
+    } else {
+        Object.assign(obj, { h: +document.getElementById('bHarga').value, L: +document.getElementById('bL').value, T: +document.getElementById('bT').value });
+    }
+    list.push(obj); 
+    localStorage.setItem('temp_calc_list', JSON.stringify(list)); // Simpan ketahanan lokal
+    render();
+}
+
+function hitung(w) {
+    let items = [], Lc = Math.max(w.L, 1);
+    if(w.mode === 'curtain') {
+        let mK = (w.jenis === 'lokal') ? Math.ceil((w.L + 0.2) / 0.4) * (w.T + 0.3) : (w.L + 0.2) * 3;
+        if(w.model === 'tabtop') mK += 1.0;
         
-        document.getElementById('form_gorden_only').style.display = mode === 'gorden' ? 'block' : 'none';
-        document.getElementById('form_blinds_only').style.display = mode === 'blinds' ? 'block' : 'none';
+        let hargaKain = (w.jenis === 'vitrase') ? w.hVit : w.hKain;
+        items.push({nama: "Kain", qty: mK.toFixed(2)+"m", harga: mK * hargaKain}, {nama: "Jahit Kain", qty: mK.toFixed(2)+"m", harga: mK * h.jahit});
         
-        calculateCurrentItem();
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Mencegah zoom otomatis pada perangkat mobile saat input difokuskan
-        const metaViewport = document.querySelector('meta[name="viewport"]');
-        if (metaViewport) {
-            metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        if(w.model === 'smokring') {
+            let n = Math.ceil(w.L * 24); if(n%2!==0) n++;
+            items.push({nama: "Smokring", qty: n+"pcs", harga: n * h.smokring});
         }
-    });
-
-    function addDynamicItemField() {
-        const container = document.getElementById('dynamic_items_container');
-        const rowId = 'dyn_row_' + Date.now();
+        if(['smokring', 'tabtop', 'plisket'].includes(w.model)) {
+            items.push({nama: (w.model === 'plisket' ? "Rell" : "Rollet"), qty: Lc+"m", harga: Lc * (w.model === 'plisket' ? h.rell : h.rollet)}, {nama: "Hook", qty: "1 set", harga: h.hook}, {nama: "Tali", qty: "1 set", harga: h.tali});
+        } else if(w.model === 'spiral') { items.push({nama: "Stick", qty: "1pcs", harga: h.stick}); }
         
-        const rowHtml = `
-            <div class="dynamic-item-row" id="${rowId}">
-                <input type="text" placeholder="Nama Item" class="dyn-name" style="flex: 2;" oninput="calculateCurrentItem()">
-                <input type="number" placeholder="Qty" class="dyn-qty" value="1" min="1" style="flex: 0.6;" oninput="calculateCurrentItem()">
-                <input type="number" placeholder="Harga" class="dyn-price" style="flex: 1.2;" oninput="calculateCurrentItem()">
-                <button type="button" class="btn-danger" style="padding: 6px 10px;" onclick="removeDynamicItemField('${rowId}')">✕</button>
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', rowHtml);
-    }
-
-    function removeDynamicItemField(id) {
-        const row = document.getElementById(id);
-        if (row) {
-            row.remove();
-            calculateCurrentItem();
+        if(w.vOn) {
+            let mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : mK;
+            items.push({nama: "Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * w.hVit}, {nama: "Jahit Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * h.jahit}, {nama: "Rell", qty: Lc+"m", harga: Lc * h.rell});
         }
+        items.push({nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
+    } else {
+        let luas = Math.max(w.L, 1) * Math.max(w.T, 1);
+        items.push({nama: "Blinds", qty: luas+"m²", harga: luas * w.h}, {nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
     }
+    return { items, total: items.reduce((s, i) => s + i.harga, 0) };
+}
 
-    function toggleBahanSection(type) {
-        if (type === 'kain') {
-            document.getElementById('kain_section').style.display = document.getElementById('use_kain').checked ? 'block' : 'none';
-        } else {
-            document.getElementById('vitrase_section').style.display = document.getElementById('use_vitrase').checked ? 'block' : 'none';
-        }
-    }
+function render() {
+    let cont = document.getElementById('daftarJendela'), grand = 0;
+    cont.innerHTML = list.map(w => {
+        let res = hitung(w); grand += res.total;
+        let secureData = encodeURIComponent(JSON.stringify({ nama: w.nama, items: res.items, total: res.total }));
+        return `<div class="window-card">
+            <strong>${w.nama}</strong>: Rp ${res.total.toLocaleString()} 
+            <button onclick="bukaModal('${secureData}')">Detail</button>
+            <button onclick="hapusItem(${w.id})">Hapus</button>
+        </div>`;
+    }).join('');
+    document.getElementById('totalSemua').innerText = "Total Semua: Rp " + grand.toLocaleString();
+}
 
-    function handleModelChange() {
-        if (currentProductMode === 'blinds') return;
-        const model = document.getElementById('model_select').value;
-        const useKainChk = document.getElementById('use_kain');
-        const useVitraseChk = document.getElementById('use_vitrase');
-        const modelVitraseSelect = document.getElementById('model_vitrase_select');
-        const spiralSection = document.getElementById('ukuran_vitrase_spiral_section');
+function hapusItem(id) {
+    list = list.filter(x => x.id != id);
+    localStorage.setItem('temp_calc_list', JSON.stringify(list));
+    render();
+}
 
-        if (model === 'spiral') {
-            useKainChk.checked = false;
-            useKainChk.disabled = true;
-            useVitraseChk.checked = true;
-            useVitraseChk.disabled = true;
-            modelVitraseSelect.value = 'spiral';
-            modelVitraseSelect.disabled = true;
-        } else {
-            useKainChk.disabled = false;
-            useVitraseChk.disabled = false;
-            modelVitraseSelect.disabled = false;
-        }
-
-        toggleBahanSection('kain');
-        toggleBahanSection('vitrase');
-
-        if (useVitraseChk.checked && modelVitraseSelect.value === 'spiral' && model !== 'spiral') {
-            spiralSection.style.display = 'block';
-        } else {
-            spiralSection.style.display = 'none';
-        }
-    }
-
-    function formatRupiah(num) {
-        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
-    }
-
-    function generatePrintHeader(title) {
-        const now = new Date();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const yyyy = now.getFullYear();
-        const hh = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        const ss = String(now.getSeconds()).padStart(2, '0');
-        const invNumber = `${mm}/${yyyy}/${hh}${min}${ss}`;
-
-        return `
-            <div style="font-family:Arial, sans-serif; color:#000; width:100%; margin-bottom:15px;">
-                <table style="width:100%; border-collapse:collapse; border:none; margin-bottom:5px;">
-                    <tr>
-                        <td style="width:75px; vertical-align:middle; padding:0; border:none;">
-                            <img src="${LOGO_URL}" style="width:70px; height:70px; object-fit:contain; display:block;">
-                        </td>
-                        <td style="text-align:center; vertical-align:middle; padding:0; border:none;">
-                            <strong style="font-size:24px; display:block; letter-spacing:1px; color:#000; font-family:Arial, sans-serif;">YENY GORDEN</strong>
-                            <span style="font-size:11px; font-weight:bold; display:block; color:#111; margin-top:2px;">Jl. Jend. Sudirman Berkoh - Purwokerto (53146)</span>
-                            <span style="font-size:11px; font-weight:bold; display:block; color:#333; margin-top:1px;">Tlp: 089504215020 | Email: yenygorden@gmail.com</span>
-                        </td>
-                        <td style="width:75px; border:none;"></td>
-                    </tr>
-                </table>
-                <div style="width:100%; border-bottom:3px solid #000; margin-bottom:15px;"></div>
-            </div>
-            
-            <div style="font-family:Arial, sans-serif; color:#000; font-size:12px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:flex-end; line-height:1.5;">
+function bukaModal(encodedData) {
+    const data = JSON.parse(decodeURIComponent(encodedData));
+    document.getElementById('modalTitle').innerText = "Rincian: " + data.nama;
+    let bodyHtml = '';
+    data.items.forEach(item => {
+        bodyHtml += `
+            <div class="detail-row">
                 <div>
-                    <strong>Nama Pelanggan:</strong> ${document.getElementById('custNama').value || "-"}<br>
-                    <strong>Alamat Kirim:</strong> ${document.getElementById('custAlamat').value || "-"}<br>
-                    <strong>No. Telepon:</strong> ${document.getElementById('custTelp').value || "-"}
+                    <div style="font-weight: bold;">${item.nama}</div>
+                    <div style="font-size: 0.8rem; color: #aaa;">Qty: ${item.qty}</div>
                 </div>
-                <div style="text-align:right;">
-                    <strong style="font-size:14px; text-decoration:underline; display:block; margin-bottom:4px; font-weight:bold; color:#000;">${title}</strong>
-                    <span style="display:block;">Tanggal: ${now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                    <span style="display:block; font-weight:bold; margin-top:2px;">No: ${invNumber}</span>
-                </div>
-            </div>
-        `;
-    }
+                <div style="font-weight: bold; color: var(--accent);">Rp ${Math.round(item.harga).toLocaleString()}</div>
+            </div>`;
+    });
+    bodyHtml += `
+        <div class="detail-row" style="border-top: 2px solid var(--accent); margin-top: 10px; padding-top: 12px; font-size: 1.1rem;">
+            <strong>TOTAL AKHIR</strong>
+            <strong style="color: #4af2a1;">Rp ${Math.round(data.total).toLocaleString()}</strong>
+        </div>`;
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('customModal').classList.add('active');
+}
 
-    function calculateCurrentItem() {
-        const L = parseFloat(document.getElementById('lebar').value) || 0;
-        const T = parseFloat(document.getElementById('tinggi').value) || 0;
-        const qty = parseInt(document.getElementById('qty').value) || 1;
-        const labelItem = document.getElementById('nama_lokasi_item').value || "Jendela";
-
-        if (L <= 0 || T <= 0) {
-            document.getElementById('current_item_price').textContent = 'Rp 0';
-            currentCalculatedObject = null;
-            return;
-        }
-
-        // Penghitungan batas acuan minimal 1 meter untuk penentuan rel/lebar pasang
-        let panjangRelAcu = L < 1 ? 1 : L;
-
-        if (currentProductMode === 'blinds') {
-            // === KALKULATOR BLINDS ===
-            const blindsName = document.getElementById('blinds_name').value || "Blinds Standard";
-            const priceM2 = parseFloat(document.getElementById('blinds_price_m2').value) || 0;
-            
-            // Aturan luas m2 minimal blinds
-            const L_hitung = L < 1 ? 1 : L;
-            const T_hitung = T < 1 ? 1 : T;
-            const luasM2 = L_hitung * T_hitung;
-            
-            let subtotalBlinds = luasM2 * priceM2 * qty;
-            
-            let dataSpekHtml = `<strong>[${labelItem}]</strong> ${blindsName} (${L}m x ${T}m) Qty:${qty} Set<br>&bull; Luas Hitung: ${luasM2.toFixed(2)} m² x ${formatRupiah(priceM2)}`;
-
-            const rows = document.querySelectorAll('.dynamic-item-row');
-            let totalAksesorisTambahan = 0;
-            
-            rows.forEach(row => {
-                const name = row.querySelector('.dyn-name').value || "Aksesoris";
-                const dQty = parseInt(row.querySelector('.dyn-qty').value) || 0;
-                const dPrice = parseFloat(row.querySelector('.dyn-price').value) || 0;
-                
-                if (dQty > 0 && dPrice > 0) {
-                    const subItem = dQty * dPrice;
-                    totalAksesorisTambahan += subItem;
-                    dataSpekHtml += `<br>&bull; Tambahan: ${name} (${dQty} Pcs x ${formatRupiah(dPrice)})`;
-                }
-            });
-
-            subtotalBlinds += totalAksesorisTambahan;
-
-            document.getElementById('current_item_price').textContent = formatRupiah(subtotalBlinds);
-            currentCalculatedObject = {
-                label: labelItem,
-                subtotal: subtotalBlinds,
-                htmlSpek: dataSpekHtml,
-                lebarAcuPasang: panjangRelAcu * qty, // <--- DISAMAKAN: Memakai Aturan Lebar Gorden Minimal 1 meter x Qty
-                lebarVitSpiralPasang: 0
-            };
-
-        } else {
-            // === KALKULATOR GORDEN KAIN ===
-            if (kainData.length === 0) return;
-
-            let hargaJahit = parseFloat(aksesorisJasa["Jahit"]) || 0;
-            let hargaStick = parseFloat(aksesorisJasa["Stick"]) || 0;
-            let hargaRollet = parseFloat(aksesorisJasa["Rollet"]) || 0;
-            let hargaRell = parseFloat(aksesorisJasa["Rell"]) || 0;
-            let hargaSmokring = parseFloat(aksesorisJasa["Smokring"]) || 0;
-            let hargaHook = parseFloat(aksesorisJasa["Hook"]) || 0;
-            let hargaTali = parseFloat(aksesorisJasa["Tali"]) || 0;
-
-            const colG = document.getElementById('gorden_color').value || "-";
-            const model = document.getElementById('model_select').value;
-            const isKain = document.getElementById('use_kain').checked && !document.getElementById('use_kain').disabled;
-            const isVitrase = document.getElementById('use_vitrase').checked && !document.getElementById('use_vitrase').disabled;
-            const modelVitrase = document.getElementById('model_vitrase_select').value;
-            const colV = document.getElementById('vitrase_color').value || "-";
-
-            const L_vit = parseFloat(document.getElementById('lebar_vit').value) || 0;
-            const T_vit = parseFloat(document.getElementById('tinggi_vit').value) || 0;
-            const qty_vit = parseInt(document.getElementById('qty_vit').value) || 1;
-
-            let subtotalJendela = 0;
-            let pemakaianKainSatuUnit = 0;
-            let totalPemakaianVitraseAll = 0;
-            let ringSmokringPcs = 0;
-
-            let txtNamaModel = document.getElementById('model_select').options[document.getElementById('model_select').selectedIndex].text;
-            let dataSpekHtml = `<strong>[${labelItem}]</strong> ${txtNamaModel} (${L}m x ${T}m) Qty:${qty} Set Varian:${colG}`;
-
-            if (isKain) {
-                const selectedKain = kainData[document.getElementById('kain_select').value];
-                let katKain = selectedKain.kategori || selectedKain.Kategori || "Bidang Besar";
-                document.getElementById('kain_kat').textContent = katKain;
-
-                if (katKain === "Bidang Besar") {
-                    pemakaianKainSatuUnit = (L + 0.2) * 3;
-                } else if (katKain === "Bidang Kecil") {
-                    pemakaianKainSatuUnit = Math.ceil((L + 0.2) / 0.4) * (T + 0.3);
-                }
-
-                if (model === 'tab_top') {
-                    pemakaianKainSatuUnit = pemakaianKainSatuUnit + 1;
-                }
-                
-                let totalKainAll = pemakaianKainSatuUnit * qty;
-                document.getElementById('kain_qty_lbl').textContent = totalKainAll.toFixed(2) + ' m';
-                
-                let hargaBahanKain = parseFloat(selectedKain.harga) || 0;
-                subtotalJendela += (totalKainAll * hargaBahanKain);
-                dataSpekHtml += `<br>&bull; Kain: ${selectedKain.nama || selectedKain.Nama} (${totalKainAll.toFixed(2)} m)`;
-            } else {
-                document.getElementById('kain_kat').textContent = '-';
-                document.getElementById('kain_qty_lbl').textContent = '0 m';
-            }
-
-            if (vitraseData.length > 0) {
-                const selectedVit = vitraseData[document.getElementById('vitrase_select').value];
-                if (model === 'spiral') {
-                    pemakaianKainSatuUnit = 0;
-                    let pemakaianVitraseSatuUnit = (L + 0.2) * 3;
-                    totalPemakaianVitraseAll = pemakaianVitraseSatuUnit * qty;
-                    dataSpekHtml += `<br>&bull; Vitrase Spiral: ${selectedVit.nama || selectedVit.Nama} (${totalPemakaianVitraseAll.toFixed(2)} m) [${colV}]`;
-                } else if (isVitrase) {
-                    if (modelVitrase === 'spiral') {
-                        if (L_vit > 0) {
-                            let pemakaianVitraseSatuUnit = (L_vit + 0.2) * 3;
-                            totalPemakaianVitraseAll = pemakaianVitraseSatuUnit * qty_vit;
-                        }
-                        dataSpekHtml += `<br>&bull; Vitrase Spiral Tambahan: ${selectedVit.nama || selectedVit.Nama} [${L_vit}x${T_vit} Qty:${qty_vit}] [${colV}]`;
-                    } else {
-                        let pemakaianVitraseSatuUnit = (L + 0.2) * 3;
-                        totalPemakaianVitraseAll = pemakaianVitraseSatuUnit * qty;
-                        dataSpekHtml += `<br>&bull; Vitrase Plisket: ${selectedVit.nama || selectedVit.Nama} (${totalPemakaianVitraseAll.toFixed(2)} m) [${colV}]`;
-                    }
-                }
-                
-                document.getElementById('vitrase_qty_lbl').textContent = totalPemakaianVitraseAll.toFixed(2) + ' m';
-                if (totalPemakaianVitraseAll > 0) {
-                    let hargaBahanVit = parseFloat(selectedVit.harga) || 0;
-                    subtotalJendela += (totalPemakaianVitraseAll * hargaBahanVit);
-                }
-            }
-
-            let biayaJahitItem = 0;
-            if (model !== 'spiral' && isKain && pemakaianKainSatuUnit > 0) {
-                biayaJahitItem += (pemakaianKainSatuUnit * qty) * hargaJahit;
-            }
-            if ((model === 'spiral' || isVitrase) && totalPemakaianVitraseAll > 0) {
-                biayaJahitItem += totalPemakaianVitraseAll * hargaJahit;
-            }
-            subtotalJendela += biayaJahitItem;
-
-            let isDoubleBracket = (isKain && isVitrase && model !== 'spiral' && modelVitrase !== 'spiral');
-            let totalBreketPcs = 2; 
-            if (panjangRelAcu >= 1.5 && panjangRelAcu < 2.5) totalBreketPcs = 3;
-            else if (panjangRelAcu >= 2.5 && panjangRelAcu < 3.5) totalBreketPcs = 4;
-            else if (panjangRelAcu >= 3.5) totalBreketPcs = Math.ceil(panjangRelAcu * 1.3);
-            let jumlahBreketEkstra = totalBreketPcs - 2;
-
-            if (model === 'ripple_fold') {
-                let rf_rail = parseFloat(aksesorisJasa["rf_rail_meter"]) || 0;
-                let rf_cup = parseFloat(aksesorisJasa["rf_end_cup"]) || 0;
-                let rf_brk = isDoubleBracket ? (parseFloat(aksesorisJasa["rf_bracket_double"]) || 0) : (parseFloat(aksesorisJasa["rf_bracket_single"]) || 0);
-                let rf_mst = parseFloat(aksesorisJasa["rf_master_carrier"]) || 0;
-                let rf_crr = parseFloat(aksesorisJasa["rf_carrier"]) || 0;
-                let rf_hok = parseFloat(aksesorisJasa["rf_hook"]) || 0;
-                let rf_chn = parseFloat(aksesorisJasa["rf_link_chain"]) || 0;
-                let rf_tap = parseFloat(aksesorisJasa["rf_tape"]) || 0;
-
-                let totalBiayaRippleFold = ((panjangRelAcu * rf_rail) + (2 * rf_cup) + (totalBreketPcs * rf_brk) + rf_mst + (Math.ceil(panjangRelAcu * 16) * rf_crr) + (Math.ceil(panjangRelAcu * 16) * rf_hok) + (panjangRelAcu * rf_chn) + ((panjangRelAcu * 2.33) * rf_tap)) * qty;
-                subtotalJendela += totalBiayaRippleFold;
-            } else if (model !== 'spiral') {
-                let hargaRelSaja = (model === 'pinch_pleat') ? hargaRell : hargaRollet;
-                
-                if (isDoubleBracket) {
-                    subtotalJendela += (panjangRelAcu * hargaRelSaja) * qty;
-                    if (modelVitrase === 'pinch_pleat') {
-                        subtotalJendela += (panjangRelAcu * hargaRell) * qty;
-                    }
-                    if (jumlahBreketEkstra > 0) {
-                        subtotalJendela += (jumlahBreketEkstra * 25000) * qty;
-                    }
-                } else {
-                    subtotalJendela += (panjangRelAcu * hargaRelSaja) * qty;
-                    if (jumlahBreketEkstra > 0) {
-                        subtotalJendela += (jumlahBreketEkstra * 15000) * qty;
-                    }
-                }
-
-                if (model === 'smokring') {
-                    ringSmokringPcs = Math.ceil(L * 24) * qty;
-                    if (ringSmokringPcs % 2 !== 0) ringSmokringPcs += 1;
-                    subtotalJendela += (ringSmokringPcs * hargaSmokring);
-                }
-
-                if (isKain) {
-                    subtotalJendela += (hargaHook + hargaTali) * qty;
-                }
-            }
-
-            if (model === 'spiral') {
-                subtotalJendela += (hargaStick * qty);
-            } else if (isVitrase && modelVitrase === 'spiral') {
-                subtotalJendela += (hargaStick * qty_vit);
-            }
-
-            document.getElementById('current_item_price').textContent = formatRupiah(subtotalJendela);
-            currentCalculatedObject = {
-                label: labelItem,
-                subtotal: subtotalJendela,
-                htmlSpek: dataSpekHtml,
-                lebarAcuPasang: panjangRelAcu * qty,
-                lebarVitSpiralPasang: (model !== 'spiral' && isVitrase && modelVitrase === 'spiral' && L_vit > 0) ? (L_vit * qty_vit) : 0
-            };
-        }
-    }
-
-    function addItemToBasket() {
-        if (!currentCalculatedObject) {
-            alert("Harap isi ukuran Lebar dan Tinggi jendela dengan benar sebelum menambahkan!");
-            return;
-        }
-        
-        basketItems.push(currentCalculatedObject);
-        
-        document.getElementById('nama_lokasi_item').value = "";
-        document.getElementById('lebar').value = "";
-        document.getElementById('tinggi').value = "";
-        document.getElementById('lebar_vit').value = "";
-        document.getElementById('tinggi_vit').value = "";
-        document.getElementById('blinds_name').value = "";
-        document.getElementById('blinds_price_m2').value = "";
-        document.getElementById('dynamic_items_container').innerHTML = "";
-        
-        renderBasketUI();
-        calculateCurrentItem();
-        renderFinalDocuments();
-    }
-
-    function removeItemFromBasket(index) {
-        basketItems.splice(index, 1);
-        renderBasketUI();
-        renderFinalDocuments();
-    }
-
-    function renderBasketUI() {
-        document.getElementById('basket_count').textContent = basketItems.length;
-        const container = document.getElementById('basket_list_container');
-        
-        if (basketItems.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-muted); text-align: center; padding: 10px; font-size: 0.85rem;">Belum ada jendela yang ditambahkan.</div>';
-            return;
-        }
-
-        let html = '';
-        basketItems.forEach((item, idx) => {
-            html += `
-                <div class="basket-item">
-                    <div style="font-size:0.85rem; max-width:75%; line-height:1.4;">
-                        ${item.htmlSpek}
-                        <div style="font-weight:bold; color:var(--accent-color); margin-top:2px;">Subtotal: ${formatRupiah(item.subtotal)}</div>
-                    </div>
-                    <button class="btn-danger" onclick="removeItemFromBasket(${idx})">🗑️ Hapus</button>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function renderFinalDocuments() {
-        let totalSubtotalGabungan = 0;
-        let totalLebarInstalasi = 0;
-        let rincianListNotaHtml = '';
-        let spkItemsHtml = '';
-
-        basketItems.forEach((item) => {
-            totalSubtotalGabungan += item.subtotal;
-            totalLebarInstalasi += item.lebarAcuPasang + item.lebarVitSpiralPasang;
-
-            rincianListNotaHtml += `
-                <div style="font-family:Arial, sans-serif; color:#000; font-size:12px; border-bottom:1px solid #eee; padding:8px 0; text-align:left;">
-                    ${item.htmlSpek}
-                    <div style="text-align:right; font-weight:bold;">Subtotal Item: ${formatRupiah(item.subtotal)}</div>
-                </div>
-            `;
-
-            spkItemsHtml += `
-                <div style="font-family:Arial, sans-serif; color:#000; font-size:12px; border-bottom:1px solid #000; padding:10px 0; text-align:left; line-height:1.4;">
-                    ${item.htmlSpek}
-                </div>
-            `;
-        });
-
-        let hargaInstalasiUnit = parseFloat(aksesorisJasa["Instalasi"]) || 0;
-        let biayaInstalasiGlobal = 0;
-        let labelPasangStatusText = "termasuk biaya aksesoris, pembuatan, dan jahit.";
-
-        if (document.getElementById('chk_instalasi').checked && basketItems.length > 0) {
-            biayaInstalasiGlobal = totalLebarInstalasi * hargaInstalasiUnit;
-            totalSubtotalGabungan += biayaInstalasiGlobal;
-            labelPasangStatusText = "termasuk biaya aksesoris, jahit/pembuatan dan jasa pasang.";
-
-            rincianListNotaHtml += `
-                <div style="font-family:Arial, sans-serif; color:#000; font-size:12px; border-bottom:1px solid #eee; padding:6px 0; text-align:left; font-weight:bold; color:#555;">
-                    &bull; Jasa Instalasi Pasang Seluruh Jendela Gorden & Blinds (Total ${totalLebarInstalasi.toFixed(2)}m)
-                    <div style="text-align:right; color:#000;">${formatRupiah(biayaInstalasiGlobal)}</div>
-                </div>
-            `;
-        }
-
-        const disPersen = parseFloat(document.getElementById('extraDiskon').value) || 0;
-        const dp = parseFloat(document.getElementById('extraDP').value) || 0;
-
-        const disNominal = totalSubtotalGabungan * (disPersen / 100);
-        const grandTotal = totalSubtotalGabungan - disNominal;
-        const sisa = grandTotal - dp;
-
-        const titleDoc = dp > 0 ? 'INVOICE PEMBAYARAN' : 'ESTIMASI BIAYA';
-        const labelCatatan = dp > 0 ? 'Batas waktu pelunasan' : 'Estimasi berlaku hingga';
-        
-        const expDate = new Date();
-        expDate.setDate(expDate.getDate() + 7);
-        const expString = expDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-        document.getElementById('grand_total').textContent = formatRupiah(grandTotal);
-
-        if (basketItems.length === 0) {
-            let emptyTemplate = `
-                <div style="background:#fff; padding:15px; font-family:Arial, sans-serif; color:#000;">
-                    ${generatePrintHeader('ESTIMASI BIAYA')}
-                    <div style="text-align:center; padding:30px; color:#666; font-style:italic; border:1px dashed #ccc;">
-                        Belum ada item gorden/blinds yang ditambahkan ke nota.
-                    </div>
-                </div>`;
-            document.body.dataset.estimasi = emptyTemplate;
-            document.body.dataset.spk = emptyTemplate;
-            document.getElementById('printArea').innerHTML = emptyTemplate;
-            return;
-        }
-
-        let finalInvoiceTemplate = `
-            <div style="background:#fff; padding:15px; font-family:Arial, sans-serif; color:#000;">
-                ${generatePrintHeader(titleDoc)}
-                <div style="margin-top:10px; border-top:1px solid #000; padding-top:5px;">
-                    ${rincianListNotaHtml}
-                </div>
-                <div style="border-top:2px solid #000; font-family:Arial; font-weight:bold; color:#000; padding-top:6px; text-align:left; margin-top:5px;">
-                    ${disPersen > 0 ? `<div style="display:flex; justify-content:space-between; color:red; font-size:12px;"><span>Diskon Global (${disPersen}%):</span><span>- ${formatRupiah(disNominal)}</span></div>` : ''}
-                    <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:2px; border-top:1px solid #000; padding-top:2px;"><span>TOTAL AKHIR :</span><span>${formatRupiah(grandTotal)}</span></div>
-                    ${dp > 0 ? `
-                    <div style="display:flex; justify-content:space-between; color:green; margin-top:2px; font-size:12px;"><span>DP / Uang Muka:</span><span>- ${formatRupiah(dp)}</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:15px; margin-top:4px; background:#f0f0f0; padding:5px; border:1px solid #ccc;"><span>SISA TAGIHAN :</span><span>${formatRupiah(sisa)}</span></div>
-                    ` : ''}
-                </div>
-                <div style="margin-top:15px; border: 1px solid #000; padding: 8px; font-weight:bold; text-align:left; font-size:11px;">
-                    <div style="text-decoration:underline; margin-bottom:2px;">Instruksi Pembayaran:</div>
-                    Bank BCA &bull; No. Rek: 0463191163 &bull; A/n: Eko Triono
-                </div>
-                <div style="margin-top:15px; color:red; font-weight:bold; font-size:10px; text-align:left;">
-                    * ${labelCatatan} ${expString}.<br>
-                    * Seluruh harga di atas sudah ${labelPasangStatusText}
-                </div>
-            </div>
-        `;
-
-        let finalSPKTemplate = `
-            <div style="background:#fff; padding:15px; font-family:Arial, sans-serif; color:#000;">
-                ${generatePrintHeader('SURAT PERINTAH KERJA WORKSHOP (SPK)')}
-                <div style="margin-top:10px; background:#000; color:#fff; font-weight:bold; padding:4px; font-size:12px; text-align:left;">
-                    DAFTAR ITEM WAJIB DIPRODUKSI:
-                </div>
-                ${spkItemsHtml}
-                <div style="display:flex; justify-content:space-between; text-align:center; font-weight:bold; margin-top:5px; font-size:11px; color:#555; padding-top:5px; border-top:1px dashed #000;">
-                    <div>Status Instalasi Pasang Lapangan: <strong>${document.getElementById('chk_instalasi').checked ? 'YA (PASANG)' : 'TIDAK (AMBIL SENDIRI)'}</strong></div>
-                    <div>Total Unit Jendela: <strong>${basketItems.length} Lokasi</strong></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; text-align:center; font-weight:bold; margin-top:50px; font-size:12px;">
-                    <div style="width:130px;">Tanda Tangan Pelanggan<br><br><br><br>(................)</div>
-                    <div style="width:130px;">Tukang Jahit / Workshop<br><br><br><br>(................)</div>
-                </div>
-            </div>
-        `;
-
-        document.body.dataset.estimasi = finalInvoiceTemplate;
-        document.body.dataset.spk = finalSPKTemplate;
-        document.getElementById('printArea').innerHTML = finalInvoiceTemplate;
-    }
-
-    function printDoc(type) {
-        if (basketItems.length === 0) {
-            alert("Keranjang nota kosong! Silakan isi ukuran gorden/blinds lalu klik 'Tambahkan Jendela ke Nota' terlebih dahulu.");
-            return;
-        }
-
-        let custName = document.getElementById('custNama').value.trim();
-        if(!custName) {
-            custName = "Pelanggan";
-        }
-
-        let fileTitle = (type === 'Estimasi') ? "inv " + custName : "spk " + custName;
-        const content = (type === 'Estimasi') ? document.body.dataset.estimasi : document.body.dataset.spk;
-        
-        let printFrame = document.getElementById('printFrame');
-        if (!printFrame) {
-            printFrame = document.createElement('iframe');
-            printFrame.id = 'printFrame';
-            printFrame.style.display = 'none';
-            document.body.appendChild(printFrame);
-        }
-        
-        const doc = printFrame.contentWindow.document;
-        doc.open();
-        doc.write(`<html><head><title>${fileTitle}</title><style>@page{margin:0.5cm;} body{margin:0; font-family:Arial, sans-serif; background:white;}</style></head><body>${content}</body></html>`);
-        doc.close();
-        
-        setTimeout(() => {
-            printFrame.contentWindow.focus();
-            printFrame.contentWindow.print();
-        }, 350);
-    }
-
-    window.onload = loadDatabase;
+function tutupModal() { document.getElementById('customModal').classList.remove('active'); }
+function tutupModalLuar(event) { if (event.target.id === 'customModal') tutupModal(); }
 </script>
+
+<!-- TOMBOL UPDATE: BISA DIKLIK LANGSUNG WALAUPUN DATA KOSONG & AMAN DIJALANKAN OFFLINE -->
+<button onclick="lanjutKeInvoice()" style="background:#28a745; color: white; width:100%; padding:15px; margin-top:20px; font-size:18px; cursor:pointer; border: none; border-radius: 6px; font-weight: bold;">LANJUT KE INVOICE</button>
+
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-  }
+function lanjutKeInvoice() {
+    let dataInvoice = [];
+    
+    // Jika ada item kalkulasi, konversi data ke format nota
+    if (list.length > 0) {
+        dataInvoice = list.map(w => {
+            let hasilHitung = hitung(w);
+            return {
+                namaItem: w.nama,
+                totalHarga: hasilHitung.total
+            };
+        });
+        // Bersihkan cache temporer kalkulator karena data sudah siap dipindah ke invoice
+        localStorage.removeItem('temp_calc_list');
+    }
+
+    // Tetap simpan ke LocalStorage (kosong ataupun ada isi akan dibaca dengan aman secara offline oleh invoice.html)
+    localStorage.setItem('invoiceItems', JSON.stringify(dataInvoice));
+    
+    // Alihkan langsung ke halaman utama invoice
+    window.location.href = 'invoice.html';
+}
 </script>
+
 </body>
 </html>
