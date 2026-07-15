@@ -1,15 +1,24 @@
 {
-  "name": "Yeny Gorden Pro",
+  "name": "Yeny Gorden Billing System",
   "short_name": "Yeny Gorden",
+  "description": "Sistem Kasir & Invoice Resmi Yeny Gorden - Custom Blinds & Curtain",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#bb86fc",
+  "background_color": "#0f172a",
+  "theme_color": "#9a3412",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://yeny-gorden.github.io/Progressive-Web-App/logo.png",
+      "src": "./logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
