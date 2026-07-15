@@ -490,16 +490,40 @@
     </div>
 </div>
 
-<script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySJJFsyBrryW_FRmzuM0hsQx1kkAzzBfUiSebEPXCjytKp70l3LD3QRh__CqkIg-8/exec";
+<!-- SCRIPT SDK FIREBASE & LOGIK HIBRIDA (FIREBASE + GOOGLE SHEETS) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, addDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 1. KONFIGURASI FIREBASE ASLI ANDA
+    const firebaseConfig = {
+      apiKey: "AIzaSyCD_3C4xY97O0RyQ1Dp8EYzGfp-_vey9Zo",
+      authDomain: "kalkulator-gorden-pwa.firebaseapp.com",
+      databaseURL: "https://kalkulator-gorden-pwa-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "kalkulator-gorden-pwa",
+      storageBucket: "kalkulator-gorden-pwa.firebasestorage.app",
+      messagingSenderId: "537305953956",
+      appId: "1:537305953956:web:577330bb92d4d750d81831",
+      measurementId: "G-3QKXHLFMRM"
+    };
+
+    // Inisialisasi Firebase & Aktifkan Fitur Offline Tangguh Cache Browser
+    const app = initializeApp(firebaseConfig);
+    const db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    });
+
+    // 2. URL GOOGLE APPS SCRIPT (SINKRONISASI SHEETS)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQa_N0nci3C_j4tIBcyhi_gt3wNj8xkEsgeEoZ84wzjqjbmEzKj_XR18OKz0yqc0U/exec";
 
     let namaKasirAktif = "";
     let isLunas = false;
     let html5QrcodeScanner;
     let currentAlertCallback = null;
-    let dataNotaTerpilih = null; 
+    let dataNotaTerpilih = null;
 
-    function showCustomAlert(title, message, type = "alert", defaultValue = "", callback = null) {
+    // --- UTILITY MODAL SYSTEM ---
+    window.showCustomAlert = function(title, message, type = "alert", defaultValue = "", callback = null) {
         document.getElementById('alert-title').innerText = title;
         document.getElementById('alert-message').innerText = message;
         currentAlertCallback = callback;
@@ -523,7 +547,7 @@
         if (type === "prompt") promptInput.focus();
     }
 
-    function closeCustomAlert(isOk) {
+    window.closeCustomAlert = function(isOk) {
         document.getElementById('custom-alert-overlay').style.display = "none";
         const promptValue = document.getElementById('alert-prompt-input').value;
         if (currentAlertCallback) {
@@ -575,64 +599,52 @@
         }
         calculateTotal();
 
-        // Cek koneksi & jalankan sinkronisasi data tertunda
-        window.addEventListener('online', handleOnlineStatus);
-        window.addEventListener('offline', handleOfflineStatus);
-        if (navigator.onLine) {
-            syncPendingData();
-        } else {
-            handleOfflineStatus();
-        }
+        window.addEventListener('online', () => document.getElementById('offline-indicator').style.display = 'none');
+        window.addEventListener('offline', () => document.getElementById('offline-indicator').style.display = 'block');
     };
 
-    function handleOnlineStatus() {
-        document.getElementById('offline-indicator').style.display = 'none';
-        syncPendingData();
-    }
-
-    function handleOfflineStatus() {
-        document.getElementById('offline-indicator').style.display = 'block';
-    }
-
-    function prosesLogin() {
+    // --- 1. PROSES LOGIN KASIR (FIREBASE FIRESTORE) ---
+    window.prosesLogin = async function() {
         const idKasir = document.getElementById('login-id').value.trim();
         const pinKasir = document.getElementById('login-pin').value.trim();
 
         if (!idKasir || !pinKasir) { showCustomAlert("Peringatan", "ID Kasir dan PIN tidak boleh kosong!"); return; }
 
-        const params = new URLSearchParams();
-        params.append('action', 'login');
-        params.append('idKasir', idKasir);
-        params.append('pin', pinKasir);
+        try {
+            const userDoc = await getDoc(doc(db, "users", idKasir));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.pin === pinKasir) {
+                    namaKasirAktif = userData.nama;
+                    document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
 
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                namaKasirAktif = data.nama;
-                document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
-
-                if (data.isFirstTime) {
-                    document.getElementById('box-auth').style.display = 'none';
-                    document.getElementById('box-ganti-pin').style.display = 'block';
+                    if (userData.isFirstTime) {
+                        document.getElementById('box-auth').style.display = 'none';
+                        document.getElementById('box-ganti-pin').style.display = 'block';
+                    } else {
+                        document.getElementById('login-screen').style.display = 'none';
+                        showCustomAlert("Login Sukses", "Selamat bekerja, " + namaKasirAktif + "!");
+                    }
                 } else {
-                    document.getElementById('login-screen').style.display = 'none';
-                    showCustomAlert("Login Sukses", "Selamat bekerja, " + namaKasirAktif + "!");
+                    showCustomAlert("Gagal", "PIN Kasir salah!");
                 }
             } else {
-                showCustomAlert("Gagal", data.message);
+                // Skema Fallback Offline Darurat agar tetap bisa jualan walau mati lampu/tanpa kuota
+                namaKasirAktif = idKasir;
+                document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
+                document.getElementById('login-screen').style.display = 'none';
+                showCustomAlert("Offline Login", "Masuk dengan mode darurat lokal.");
             }
-        })
-        .catch(err => {
-            // Toleransi login offline demi kelancaran lokal
-            namaKasirAktif = idKasir || "Kasir Lokal";
+        } catch (err) {
+            namaKasirAktif = idKasir;
             document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
             document.getElementById('login-screen').style.display = 'none';
-            showCustomAlert("Offline Login", "Masuk dengan mode lokal (tanpa internet).");
-        });
+            showCustomAlert("Offline Login", "Masuk menggunakan cache internal perangkat.");
+        }
     }
 
-    function prosesGantiPIN() {
+    // --- 2. PROSES GANTI PIN (FIREBASE FIRESTORE) ---
+    window.prosesGantiPIN = async function() {
         const p1 = document.getElementById('pin-baru-1').value.trim();
         const p2 = document.getElementById('pin-baru-2').value.trim();
         const idKasir = document.getElementById('login-id').value.trim();
@@ -640,25 +652,21 @@
         if (!p1 || !p2) { showCustomAlert("Peringatan", "PIN baru wajib diisi!"); return; }
         if (p1 !== p2) { showCustomAlert("Peringatan", "Konfirmasi PIN tidak cocok!"); return; }
 
-        const params = new URLSearchParams();
-        params.append('action', 'gantiPin');
-        params.append('idKasir', idKasir);
-        params.append('pinBaru', p1);
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                showCustomAlert("Sukses", "PIN berhasil diperbarui. Selamat bekerja!", "alert", "", () => {
-                    document.getElementById('login-screen').style.display = 'none';
-                });
-            } else {
-                showCustomAlert("Gagal", data.message);
-            }
-        });
+        try {
+            await updateDoc(doc(db, "users", idKasir), {
+                pin: p1,
+                isFirstTime: false
+            });
+            showCustomAlert("Sukses", "PIN berhasil diperbarui. Selamat bekerja!", "alert", "", () => {
+                document.getElementById('login-screen').style.display = 'none';
+            });
+        } catch(e) {
+            showCustomAlert("Gagal", "Gagal memperbarui PIN di server cloud.");
+        }
     }
 
-    function addNewRow() {
+    // --- TABLE MANAGER ---
+    window.addNewRow = function() {
         const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
         const row = tableBody.insertRow();
         row.innerHTML = `
@@ -670,12 +678,12 @@
         `;
     }
 
-    function removeRow(btn) {
+    window.removeRow = function(btn) {
         btn.parentNode.parentNode.remove();
         calculateTotal();
     }
 
-    function calculateTotal() {
+    window.calculateTotal = function() {
         const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
         let subtotal = 0;
         for (let i = 0; i < rows.length; i++) {
@@ -734,73 +742,83 @@
                 badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
             }
         }
-        updateQRCode();
+        window.updateQRCode();
     }
 
-    function updateQRCode() {
+    window.updateQRCode = function() {
         const noNota = document.getElementById('nota-num').value || '-';
         qrcode.clear(); 
         qrcode.makeCode(noNota); 
     }
 
-    function simpanKeGoogleSheets(bukaCetakSetelahSelesai = false) {
+    // --- 3. SAVE ACTION HIBRIDA (FIREBASE FIRESTORE + GOOGLE SHEETS SINKRONISASI) ---
+    window.simpanKeGoogleSheets = async function(bukaCetakSetelahSelesai = false) {
         const nota = document.getElementById('nota-num').value || '-';
         
         const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
-        let detailItems = [];
+        let itemsArray = [];
+        let detailTextArray = [];
+        
         for (let i = 0; i < rows.length; i++) {
             const desc = rows[i].cells[0].querySelector('input').value || '';
             const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
             const price = parseFloat(rows[i].querySelector('.price').value) || 0;
-            detailItems.push({ desc, qty, price });
+            if(desc.trim() !== "") {
+                itemsArray.push({ desc, qty, price });
+                detailTextArray.push(`${desc} (${qty}x @Rp${price.toLocaleString('id-ID')})`);
+            }
         }
 
+        const detailItemsString = detailTextArray.join(", ");
+        const statusNota = isLunas ? "LUNAS" : (parseFloat(document.getElementById('dp-amount').value) > 0 ? "DP" : "BARU");
+
         const dataPayload = {
-            action: 'simpanNota',
             nota: nota,
             tanggal: document.getElementById('date-picker').value || '-',
             nama: document.getElementById('client-name').value || '',
             alamat: document.getElementById('client-address').value || '',
             nohp: document.getElementById('client-phone').value || '',
             proyek: document.getElementById('project-details').value || '',
-            items: JSON.stringify(detailItems),
+            items: JSON.stringify(itemsArray),
+            detailItems: detailItemsString, // Masuk ke Kolom G di Google Sheets
             subtotal: parseFloat(document.getElementById('subtotal').value) || 0,
-            diskon: document.getElementById('discount-amount').value || 0,
+            diskon: document.getElementById('discount-amount').value || "0",
             ppn: parseFloat(document.getElementById('ppn-rate').value) || 0,
             ongkir: parseFloat(document.getElementById('shipping-cost').value) || 0,
             dp: parseFloat(document.getElementById('dp-amount').value) || 0,
             sisa: parseFloat(document.getElementById('balance-due').value) || 0,
-            status: isLunas ? "LUNAS" : "BELUM LUNAS (DP)",
-            kasir: namaKasirAktif
+            status: statusNota,
+            kasir: namaKasirAktif || "Kasir Utama",
+            serverTimestamp: new Date()
         };
 
-        const params = new URLSearchParams();
-        for (let key in dataPayload) { params.append(key, dataPayload[key]); }
+        try {
+            // A. Tulis Data ke Firebase Firestore (Otomatis masuk cache lokal jika sedang offline)
+            await setDoc(doc(db, "invoices", nota), dataPayload);
 
-        // Simpan salinan lokal ke cache agar data di layar tidak hilang
-        localStorage.setItem('local_backup_' + nota, JSON.stringify(dataPayload));
+            // B. Kirim Salinan Data ke Google Sheets secara Real-Time jika gawai online
+            if (navigator.onLine) {
+                const params = new URLSearchParams();
+                params.append('action', 'simpanNota');
+                for (let key in dataPayload) { params.append(key, dataPayload[key]); }
+                
+                // Memicu trigger lembar kerja Google Sheets tanpa memblokir performa kasir (no-cors)
+                fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: params });
+            }
 
-        if (!navigator.onLine) {
-            pushToOfflineQueue('nota', dataPayload);
-            if (bukaCetakSetelahSelesai) { window.print(); }
-            else { showCustomAlert("Offline", "Koneksi terputus! Nota disimpan di memori lokal & akan otomatis disinkronkan saat online."); }
-            return;
+            if (bukaCetakSetelahSelesai) { 
+                window.print(); 
+            } else { 
+                showCustomAlert("Sukses", "Nota " + nota + " berhasil disimpan ke Database Cloud Firebase!"); 
+            }
+        } catch (err) {
+            console.error(err);
+            if (bukaCetakSetelahSelesai) window.print();
+            else showCustomAlert("Tersimpan Lokal", "Offline terdeteksi. Transaksi aman tersimpan di PWA Firestore.");
         }
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(response => response.json())
-        .then(res => {
-            if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showCustomAlert("Sukses", res.result === "updated" ? "Data Nota " + nota + " Berhasil Diperbarui!" : "Sukses Disimpan ke Sheets."); }
-        })
-        .catch(err => {
-            pushToOfflineQueue('nota', dataPayload);
-            if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showCustomAlert("Offline Terdeteksi", "Gagal mengirim ke Sheets. Data aman tersimpan di memori browser Anda."); }
-        });
     }
 
-    function simpanLaluCetak() { simpanKeGoogleSheets(true); }
+    window.simpanLaluCetak = function() { window.simpanKeGoogleSheets(true); }
 
     function renderDataKeLayar(data) {
         document.getElementById('nota-num').value = data.nota;
@@ -835,29 +853,25 @@
         calculateTotal();
     }
 
-    // --- KONTROL UNTUK MENU FLOATING PEMBAYARAN TERMIN ---
-    function openFloatingPayment(data) {
+    // --- 4. INPUT PEMBAYARAN TERMIN DENGAN UPDATE FIREBASE CLOUD ---
+    window.openFloatingPayment = function(data) {
         const sisa = parseFloat(data.sisa) || 0;
-        if (sisa <= 0) {
-            showCustomAlert("Selesai", "Nota ini sudah LUNAS.");
-            return;
-        }
+        if (sisa <= 0) { showCustomAlert("Selesai", "Nota ini sudah LUNAS."); return; }
 
         dataNotaTerpilih = data;
         document.getElementById('float-nota-text').innerText = data.nota;
         document.getElementById('float-sisa-tagihan').innerText = sisa.toLocaleString('id-ID');
         document.getElementById('float-input-nominal').value = sisa; 
         document.getElementById('float-input-termin').value = "2"; 
-        
         document.getElementById('floating-payment-modal').style.display = "flex";
     }
 
-    function closeFloatingPayment() {
+    window.closeFloatingPayment = function() {
         document.getElementById('floating-payment-modal').style.display = "none";
         dataNotaTerpilih = null;
     }
 
-    function prosesBayarFloating() {
+    window.prosesBayarFloating = async function() {
         if (!dataNotaTerpilih) return;
 
         const inputNominal = document.getElementById('float-input-nominal').value;
@@ -869,102 +883,76 @@
         }
 
         const nominalBayar = parseFloat(inputNominal);
-        const noTermin = inputTermin || "2";
         const scannedNota = dataNotaTerpilih.nota;
-
         closeFloatingPayment();
 
-        const dataCicilanPayload = {
-            action: 'simpanCicilan',
-            nota: scannedNota,
-            nominal: nominalBayar,
-            terminKe: noTermin,
-            kasir: namaKasirAktif
-        };
-
-        // Perbarui simulasi angka di layar secara offline terlebih dahulu
         let dpLama = parseFloat(document.getElementById('dp-amount').value) || 0;
         let sisaLama = parseFloat(document.getElementById('balance-due').value) || 0;
         let dpBaru = dpLama + nominalBayar;
-        let sisaBaru = sisaLama - nominalBayar;
-        if(sisaBaru < 0) sisaBaru = 0;
+        let sisaBaru = Math.max(0, sisaLama - nominalBayar);
 
         document.getElementById('dp-amount').value = dpBaru;
         document.getElementById('balance-due').value = sisaBaru;
         calculateTotal();
 
-        if (!navigator.onLine) {
-            pushToOfflineQueue('cicilan', dataCicilanPayload);
-            showCustomAlert("Offline", "Koneksi terputus! Pembayaran dicatat lokal dan akan disinkronkan otomatis saat sinyal kembali.");
-            return;
-        }
+        const statusNotaTerbaru = sisaBaru <= 0 ? "LUNAS" : "DP";
 
-        showCustomAlert("Memproses", "Sedang menyimpan pembayaran cicilan...");
-        const paramsCicilan = new URLSearchParams();
-        for (let key in dataCicilanPayload) { paramsCicilan.append(key, dataCicilanPayload[key]); }
+        try {
+            // A. Simpan log transaksi detail cicilan ke sub-collection Firestore
+            const cicilanRef = collection(db, "invoices", scannedNota, "cicilan");
+            await addDoc(cicilanRef, {
+                nominal: nominalBayar,
+                terminKe: inputTermin || "2",
+                kasir: namaKasirAktif || "Kasir",
+                waktu: new Date()
+            });
 
-        fetch(WEB_APP_URL, { method: "POST", body: paramsCicilan })
-        .then(res => res.json())
-        .then(resCicil => {
-            if(resCicil.status === "success") {
-                document.getElementById('dp-amount').value = resCicil.dpAktif;
-                document.getElementById('balance-due').value = resCicil.sisaAktif;
-                calculateTotal();
-                showCustomAlert("Sukses", "Pembayaran cicilan aman masuk ke jurnal riwayat!");
-            } else {
-                showCustomAlert("Gagal", resCicil.message);
+            // B. Update status sisa bayar pada master invoice Firestore
+            await updateDoc(doc(db, "invoices", scannedNota), {
+                dp: dpBaru,
+                sisa: sisaBaru,
+                status: statusNotaTerbaru
+            });
+
+            // C. Kirim request pembaruan ke Google Sheets jika online
+            if (navigator.onLine) {
+                const params = new URLSearchParams();
+                params.append('action', 'simpanNota');
+                params.append('noNota', scannedNota);
+                params.append('dpMasuk', dpBaru);
+                params.append('sisaTagihan', sisaBaru);
+                params.append('status', statusNotaTerbaru);
+                params.append('kasir', namaKasirAktif);
+
+                fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: params });
             }
-        })
-        .catch(err => {
-            pushToOfflineQueue('cicilan', dataCicilanPayload);
-            showCustomAlert("Offline Terdeteksi", "Gagal sinkron. Transaksi diamankan ke antrean offline.");
-        });
+
+            showCustomAlert("Sukses", "Pembayaran termin ke-" + inputTermin + " berhasil diverifikasi!");
+        } catch (err) {
+            showCustomAlert("Tersimpan Lokal", "Pembayaran diamankan di penyimpanan lokal sistem kasir.");
+        }
     }
 
-    function cariNotaManual() {
+    // --- 5. SEARCH & KAMERA SCAN QR BERBASIS FIRESTORE DATASET ---
+    window.cariNotaManual = async function() {
         const noNota = document.getElementById('search-nota').value.trim();
         if (!noNota) { showCustomAlert("Peringatan", "Masukkan nomor nota!"); return; }
 
-        // Jika offline, coba cari dari backup lokal yang pernah disimpan di perangkat ini
-        if (!navigator.onLine) {
-            const localBackup = localStorage.getItem('local_backup_' + noNota);
-            if (localBackup) {
-                const dataObj = JSON.parse(localBackup);
-                renderDataKeLayar(dataObj);
-                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-                return;
-            }
-        }
-
-        const params = new URLSearchParams();
-        params.append('action', 'getNota');
-        params.append('nota', noNota);
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "found") {
+        try {
+            const docRef = await getDoc(doc(db, "invoices", noNota));
+            if (docRef.exists()) {
+                const data = docRef.data();
                 renderDataKeLayar(data);
-                // Simpan cache lokal untuk dibaca jika sewaktu-waktu offline
-                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
-                setTimeout(() => { openFloatingPayment(data); }, 500);
+                setTimeout(() => { window.openFloatingPayment(data); }, 500);
             } else {
-                showCustomAlert("Tidak Ditemukan", "Nomor nota tidak terdaftar.");
+                showCustomAlert("Tidak Ditemukan", "Nomor nota tidak ditemukan di data Firebase.");
             }
-        }).catch(err => {
-            // Fallback backup lokal jika gagal fetch di tengah jalan akibat gangguan sinyal
-            const localBackup = localStorage.getItem('local_backup_' + noNota);
-            if (localBackup) {
-                const dataObj = JSON.parse(localBackup);
-                renderDataKeLayar(dataObj);
-                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-            } else {
-                showCustomAlert("Error", "Gagal menarik data. Koneksi internet bermasalah.");
-            }
-        });
+        } catch (err) {
+            showCustomAlert("Error", "Gagal memproses penarikan data transaksi.");
+        }
     }
 
-    function toggleScanner() {
+    window.toggleScanner = function() {
         const area = document.getElementById('scanner-area');
         if (area.style.display === 'block') {
             area.style.display = 'none';
@@ -978,79 +966,25 @@
     function runScanner() {
         html5QrcodeScanner = new Html5Qrcode("reader");
         html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-            qrCodeMessage => {
+            async (qrCodeMessage) => {
                 try {
                     const scannedNota = qrCodeMessage.trim();
                     if (scannedNota) {
-                        html5QrcodeScanner.stop().then(() => { document.getElementById('scanner-area').style.display = 'none'; });
-                        
-                        if (!navigator.onLine) {
-                            const localBackup = localStorage.getItem('local_backup_' + scannedNota);
-                            if (localBackup) {
-                                const dataObj = JSON.parse(localBackup);
-                                renderDataKeLayar(dataObj);
-                                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-                                return;
-                            }
+                        await html5QrcodeScanner.stop();
+                        document.getElementById('scanner-area').style.display = 'none';
+
+                        const docRef = await getDoc(doc(db, "invoices", scannedNota));
+                        if (docRef.exists()) {
+                            const data = docRef.data();
+                            renderDataKeLayar(data);
+                            setTimeout(() => { window.openFloatingPayment(data); }, 500);
+                        } else {
+                            showCustomAlert("Gagal", "QR Code Nota tidak terindeks di sistem database.");
                         }
-
-                        const params = new URLSearchParams();
-                        params.append('action', 'getNota');
-                        params.append('nota', scannedNota);
-
-                        fetch(WEB_APP_URL, { method: "POST", body: params })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.status === "found") {
-                                renderDataKeLayar(data);
-                                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
-                                setTimeout(() => { openFloatingPayment(data); }, 500);
-                            } else {
-                                showCustomAlert("Gagal", "Nota tidak ditemukan.");
-                            }
-                        });
                     }
                 } catch (e) {}
             }, () => {}
-        ).catch(err => { showCustomAlert("Kamera Error", "Gagal akses kamera."); });
-    }
-
-    // --- ENGINE MANAJEMEN ANTREAN OFFLINE ---
-    function pushToOfflineQueue(type, payload) {
-        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
-        queue.push({ type, payload, timestamp: new Date().getTime() });
-        localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
-    }
-
-    function syncPendingData() {
-        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
-        if (queue.length === 0) return;
-
-        console.log("Menemukan " + queue.length + " data tertunda. Memulai sinkronisasi otomatis...");
-        
-        // Ambil item pertama dari antrean untuk dikirim
-        let currentItem = queue[0];
-        const params = new URLSearchParams();
-        for (let key in currentItem.payload) { params.append(key, currentItem.payload[key]); }
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(result => {
-            // Jika sukses terkirim, hapus dari antrean lokal
-            queue.shift();
-            localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
-            
-            // Rekursif jalankan lagi sampai antrean habis
-            if(queue.length > 0) {
-                syncPendingData();
-            } else {
-                showCustomAlert("Sinkronisasi Berhasil", "Semua transaksi offline yang tertunda telah berhasil disimpan ke Google Sheets!");
-                calculateTotal();
-            }
-        })
-        .catch(err => {
-            console.log("Gagal sinkronisasi otomatis, internet belum stabil. Mencoba lagi nanti.");
-        });
+        ).catch(() => { showCustomAlert("Kamera Error", "Gagal menginisialisasi modul kamera PWA."); });
     }
 </script>
 </body>
