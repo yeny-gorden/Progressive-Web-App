@@ -113,7 +113,9 @@
             text-align: center;
         }
         .login-box input:focus { border-color: var(--accent); outline: none; }
-        .login-box button {
+        
+        /* --- ANIMATED BUTTON LOGIC --- */
+        .login-box button.btn-animate {
             width: 100%;
             padding: 12px;
             background: var(--accent);
@@ -123,6 +125,41 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(154, 52, 18, 0.2), 0 2px 4px -1px rgba(154, 52, 18, 0.1);
+        }
+        .login-box button.btn-animate:hover {
+            background: #b43e17;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(154, 52, 18, 0.4), 0 4px 6px -2px rgba(154, 52, 18, 0.2);
+        }
+        .login-box button.btn-animate:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(154, 52, 18, 0.2);
+        }
+        /* Efek Berkilau Glimmer / Shimmer */
+        .login-box button.btn-animate::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+            animation: shimmerEffect 4s infinite linear;
+        }
+        @keyframes shimmerEffect {
+            0% { left: -60%; }
+            30% { left: 140%; }
+            100% { left: 140%; }
         }
 
         .invoice-container {
@@ -167,7 +204,7 @@
         .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
         .brand-section p { margin: 4px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
         .nib-text { color: #334155 !important; font-weight: 500 !important; }
-
+
         .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
         .meta-inputs { font-weight: 700; color: var(--primary); }
         .meta-inputs div { margin-bottom: 5px; }
@@ -325,7 +362,7 @@
         <p>Yeny Gorden Billing System</p>
         <input type="text" id="login-id" placeholder="Masukan ID Kasir">
         <input type="password" id="login-pin" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric">
-        <button onclick="prosesLogin()">Masuk Aplikasi</button>
+        <button class="btn-animate" onclick="prosesLogin()">Masuk Aplikasi</button>
     </div>
 
     <div class="login-box" id="box-ganti-pin" style="display: none;">
@@ -333,7 +370,7 @@
         <p>Demi privasi, wajib ganti PIN bawaan Anda sekarang.</p>
         <input type="password" id="pin-baru-1" placeholder="Masukkan PIN Baru" pattern="[0-9]*" inputmode="numeric">
         <input type="password" id="pin-baru-2" placeholder="Ulangi PIN Baru" pattern="[0-9]*" inputmode="numeric">
-        <button onclick="prosesGantiPIN()">Simpan & Amankan</button>
+        <button class="btn-animate" onclick="prosesGantiPIN()">Simpan & Amankan</button>
     </div>
 </div>
 
