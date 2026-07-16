@@ -3,726 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Resmi - Yeny Gorden</title>
-    
-    <!-- Link PWA & Icon -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./logo.png">
-    <link rel="apple-touch-icon" href="./logo.png">
-    <meta name="theme-color" content="#9a3412">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>Sistem Invoice & Estimasi Mandiri</title>
     <style>
         :root {
-            --primary: #0f172a;       
-            --accent: #9a3412;        
-            --success: #166534;       
-            --text-main: #1e293b;     
-            --bg-light: #f8fafc;
-            --border: #94a3b8;        
+            --primary: #2563eb;
+            --success: #16a34a;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #cbd5e1;
         }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #cbd5e1;
-            color: var(--text-main);
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        /* --- STYLE CUSTOM ALERT MODAL --- */
-        #custom-alert-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .alert-box {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            text-align: center;
-            border-top: 6px solid var(--accent);
-            animation: slideIn 0.25s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .alert-box h3 { margin: 0 0 12px 0; color: var(--primary); font-weight: 800; font-size: 18px; }
-        .alert-box p { color: #475569; font-size: 15px; margin: 0 0 25px 0; font-weight: 500; line-height: 1.5; }
-        .alert-buttons { display: flex; justify-content: center; gap: 10px; }
-        .alert-btn-ok { background: var(--accent); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
-        .alert-btn-cancel { background: #e2e8f0; color: var(--primary); border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
-        
-        #alert-prompt-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 15px;
-            text-align: center;
-            font-weight: 600;
-            box-sizing: border-box;
-            display: none;
-        }
-        #alert-prompt-input:focus { border-color: var(--accent); outline: none; }
-
-        /* --- STYLE SYSTEM LOGIN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .login-box h2 { margin: 0 0 10px 0; color: var(--primary); font-weight: 800; }
-        .login-box p { color: #64748b; font-size: 14px; margin: 0 0 25px 0; }
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .login-box input:focus { border-color: var(--accent); outline: none; }
-        
-        /* --- ANIMATED BUTTON LOGIC --- */
-        .login-box button.btn-animate {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(154, 52, 18, 0.2), 0 2px 4px -1px rgba(154, 52, 18, 0.1);
-        }
-        .login-box button.btn-animate:hover {
-            background: #b43e17;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(154, 52, 18, 0.4), 0 4px 6px -2px rgba(154, 52, 18, 0.2);
-        }
-        .login-box button.btn-animate:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(154, 52, 18, 0.2);
-        }
-        /* Efek Berkilau Glimmer / Shimmer */
-        .login-box button.btn-animate::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 30%;
-            height: 200%;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.3) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(25deg);
-            animation: shimmerEffect 4s infinite linear;
-        }
-        @keyframes shimmerEffect {
-            0% { left: -60%; }
-            30% { left: 140%; }
-            100% { left: 140%; }
-        }
-
-        .invoice-container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            position: relative; 
-            overflow: hidden;
-        }
-
-        .stamp-lunas {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            border: 6px double #dc2626;
-            color: #dc2626;
-            font-size: 70px;
-            font-weight: 900;
-            padding: 10px 40px;
-            border-radius: 15px;
-            opacity: 0.18; 
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            pointer-events: none;
-            display: none; 
-            z-index: 99;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 30px;
-            margin-bottom: 35px;
-        }
-
-        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
-        .brand-section p { margin: 4px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
-        .nib-text { color: #334155 !important; font-weight: 500 !important; }
-
-        .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
-        .meta-inputs { font-weight: 700; color: var(--primary); }
-        .meta-inputs div { margin-bottom: 5px; }
-        .meta-inputs input { border: 1px solid transparent; text-align: right; font-size: 15px; padding: 4px; width: 190px; font-weight: 700; color: var(--primary); background: transparent; }
-        .meta-inputs input:focus { border-color: var(--border); background: var(--bg-light); outline: none; }
-
-        .details-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .info-card { background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border); }
-        .info-card h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--accent); font-weight: 800; letter-spacing: 0.5px; }
-        
-        .info-card input, .info-card textarea { 
-            width: 100%; 
-            background: transparent; 
-            border: 1px solid transparent; 
-            padding: 6px 0; 
-            font-size: 15px; 
-            color: var(--primary); 
-            font-weight: 600;
-        }
-        .info-card input::placeholder, .info-card textarea::placeholder { color: #64748b; font-weight: 400; }
-        .info-card input:focus, .info-card textarea:focus { border-bottom: 2px solid var(--primary); outline: none; background: #fff; }
-
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid var(--primary); }
-        th { background-color: var(--primary); color: #ffffff; padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 2px solid #e2e8f0; }
-        td input { width: 100%; border: 1px solid transparent; padding: 6px; font-size: 15px; font-weight: 600; color: var(--primary); background: transparent; }
-        td input:focus { background: var(--bg-light); border-color: var(--border); outline: none; }
-        .align-right input { text-align: right; font-weight: 700; }
-
-        .table-actions-row { display: flex; justify-content: flex-start; margin-bottom: 25px; }
-
-        .invoice-summary-section { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .summary-box { width: 360px; border: 2px solid var(--border); padding: 15px; border-radius: 8px; background: var(--bg-light); }
-        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; align-items: center; font-weight: 700; color: var(--primary); }
-        .summary-row input { text-align: right; border: 1px solid transparent; font-size: 15px; width: 150px; font-weight: 800; color: var(--primary); background: transparent; }
-        .summary-row input:focus { background: #fff; border-color: var(--border); outline: none; }
-        .grand-total-row { border-top: 3px solid var(--primary); margin-top: 8px; padding-top: 14px; font-size: 18px; font-weight: 800; }
-
-        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed var(--border); padding-top: 30px; position: relative; }
-        .terms { font-size: 13px; color: #1e293b; max-width: 420px; font-weight: 500; line-height: 1.5; }
-        .signature-qr-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
-
-        #qrcode { display: block; width: 150px; height: 150px; }
-
-        .thanks-note {
-            text-align: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-            font-style: italic;
-            margin-top: 40px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 15px;
-            letter-spacing: 0.3px;
-        }
-
-        #scanner-area {
-            max-width: 850px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 3px dashed var(--accent);
-            display: none;
-        }
-
-        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-        .action-left { display: flex; gap: 5px; align-items: center; }
-        .action-right { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; white-space: nowrap; }
-        .btn-add { background-color: #e2e8f0; color: var(--primary); border: 2px solid var(--border); padding: 8px 16px; font-size: 14px; }
-        .btn-print { background-color: var(--accent); color: #fff; }
-        .btn-scan { background-color: var(--primary); color: #fff; }
-        .btn-delete { background: transparent; color: #dc2626; font-size: 13px; font-weight: 700; }
-        .btn:hover { opacity: 0.9; }
-
-        #status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 800;
-            background-color: #fef3c7;
-            color: #b45309;
-            margin-top: 5px;
-            border: 1px solid #f59e0b;
-        }
-
-        #active-cashier-info {
-            font-size: 13px;
-            color: var(--primary);
-            font-weight: 700;
-            margin-top: 5px;
-            background: #e2e8f0;
-            padding: 4px 10px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        /* --- NOTIFIKASI INDIKATOR OFFLINE --- */
-        #offline-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #dc2626;
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 99999;
-            display: none;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @media print {
-            body { background: #fff; padding: 0; }
-            .invoice-container { box-shadow: none; padding: 0; width: 100%; }
-            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen, .table-actions-row, #custom-alert-overlay, #floating-payment-modal, #offline-indicator { display: none !important; }
-            input, textarea { border: none !important; background: transparent !important; pointer-events: none; color: #000 !important; }
-            .info-card { border: 2px solid #000; }
-            table { border: 2px solid #000; }
-            th { background-color: #000 !important; color: #fff !important; }
-            td { border-bottom: 1px solid #000; }
-            .summary-box { border: 2px solid #000; }
-            .stamp-lunas { opacity: 0.25 !important; } 
-            #qrcode-container {
-                border: 2px solid #000000 !important;
-                background: #ffffff !important;
-            }
-            #qrcode img { display: block !important; }
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f1f5f9; margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 900px; background: #fff; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: relative; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+        .invoice-title-area { text-align: right; }
+        h2 { margin: 0; font-size: 2rem; color: var(--primary); }
+        .badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid transparent; margin-top: 5px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+        th { background-color: var(--light); }
+        .btn { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-danger { background: #dc2626; }
+        .btn-success { background: var(--success); }
+        .summary-area { width: 50%; margin-left: auto; margin-top: 20px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+        .summary-row input { width: 60%; text-align: right; }
+        .stamp { position: absolute; top: 150px; right: 50px; border: 4px dashed var(--success); color: var(--success); font-size: 2rem; font-weight: 800; padding: 10px 20px; transform: rotate(-15deg); border-radius: 8px; display: none; opacity: 0.8; user-select: none; }
+        #qrcode { margin-top: 15px; display: flex; justify-content: flex-end; }
     </style>
+    <!-- Library QRCode Mandiri -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-<div id="offline-indicator">⚠️ Mode Offline: Koneksi internet terputus. Data disimpan lokal.</div>
+<div class="container">
+    <!-- Cap Lunas Otomatis -->
+    <div id="stamp" class="stamp">LUNAS</div>
 
-<div id="custom-alert-overlay">
-    <div class="alert-box">
-        <h3 id="alert-title">Notifikasi</h3>
-        <p id="alert-message">Pesan teks di sini...</p>
-        <input type="text" id="alert-prompt-input">
-        <div class="alert-buttons">
-            <button id="alert-btn-cancel" class="alert-btn-cancel" onclick="closeCustomAlert(false)">Batal</button>
-            <button id="alert-btn-ok" class="alert-btn-ok" onclick="closeCustomAlert(true)">Oke</button>
+    <div class="header">
+        <div>
+            <h3>NAMA PERUSAHAAN ANDA</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Alamat Kantor Pembuat Nota, No. HP / Email</p>
+        </div>
+        <div class="invoice-title-area">
+            <!-- ID Judul Ditambahkan di Sini untuk Perubahan Dinamis -->
+            <h2 id="invoice-title">INVOICE</h2>
+            <div id="status-badge" class="badge">STATUS: BARU (DRAFT)</div>
         </div>
     </div>
-</div>
 
-<div id="login-screen">
-    <div class="login-box" id="box-auth">
-        <h2>KASIR LOGIN</h2>
-        <p>Yeny Gorden Billing System</p>
-        <input type="text" id="login-id" placeholder="Masukan ID Kasir">
-        <input type="password" id="login-pin" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric">
-        <button class="btn-animate" onclick="prosesLogin()">Masuk Aplikasi</button>
-    </div>
-
-    <div class="login-box" id="box-ganti-pin" style="display: none;">
-        <h2>GANTI PIN AMAN</h2>
-        <p>Demi privasi, wajib ganti PIN bawaan Anda sekarang.</p>
-        <input type="password" id="pin-baru-1" placeholder="Masukkan PIN Baru" pattern="[0-9]*" inputmode="numeric">
-        <input type="password" id="pin-baru-2" placeholder="Ulangi PIN Baru" pattern="[0-9]*" inputmode="numeric">
-        <button class="btn-animate" onclick="prosesGantiPIN()">Simpan & Amankan</button>
-    </div>
-</div>
-
-<div id="scanner-area">
-    <h3 style="margin-top: 0; color: var(--accent); font-weight: 800;">Kamera Scanner Yeny Gorden</h3>
-    <p style="font-size: 14px; color: #334155; font-weight: 500;">Arahkan kamera ke QR Code nota pelanggan untuk pelunasan termin.</p>
-    <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-    <button class="btn btn-delete" style="display: block; margin: 10px auto 0 auto;" onclick="toggleScanner()">Tutup Kamera</button>
-</div>
-
-<div class="invoice-container">
-    <div id="stamp" class="stamp-lunas">LUNAS</div>
-
-    <div class="invoice-header">
-        <div class="brand-section">
-            <h1>YENY GORDEN</h1>
-            <p style="font-style: italic; font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 20px;">custom blinds & curtain</p>
-            <p>JL. Jend. Sudirman Berkoh - Purwokerto 53146</p>
-            <p>Tlp. 089504215020 | Email: yenygorden@gmail.com</p>
-            <p class="nib-text">NIB: 3006260016473</p>
-        </div>
-        <div class="invoice-title-block">
-            <div class="invoice-meta-title">
-                <h2>INVOICE</h2>
-                <div class="meta-inputs">
-                    <div>No Nota: <input type="text" id="nota-num" value="" oninput="updateQRCode()"></div>
-                    <div>Tanggal: <input type="date" id="date-picker"></div>
-                </div>
-                <div id="status-badge">STATUS: BARU (DRAFT)</div>
-                <br>
-                <div id="active-cashier-info">Kasir: <span id="txt-nama-kasir">-</span></div>
+    <div class="grid-2">
+        <div>
+            <div class="form-group">
+                <label>Nomor Nota / Invoice</label>
+                <input type="text" id="invoice-number" placeholder="Contoh: INV-2026-001">
+            </div>
+            <div class="form-group">
+                <label>Tanggal Nota</label>
+                <input type="date" id="invoice-date">
             </div>
         </div>
-    </div>
-
-    <div class="details-grid">
-        <div class="info-card">
-            <h3>Diterbitkan Kepada:</h3>
-            <input type="text" id="client-name" placeholder="Nama Pelanggan" style="font-weight: 700; font-size: 16px;">
-            <textarea id="client-address" rows="2" placeholder="Alamat lengkap pemasangan"></textarea>
-            <input type="text" id="client-phone" placeholder="No. HP / WhatsApp">
-        </div>
-        <div class="info-card">
-            <h3>Detail & Spesifikasi Proyek:</h3>
-            <textarea id="project-details" rows="4" placeholder="Catatan Model Gorden & Kain"></textarea>
+        <div>
+            <div class="form-group">
+                <label>Pelanggan / Kepada Yth.</label>
+                <input type="text" id="customer-name" placeholder="Nama Pelanggan">
+            </div>
+            <div class="form-group">
+                <label>Kontak Pelanggan</label>
+                <input type="text" id="customer-contact" placeholder="No. HP / Alamat">
+            </div>
         </div>
     </div>
 
     <table id="invoice-table">
         <thead>
             <tr>
-                <th style="width: 45%; text-align: left;">Deskripsi Pesanan</th>
-                <th style="width: 10%; text-align: right;">Jumlah</th>
-                <th style="width: 20%; text-align: right;">Harga Satuan (Rp)</th>
-                <th style="width: 20%; text-align: right;">Total (Rp)</th>
-                <th class="th-action" style="width: 5%;"></th>
+                <th>Deskripsi Item / Layanan</th>
+                <th style="width: 100px;">Qty</th>
+                <th style="width: 150px;">Harga Satuan</th>
+                <th style="width: 150px;">Total</th>
+                <th style="width: 80px;">Aksi</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Data item gorden masuk disini -->
+            <tr>
+                <td><input type="text" class="desc" placeholder="Nama barang/jasa"></td>
+                <td><input type="number" class="qty" value="1" oninput="calculateTotal()"></td>
+                <td><input type="number" class="price" value="0" oninput="calculateTotal()"></td>
+                <td><input type="number" class="row-total" value="0" readonly></td>
+                <td><button class="btn btn-danger" onclick="deleteRow(this)">Hapus</button></td>
+            </tr>
         </tbody>
     </table>
 
-    <div class="table-actions-row">
-        <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
-    </div>
+    <button class="btn" onclick="addRow()">+ Tambah Item</button>
 
-    <div class="invoice-summary-section">
-        <div class="summary-box">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <div>Rp <input type="number" id="subtotal" value="0" readonly></div>
-            </div>
-            <div class="summary-row" style="color: #dc2626;">
-                <span>Diskon <span id="discount-label"></span></span>
-                <div>Rp <input type="number" id="discount-amount" placeholder="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row">
-                <span>PPN (%)</span>
-                <div><input type="number" id="ppn-rate" value="0" min="0" oninput="calculateTotal()" style="width: 60px;"> %</div>
-            </div>
-            <div class="summary-row">
-                <span>Ongkos Kirim</span>
-                <div>Rp <input type="number" id="shipping-cost" value="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row" style="color: var(--success);">
-                <span>Total Masuk (DP/Cicilan)</span>
-                <div>Rp <input type="number" id="dp-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row grand-total-row">
-                <span>Sisa Tagihan</span>
-                <div style="color: var(--accent);">Rp <input type="number" id="balance-due" value="0" readonly style="color: var(--accent); font-size: 18px;"></div>
-            </div>
+    <div class="summary-area">
+        <div class="summary-row">
+            <label>Subtotal</label>
+            <input type="number" id="subtotal" value="0" readonly>
         </div>
-    </div>
-
-    <div class="invoice-footer">
-        <div class="terms">
-            <p style="margin: 0 0 5px 0; font-weight: 700; color: var(--primary);">Syarat & Ketentuan:</p>
-            <p style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.<br>
-            3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan.</p>
+        <div class="summary-row">
+            <label>Diskon <span id="discount-label" style="font-size: 0.8rem; color: var(--primary);"></span></label>
+            <input type="text" id="discount-amount" placeholder="0 atau 10%" oninput="calculateTotal()">
+        </div>
+        <div class="summary-row">
+            <label>PPN (%)</label>
+            <input type="number" id="ppn-rate" value="0" min="0" oninput="calculateTotal()">
+        </div>
+        <div class="summary-row">
+            <label>Biaya Pengiriman</label>
+            <input type="number" id="shipping-cost" value="0" oninput="calculateTotal()">
+        </div>
+        <div class="summary-row" style="border-top: 1px solid var(--border); padding-top: 8px;">
+            <label><strong>Total Akhir</strong></label>
+            <input type="number" id="grand-total" value="0" readonly style="font-weight: bold;">
+        </div>
+        <div class="summary-row">
+            <label>Total Masuk (DP/Cicilan)</label>
+            <input type="number" id="dp-amount" value="0" oninput="calculateTotal()">
+        </div>
+        <div class="summary-row" style="color: #dc2626;">
+            <label><strong>Sisa Pembayaran</strong></label>
+            <input type="number" id="balance-due" value="0" readonly style="font-weight: bold; color: #dc2626;">
         </div>
         
-        <div class="signature-qr-wrap" style="page-break-inside: avoid;">
-            <div id="qrcode-container" style="position: relative; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; padding: 6px; border-radius: 8px; border: 2px solid #0f172a; width: 150px; height: 150px; box-sizing: content-box;">
-                <div id="qrcode"></div>
-                <img src="https://raw.githubusercontent.com/yeny-gorden/Invoice-Calculator/base/logo.png" style="position: absolute; width: 38px; height: 38px; border: 3px solid #ffffff; background: #ffffff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.15); top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            </div>
-            <p style="margin-top: 10px; font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Yeny Gorden</p>
-        </div>
-    </div>
-    
-    <div class="thanks-note">
-        "Terima Kasih Telah Mempercayakan Keindahan Hunian Anda Kepada Kami"
+        <!-- Area Barcode/QRCode -->
+        <div id="qrcode"></div>
     </div>
 </div>
 
-<div class="action-bar">
-    <div class="action-left">
-        <input type="text" id="search-nota" placeholder="No. Nota..." style="padding: 10px; border-radius: 4px; border: 1px solid #94a3b8; font-size: 14px;">
-        <button class="btn btn-scan" style="padding: 10px 20px;" onclick="cariNotaManual()">Cari</button>
-    </div>
-    <div class="action-right">
-        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR</button>
-        <button class="btn btn-print" onclick="simpanLaluCetak()">Cetak / Simpan PDF</button>
-    </div>
-</div>
-
-<!-- --- FLOATING MENU INPUT PEMBAYARAN TERMIN --- -->
-<div id="floating-payment-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; justify-content: center; align-items: center;">
-    <div style="background: #ffffff; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 6px solid #166534;">
-        <h3 id="float-modal-title" style="margin: 0 0 5px 0; color: #0f172a; font-weight: 800; font-size: 18px;">Input Pembayaran Termin</h3>
-        <p id="float-modal-subtitle" style="margin: 0 0 15px 0; color: #64748b; font-size: 13px; font-weight: 600;">Nota: <span id="float-nota-text">-</span></p>
-        
-        <div style="margin-bottom: 12px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Sisa Tagihan Saat Ini:</label>
-            <div style="font-size: 20px; font-weight: 800; color: #9a3412;">Rp <span id="float-sisa-tagihan">0</span></div>
-        </div>
-
-        <div style="margin-bottom: 12px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Nominal Pembayaran (Rp):</label>
-            <input type="number" id="float-input-nominal" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 700; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Pembayaran Termin Ke-:</label>
-            <input type="number" id="float-input-termin" value="2" min="2" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 15px; font-weight: 700; box-sizing: border-box; text-align: center;">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-delete" style="padding: 10px 16px;" onclick="closeFloatingPayment()">Batal</button>
-            <button class="btn" style="background: #166534; color: white; padding: 10px 20px;" onclick="prosesBayarFloating()">Simpan Pembayaran</button>
-        </div>
-    </div>
-</div>
-
-<!-- SCRIPT SDK FIREBASE & LOGIK HIBRIDA (FIREBASE + GOOGLE SHEETS) -->
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, addDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // 1. KONFIGURASI FIREBASE ASLI ANDA
-    const firebaseConfig = {
-      apiKey: "AIzaSyCD_3C4xY97O0RyQ1Dp8EYzGfp-_vey9Zo",
-      authDomain: "kalkulator-gorden-pwa.firebaseapp.com",
-      databaseURL: "https://kalkulator-gorden-pwa-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "kalkulator-gorden-pwa",
-      storageBucket: "kalkulator-gorden-pwa.firebasestorage.app",
-      messagingSenderId: "537305953956",
-      appId: "1:537305953956:web:577330bb92d4d750d81831",
-      measurementId: "G-3QKXHLFMRM"
-    };
-
-    // Inisialisasi Firebase & Aktifkan Fitur Offline Tangguh Cache Browser
-    const app = initializeApp(firebaseConfig);
-    const db = initializeFirestore(app, {
-        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-    });
-
-    // 2. URL GOOGLE APPS SCRIPT (SINKRONISASI SHEETS)
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQa_N0nci3C_j4tIBcyhi_gt3wNj8xkEsgeEoZ84wzjqjbmEzKj_XR18OKz0yqc0U/exec";
-
-    let namaKasirAktif = "";
     let isLunas = false;
-    let html5QrcodeScanner;
-    let currentAlertCallback = null;
-    let dataNotaTerpilih = null;
+    let qrcodeInstance = null;
 
-    // --- UTILITY MODAL SYSTEM ---
-    window.showCustomAlert = function(title, message, type = "alert", defaultValue = "", callback = null) {
-        document.getElementById('alert-title').innerText = title;
-        document.getElementById('alert-message').innerText = message;
-        currentAlertCallback = callback;
+    // Set tanggal hari ini sebagai default
+    document.getElementById('invoice-date').value = new Date().toISOString().substring(0, 10);
 
-        const promptInput = document.getElementById('alert-prompt-input');
-        const cancelBtn = document.getElementById('alert-btn-cancel');
-
-        if (type === "prompt") {
-            promptInput.style.display = "block";
-            promptInput.value = defaultValue;
-            cancelBtn.style.display = "block";
-        } else if (type === "confirm") {
-            promptInput.style.display = "none";
-            cancelBtn.style.display = "block";
-        } else {
-            promptInput.style.display = "none";
-            cancelBtn.style.display = "none";
-        }
-
-        document.getElementById('custom-alert-overlay').style.display = "flex";
-        if (type === "prompt") promptInput.focus();
-    }
-
-    window.closeCustomAlert = function(isOk) {
-        document.getElementById('custom-alert-overlay').style.display = "none";
-        const promptValue = document.getElementById('alert-prompt-input').value;
-        if (currentAlertCallback) {
-            if (document.getElementById('alert-prompt-input').style.display === "block") {
-                currentAlertCallback(isOk ? promptValue : null);
-            } else {
-                currentAlertCallback(isOk);
-            }
-        }
-    }
-
-    function generateNotaNumber() {
-        const now = new Date();
-        return `YG-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-    }
-
-    document.getElementById('date-picker').valueAsDate = new Date();
-    document.getElementById('nota-num').value = generateNotaNumber();
-
-    var qrcode = new QRCode(document.getElementById("qrcode"), {
-        width: 150,
-        height: 150,
-        colorDark : "#0f172a",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
-
-    window.onload = function() {
-        const dataKalkulator = localStorage.getItem('invoiceItems');
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-        
-        if (dataKalkulator) {
-            const items = JSON.parse(dataKalkulator);
-            tableBody.innerHTML = "";
-            items.forEach(item => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td><input type="text" value="${item.namaItem}" placeholder="Deskripsi Pesanan"></td>
-                    <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="price" value="${item.totalHarga}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="row-total" value="${item.totalHarga}" readonly></td>
-                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-                `;
-            });
-            localStorage.removeItem('invoiceItems');
-        } else {
-            tableBody.innerHTML = "";
-            addNewRow();
-        }
-        calculateTotal();
-
-        window.addEventListener('online', () => document.getElementById('offline-indicator').style.display = 'none');
-        window.addEventListener('offline', () => document.getElementById('offline-indicator').style.display = 'block');
-    };
-
-    // --- 1. PROSES LOGIN KASIR (FIREBASE FIRESTORE) ---
-    window.prosesLogin = async function() {
-        const idKasir = document.getElementById('login-id').value.trim();
-        const pinKasir = document.getElementById('login-pin').value.trim();
-
-        if (!idKasir || !pinKasir) { showCustomAlert("Peringatan", "ID Kasir dan PIN tidak boleh kosong!"); return; }
-
-        try {
-            const userDoc = await getDoc(doc(db, "users", idKasir));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                if (userData.pin === pinKasir) {
-                    namaKasirAktif = userData.nama;
-                    document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
-
-                    if (userData.isFirstTime) {
-                        document.getElementById('box-auth').style.display = 'none';
-                        document.getElementById('box-ganti-pin').style.display = 'block';
-                    } else {
-                        document.getElementById('login-screen').style.display = 'none';
-                        showCustomAlert("Login Sukses", "Selamat bekerja, " + namaKasirAktif + "!");
-                    }
-                } else {
-                    showCustomAlert("Gagal", "PIN Kasir salah!");
-                }
-            } else {
-                // Skema Fallback Offline Darurat agar tetap bisa jualan walau mati lampu/tanpa kuota
-                namaKasirAktif = idKasir;
-                document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
-                document.getElementById('login-screen').style.display = 'none';
-                showCustomAlert("Offline Login", "Masuk dengan mode darurat lokal.");
-            }
-        } catch (err) {
-            namaKasirAktif = idKasir;
-            document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
-            document.getElementById('login-screen').style.display = 'none';
-            showCustomAlert("Offline Login", "Masuk menggunakan cache internal perangkat.");
-        }
-    }
-
-    // --- 2. PROSES GANTI PIN (FIREBASE FIRESTORE) ---
-    window.prosesGantiPIN = async function() {
-        const p1 = document.getElementById('pin-baru-1').value.trim();
-        const p2 = document.getElementById('pin-baru-2').value.trim();
-        const idKasir = document.getElementById('login-id').value.trim();
-
-        if (!p1 || !p2) { showCustomAlert("Peringatan", "PIN baru wajib diisi!"); return; }
-        if (p1 !== p2) { showCustomAlert("Peringatan", "Konfirmasi PIN tidak cocok!"); return; }
-
-        try {
-            await updateDoc(doc(db, "users", idKasir), {
-                pin: p1,
-                isFirstTime: false
-            });
-            showCustomAlert("Sukses", "PIN berhasil diperbarui. Selamat bekerja!", "alert", "", () => {
-                document.getElementById('login-screen').style.display = 'none';
-            });
-        } catch(e) {
-            showCustomAlert("Gagal", "Gagal memperbarui PIN di server cloud.");
-        }
-    }
-
-    // --- TABLE MANAGER ---
-    window.addNewRow = function() {
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td><input type="text" placeholder="Deskripsi Pesanan Baru"></td>
-            <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
-            <td class="align-right"><input type="number" class="price" value="0" min="0" oninput="calculateTotal()"></td>
-            <td class="align-right"><input type="number" class="row-total" value="0" readonly></td>
-            <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
+    window.addRow = function() {
+        const tbody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
+        const newRow = tbody.insertRow();
+        newRow.innerHTML = `
+            <td><input type="text" class="desc" placeholder="Nama barang/jasa"></td>
+            <td><input type="number" class="qty" value="1" oninput="calculateTotal()"></td>
+            <td><input type="number" class="price" value="0" oninput="calculateTotal()"></td>
+            <td><input type="number" class="row-total" value="0" readonly></td>
+            <td><button class="btn btn-danger" onclick="deleteRow(this)">Hapus</button></td>
         `;
+        window.calculateTotal();
     }
 
-    window.removeRow = function(btn) {
-        btn.parentNode.parentNode.remove();
-        calculateTotal();
+    window.deleteRow = function(button) {
+        const row = button.parentNode.parentNode;
+        const tbody = row.parentNode;
+        if (tbody.rows.length > 1) {
+            tbody.removeChild(row);
+            window.calculateTotal();
+        } else {
+            alert("Minimal harus ada 1 item di dalam nota!");
+        }
     }
 
     window.calculateTotal = function() {
         const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
         let subtotal = 0;
+        
         for (let i = 0; i < rows.length; i++) {
             const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
             const price = parseFloat(rows[i].querySelector('.price').value) || 0;
@@ -732,11 +182,12 @@
         }
         document.getElementById('subtotal').value = subtotal;
         
-        const discountInput = document.getElementById('discount-amount').value.toString();
+        // Proteksi string kosong/NaN pada diskon
+        const discountInput = (document.getElementById('discount-amount').value || "0").toString();
         let discountCalculated = 0;
         const discountLabel = document.getElementById('discount-label');
 
-        if (discountInput) {
+        if (discountInput && discountInput !== "0") {
             if (discountInput.includes('%') || discountInput.length <= 2) {
                 const pct = parseFloat(discountInput) || 0;
                 discountCalculated = (pct / 100) * subtotal;
@@ -756,12 +207,23 @@
         const ppnAmount = (ppnRate / 100) * totalAfterDiscount;
         
         const grandTotal = totalAfterDiscount + ppnAmount + shippingCost;
+        document.getElementById('grand-total').value = grandTotal;
+
         const dp = parseFloat(document.getElementById('dp-amount').value) || 0;
         
         let sisaAkhir = grandTotal - dp;
         if (sisaAkhir < 0) sisaAkhir = 0;
         document.getElementById('balance-due').value = sisaAkhir;
 
+        // --- SISTEM DINAMIS PENGUBAH JUDUL (INVOICE / ESTIMASI) ---
+        const invoiceTitle = document.getElementById('invoice-title');
+        if (dp === 0) {
+            invoiceTitle.innerText = "ESTIMASI";
+        } else {
+            invoiceTitle.innerText = "INVOICE";
+        }
+
+        // Perubahan Status Badge & Cap
         const badge = document.getElementById('status-badge');
         if (sisaAkhir <= 0 && subtotal > 0) {
             isLunas = true;
@@ -769,12 +231,13 @@
             badge.innerText = "STATUS: LUNAS";
             badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
         } else {
-            isLunas = false;
             document.getElementById('stamp').style.display = 'none';
             if (dp > 0) {
+                isLunas = false;
                 badge.innerText = "STATUS: BELUM LUNAS (DP)";
                 badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
             } else {
+                isLunas = false;
                 badge.innerText = "STATUS: BARU (DRAFT)";
                 badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
             }
@@ -783,246 +246,29 @@
     }
 
     window.updateQRCode = function() {
-        const noNota = document.getElementById('nota-num').value || '-';
-        qrcode.clear(); 
-        qrcode.makeCode(noNota); 
-    }
-
-    // --- 3. SAVE ACTION HIBRIDA (FIREBASE FIRESTORE + GOOGLE SHEETS SINKRONISASI) ---
-    window.simpanKeGoogleSheets = async function(bukaCetakSetelahSelesai = false) {
-        const nota = document.getElementById('nota-num').value || '-';
+        const invNum = document.getElementById('invoice-number').value || "DRAFT";
+        const total = document.getElementById('grand-total').value || 0;
+        const sisa = document.getElementById('balance-due').value || 0;
+        const statusText = isLunas ? "LUNAS" : `SISA: Rp ${sisa}`;
         
-        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
-        let itemsArray = [];
-        let detailTextArray = [];
+        const qrContent = `Nota: ${invNum} | Total: Rp ${total} | Status: ${statusText}`;
         
-        for (let i = 0; i < rows.length; i++) {
-            const desc = rows[i].cells[0].querySelector('input').value || '';
-            const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
-            const price = parseFloat(rows[i].querySelector('.price').value) || 0;
-            if(desc.trim() !== "") {
-                itemsArray.push({ desc, qty, price });
-                detailTextArray.push(`${desc} (${qty}x @Rp${price.toLocaleString('id-ID')})`);
-            }
-        }
-
-        const detailItemsString = detailTextArray.join(", ");
-        const statusNota = isLunas ? "LUNAS" : (parseFloat(document.getElementById('dp-amount').value) > 0 ? "DP" : "BARU");
-
-        const dataPayload = {
-            nota: nota,
-            tanggal: document.getElementById('date-picker').value || '-',
-            nama: document.getElementById('client-name').value || '',
-            alamat: document.getElementById('client-address').value || '',
-            nohp: document.getElementById('client-phone').value || '',
-            proyek: document.getElementById('project-details').value || '',
-            items: JSON.stringify(itemsArray),
-            detailItems: detailItemsString, // Masuk ke Kolom G di Google Sheets
-            subtotal: parseFloat(document.getElementById('subtotal').value) || 0,
-            diskon: document.getElementById('discount-amount').value || "0",
-            ppn: parseFloat(document.getElementById('ppn-rate').value) || 0,
-            ongkir: parseFloat(document.getElementById('shipping-cost').value) || 0,
-            dp: parseFloat(document.getElementById('dp-amount').value) || 0,
-            sisa: parseFloat(document.getElementById('balance-due').value) || 0,
-            status: statusNota,
-            kasir: namaKasirAktif || "Kasir Utama",
-            serverTimestamp: new Date()
-        };
-
-        try {
-            // A. Tulis Data ke Firebase Firestore (Otomatis masuk cache lokal jika sedang offline)
-            await setDoc(doc(db, "invoices", nota), dataPayload);
-
-            // B. Kirim Salinan Data ke Google Sheets secara Real-Time jika gawai online
-            if (navigator.onLine) {
-                const params = new URLSearchParams();
-                params.append('action', 'simpanNota');
-                for (let key in dataPayload) { params.append(key, dataPayload[key]); }
-                
-                // Memicu trigger lembar kerja Google Sheets tanpa memblokir performa kasir (no-cors)
-                fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: params });
-            }
-
-            if (bukaCetakSetelahSelesai) { 
-                window.print(); 
-            } else { 
-                showCustomAlert("Sukses", "Nota " + nota + " berhasil disimpan ke Database Cloud Firebase!"); 
-            }
-        } catch (err) {
-            console.error(err);
-            if (bukaCetakSetelahSelesai) window.print();
-            else showCustomAlert("Tersimpan Lokal", "Offline terdeteksi. Transaksi aman tersimpan di PWA Firestore.");
-        }
-    }
-
-    window.simpanLaluCetak = function() { window.simpanKeGoogleSheets(true); }
-
-    function renderDataKeLayar(data) {
-        document.getElementById('nota-num').value = data.nota;
-        document.getElementById('date-picker').value = data.tanggal;
-        document.getElementById('client-name').value = data.nama;
-        document.getElementById('client-address').value = data.alamat || '';
-        document.getElementById('client-phone').value = data.nohp || '';
-        document.getElementById('project-details').value = data.proyek || '';
-        document.getElementById('discount-amount').value = data.diskon || 0;
-        document.getElementById('ppn-rate').value = data.ppn || 0;
-        document.getElementById('shipping-cost').value = data.ongkir || 0;
-        document.getElementById('dp-amount').value = data.dp;
-
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = "";
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = ""; 
         
-        if (data.items) {
-            const listItems = JSON.parse(data.items);
-            listItems.forEach(item => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td><input type="text" value="${item.desc}" placeholder="Deskripsi Pesanan"></td>
-                    <td class="align-right"><input type="number" class="qty" value="${item.qty}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="price" value="${item.price}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="row-total" value="${item.qty * item.price}" readonly></td>
-                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-                `;
-            });
-        } else {
-            addNewRow();
-        }
-        calculateTotal();
+        qrcodeInstance = new QRCode(qrContainer, {
+            text: qrContent,
+            width: 100,
+            height: 100,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
     }
 
-    // --- 4. INPUT PEMBAYARAN TERMIN DENGAN UPDATE FIREBASE CLOUD ---
-    window.openFloatingPayment = function(data) {
-        const sisa = parseFloat(data.sisa) || 0;
-        if (sisa <= 0) { showCustomAlert("Selesai", "Nota ini sudah LUNAS."); return; }
-
-        dataNotaTerpilih = data;
-        document.getElementById('float-nota-text').innerText = data.nota;
-        document.getElementById('float-sisa-tagihan').innerText = sisa.toLocaleString('id-ID');
-        document.getElementById('float-input-nominal').value = sisa; 
-        document.getElementById('float-input-termin').value = "2"; 
-        document.getElementById('floating-payment-modal').style.display = "flex";
-    }
-
-    window.closeFloatingPayment = function() {
-        document.getElementById('floating-payment-modal').style.display = "none";
-        dataNotaTerpilih = null;
-    }
-
-    window.prosesBayarFloating = async function() {
-        if (!dataNotaTerpilih) return;
-
-        const inputNominal = document.getElementById('float-input-nominal').value;
-        const inputTermin = document.getElementById('float-input-termin').value;
-
-        if (!inputNominal || isNaN(inputNominal) || parseFloat(inputNominal) <= 0) {
-            showCustomAlert("Peringatan", "Masukkan nominal pembayaran yang valid!");
-            return;
-        }
-
-        const nominalBayar = parseFloat(inputNominal);
-        const scannedNota = dataNotaTerpilih.nota;
-        closeFloatingPayment();
-
-        let dpLama = parseFloat(document.getElementById('dp-amount').value) || 0;
-        let sisaLama = parseFloat(document.getElementById('balance-due').value) || 0;
-        let dpBaru = dpLama + nominalBayar;
-        let sisaBaru = Math.max(0, sisaLama - nominalBayar);
-
-        document.getElementById('dp-amount').value = dpBaru;
-        document.getElementById('balance-due').value = sisaBaru;
-        calculateTotal();
-
-        const statusNotaTerbaru = sisaBaru <= 0 ? "LUNAS" : "DP";
-
-        try {
-            // A. Simpan log transaksi detail cicilan ke sub-collection Firestore
-            const cicilanRef = collection(db, "invoices", scannedNota, "cicilan");
-            await addDoc(cicilanRef, {
-                nominal: nominalBayar,
-                terminKe: inputTermin || "2",
-                kasir: namaKasirAktif || "Kasir",
-                waktu: new Date()
-            });
-
-            // B. Update status sisa bayar pada master invoice Firestore
-            await updateDoc(doc(db, "invoices", scannedNota), {
-                dp: dpBaru,
-                sisa: sisaBaru,
-                status: statusNotaTerbaru
-            });
-
-            // C. Kirim request pembaruan ke Google Sheets jika online
-            if (navigator.onLine) {
-                const params = new URLSearchParams();
-                params.append('action', 'simpanNota');
-                params.append('noNota', scannedNota);
-                params.append('dpMasuk', dpBaru);
-                params.append('sisaTagihan', sisaBaru);
-                params.append('status', statusNotaTerbaru);
-                params.append('kasir', namaKasirAktif);
-
-                fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: params });
-            }
-
-            showCustomAlert("Sukses", "Pembayaran termin ke-" + inputTermin + " berhasil diverifikasi!");
-        } catch (err) {
-            showCustomAlert("Tersimpan Lokal", "Pembayaran diamankan di penyimpanan lokal sistem kasir.");
-        }
-    }
-
-    // --- 5. SEARCH & KAMERA SCAN QR BERBASIS FIRESTORE DATASET ---
-    window.cariNotaManual = async function() {
-        const noNota = document.getElementById('search-nota').value.trim();
-        if (!noNota) { showCustomAlert("Peringatan", "Masukkan nomor nota!"); return; }
-
-        try {
-            const docRef = await getDoc(doc(db, "invoices", noNota));
-            if (docRef.exists()) {
-                const data = docRef.data();
-                renderDataKeLayar(data);
-                setTimeout(() => { window.openFloatingPayment(data); }, 500);
-            } else {
-                showCustomAlert("Tidak Ditemukan", "Nomor nota tidak ditemukan di data Firebase.");
-            }
-        } catch (err) {
-            showCustomAlert("Error", "Gagal memproses penarikan data transaksi.");
-        }
-    }
-
-    window.toggleScanner = function() {
-        const area = document.getElementById('scanner-area');
-        if (area.style.display === 'block') {
-            area.style.display = 'none';
-            if (html5QrcodeScanner) html5QrcodeScanner.stop().catch(() => {});
-        } else {
-            area.style.display = 'block';
-            runScanner();
-        }
-    }
-
-    function runScanner() {
-        html5QrcodeScanner = new Html5Qrcode("reader");
-        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-            async (qrCodeMessage) => {
-                try {
-                    const scannedNota = qrCodeMessage.trim();
-                    if (scannedNota) {
-                        await html5QrcodeScanner.stop();
-                        document.getElementById('scanner-area').style.display = 'none';
-
-                        const docRef = await getDoc(doc(db, "invoices", scannedNota));
-                        if (docRef.exists()) {
-                            const data = docRef.data();
-                            renderDataKeLayar(data);
-                            setTimeout(() => { window.openFloatingPayment(data); }, 500);
-                        } else {
-                            showCustomAlert("Gagal", "QR Code Nota tidak terindeks di sistem database.");
-                        }
-                    }
-                } catch (e) {}
-            }, () => {}
-        ).catch(() => { showCustomAlert("Kamera Error", "Gagal menginisialisasi modul kamera PWA."); });
-    }
+    // Inisialisasi awal saat halaman dimuat
+    window.calculateTotal();
 </script>
+
 </body>
 </html>
