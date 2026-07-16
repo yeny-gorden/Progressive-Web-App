@@ -454,7 +454,7 @@
             </div>
             <div class="summary-row">
                 <span>Ongkos Kirim</span>
-                <div>Rp <input type="number" id="shipping-cost" value="0" min="0" oninput="calculateTotal()"></div>
+                <div>Rp <input type="number" id="shipping-cost" placeholder="0" min="0" oninput="calculateTotal()"></div>
             </div>
             <div class="summary-row" style="color: var(--success);">
                 <span>Total Masuk (DP/Cicilan)</span>
@@ -736,7 +736,11 @@
         const discountLabel = document.getElementById('discount-label');
 
         if (discountInput) {
-            if (discountInput.includes('%') || (discountInput.length <= 2 && !isNaN(discountInput))) {
+            if (discountInput.includes('%')) {
+                const pct = parseFloat(discountInput.replace('%', '')) || 0;
+                discountCalculated = (pct / 100) * subtotal;
+                discountLabel.innerText = `(${pct}%)`;
+            } else if (discountInput.length <= 2 && !isNaN(discountInput)) {
                 const pct = parseFloat(discountInput) || 0;
                 discountCalculated = (pct / 100) * subtotal;
                 discountLabel.innerText = `(${pct}%)`;
@@ -762,20 +766,25 @@
         document.getElementById('balance-due').value = sisaAkhir;
 
         const badge = document.getElementById('status-badge');
+        const invoiceTitle = document.querySelector('.invoice-meta-title h2');
+
         if (sisaAkhir <= 0 && subtotal > 0) {
             isLunas = true;
             document.getElementById('stamp').style.display = 'block';
             badge.innerText = "STATUS: LUNAS";
             badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
+            if (invoiceTitle) invoiceTitle.innerText = "INVOICE";
         } else {
             isLunas = false;
             document.getElementById('stamp').style.display = 'none';
             if (dp > 0) {
                 badge.innerText = "STATUS: BELUM LUNAS (DP)";
                 badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
+                if (invoiceTitle) invoiceTitle.innerText = "INVOICE";
             } else {
                 badge.innerText = "STATUS: BARU (DRAFT)";
                 badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
+                if (invoiceTitle) invoiceTitle.innerText = "ESTIMASI";
             }
         }
         window.updateQRCode();
@@ -806,7 +815,7 @@
         }
 
         const detailItemsString = detailTextArray.join(", ");
-        const statusNota = isLunas ? "LUNAS" : (parseFloat(document.getElementById('dp-amount').value) > 0 ? "DP" : "BARU");
+        const statusNota = isLunas ? "LUNAS" : (parseFloat(document.getElementById('dp-amount').value) > 0 ? "DP" : "ESTIMASI");
 
         // Memastikan jika data kosong tetap dikirim 0 bukan string kosong/NaN
         const dataPayload = {
