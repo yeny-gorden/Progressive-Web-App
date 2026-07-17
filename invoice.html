@@ -162,6 +162,12 @@
             100% { left: 140%; }
         }
 
+        /* Animasi Putar Spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .invoice-container {
             max-width: 850px;
             margin: 0 auto;
@@ -362,7 +368,17 @@
         <p>Yeny Gorden Billing System</p>
         <input type="text" id="login-id" placeholder="Masukan ID Kasir">
         <input type="password" id="login-pin" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric">
-        <button class="btn-animate" onclick="prosesLogin()">Masuk Aplikasi</button>
+        
+        <button class="btn-animate" id="btn-login-submit" onclick="prosesLogin()">
+            <span id="btn-login-text">Masuk Aplikasi</span>
+            <span id="btn-login-spinner" style="display: none; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.2)" stroke-width="3" fill="none"/>
+                    <path d="M4 12a8 8 0 0 1 8-8V4a10 10 0 0 0-10 10h2z" fill="#ffffff"/>
+                </svg>
+                Verifikasi...
+            </span>
+        </button>
     </div>
 
     <div class="login-box" id="box-ganti-pin" style="display: none;">
@@ -470,8 +486,7 @@
     <div class="invoice-footer">
         <div class="terms">
             <p style="margin: 0 0 5px 0; font-weight: 700; color: var(--primary);">Syarat & Ketentuan:</p>
-            <p style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.<br>
-            3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan.</p>
+            <p id="terms-content" style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.<br>3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan.</p>
         </div>
         
         <div class="signature-qr-wrap" style="page-break-inside: avoid;">
@@ -640,12 +655,27 @@
         window.addEventListener('offline', () => document.getElementById('offline-indicator').style.display = 'block');
     };
 
-    // --- 1. PROSES LOGIN KASIR (FIREBASE FIRESTORE) ---
+    // --- 1. PROSES LOGIN KASIR (DENGAN INDIKATOR VERIFIKASI AKTIF) ---
     window.prosesLogin = async function() {
         const idKasir = document.getElementById('login-id').value.trim();
         const pinKasir = document.getElementById('login-pin').value.trim();
 
         if (!idKasir || !pinKasir) { showCustomAlert("Peringatan", "ID Kasir dan PIN tidak boleh kosong!"); return; }
+
+        // Aktifkan animasi putar & teks memverifikasi
+        const btnSubmit = document.getElementById('btn-login-submit');
+        const btnText = document.getElementById('btn-login-text');
+        const btnSpinner = document.getElementById('btn-login-spinner');
+        
+        btnSubmit.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'flex';
+
+        function resetTombolLogin() {
+            btnSubmit.disabled = false;
+            btnText.style.display = 'inline';
+            btnSpinner.style.display = 'none';
+        }
 
         try {
             const userDoc = await getDoc(doc(db, "users", idKasir));
@@ -664,6 +694,7 @@
                     }
                 } else {
                     showCustomAlert("Gagal", "PIN Kasir salah!");
+                    resetTombolLogin();
                 }
             } else {
                 namaKasirAktif = idKasir;
@@ -719,6 +750,7 @@
         calculateTotal();
     }
 
+    // --- LOGIKA HITUNG TOTAL & PENYESUAIAN SYARAT & KETENTUAN OTOMATIS ---
     window.calculateTotal = function() {
         const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
         let subtotal = 0;
@@ -767,13 +799,18 @@
 
         const badge = document.getElementById('status-badge');
         const invoiceTitle = document.querySelector('.invoice-meta-title h2');
+        const termsContent = document.getElementById('terms-content');
 
+        // Modifikasi Otomatis Teks S&K Berdasarkan Status Dokumen Aktif
         if (sisaAkhir <= 0 && subtotal > 0) {
             isLunas = true;
             document.getElementById('stamp').style.display = 'block';
             badge.innerText = "STATUS: LUNAS";
             badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
             if (invoiceTitle) invoiceTitle.innerText = "INVOICE";
+            if (termsContent) {
+                termsContent.innerHTML = "1. Nota ini dinyatakan sah dan valid sebagai bukti pelunasan seluruh tagihan proyek.<br>2. Produk yang sudah dibeli dan dipasang sesuai spesifikasi tidak dapat ditukar atau dikembalikan.<br>3. Terima kasih telah mempercayakan keindahan hunian Anda kepada Yeny Gorden.";
+            }
         } else {
             isLunas = false;
             document.getElementById('stamp').style.display = 'none';
@@ -781,10 +818,16 @@
                 badge.innerText = "STATUS: BELUM LUNAS (DP)";
                 badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
                 if (invoiceTitle) invoiceTitle.innerText = "INVOICE";
+                if (termsContent) {
+                    termsContent.innerHTML = "1. Uang Muka (DP) minimal 50% dari total nilai tagihan agar pesanan dapat masuk antrean produksi.<br>2. Pelunasan sisa tagihan wajib dibayarkan secara tunai/transfer pada saat gorden selesai dipasang di lokasi.<br>3. Permintaan pembatalan sepihak tidak dilayani dan DP dianggap hangus apabila kain sudah dipotong atau masuk proses pengerjaan jahit.";
+                }
             } else {
                 badge.innerText = "STATUS: BARU (DRAFT)";
                 badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
                 if (invoiceTitle) invoiceTitle.innerText = "ESTIMASI";
+                if (termsContent) {
+                    termsContent.innerHTML = "1. Angka di atas merupakan estimasi atau penawaran harga sementara berdasarkan data awal.<br>2. Harga final dapat berubah sewaktu-waktu mengikuti hasil ukur ulang (survey) kondisi fisik di lokasi pemasangan.<br>3. Estimasi harga ini berlaku selama 14 hari sejak tanggal dokumen diterbitkan.";
+                }
             }
         }
         window.updateQRCode();
@@ -817,7 +860,6 @@
         const detailItemsString = detailTextArray.join(", ");
         const statusNota = isLunas ? "LUNAS" : (parseFloat(document.getElementById('dp-amount').value) > 0 ? "DP" : "ESTIMASI");
 
-        // Memastikan jika data kosong tetap dikirim 0 bukan string kosong/NaN
         const dataPayload = {
             nota: nota,
             tanggal: document.getElementById('date-picker').value || '-',
@@ -839,10 +881,8 @@
         };
 
         try {
-            // A. Tulis Data ke Firebase Firestore
             await setDoc(doc(db, "invoices", nota), dataPayload);
 
-            // B. Kirim Salinan Data ke Google Sheets secara Real-Time jika gawai online
             if (navigator.onLine) {
                 const params = new URLSearchParams();
                 params.append('action', 'simpanNota');
@@ -943,7 +983,6 @@
         const statusNotaTerbaru = sisaBaru <= 0 ? "LUNAS" : "DP";
 
         try {
-            // A. Simpan log transaksi detail cicilan ke sub-collection Firestore
             const cicilanRef = collection(db, "invoices", scannedNota, "cicilan");
             await addDoc(cicilanRef, {
                 nominal: nominalBayar,
@@ -952,14 +991,12 @@
                 waktu: new Date()
             });
 
-            // B. Update status sisa bayar pada master invoice Firestore
             await updateDoc(doc(db, "invoices", scannedNota), {
                 dp: dpBaru,
                 sisa: sisaBaru,
                 status: statusNotaTerbaru
             });
 
-            // C. Kirim request pembaruan ke Google Sheets jika online (Parameter Disinkronkan dengan Fungsi Master Simpan)
             if (navigator.onLine) {
                 const params = new URLSearchParams();
                 params.append('action', 'simpanNota');
